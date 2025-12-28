@@ -44,3 +44,23 @@
 - [ ] Implement **User Registration** logic (bcrypt encryption).
 - [ ] Implement **User Login** logic (JWT Token generation).
 - [ ] Create the first **Admin Account** via API.
+
+---
+
+## 📅 Day 2: Authentication Security
+**Date:** [Current Date]
+**Status:** ✅ Complete
+
+### 🏆 Key Achievements
+1.  **Security Implementation:**
+    - Installed `bcryptjs` for password hashing (Encryption).
+    - Installed `jsonwebtoken` (JWT) for session management.
+
+2.  **Auth Controller & Routes:**
+    - **Registration:** Logic added to check existing users, hash passwords, and save new Admins.
+    - **Login:** Logic added to verify credentials and issue JWT tokens.
+
+3.  **Verification:**
+    - Created "Super Owner" Admin account via script.
+    - Verified Password Hashing in Database (`$2b$10$...`).
+    - **Tested Login:** Successfully authenticated and received valid JWT token.
