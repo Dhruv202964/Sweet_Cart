@@ -64,3 +64,23 @@
     - Created "Super Owner" Admin account via script.
     - Verified Password Hashing in Database (`$2b$10$...`).
     - **Tested Login:** Successfully authenticated and received valid JWT token.
+
+
+---
+
+## 📅 Day 3: Logistics & Rider API
+**Date:** [Current Date]
+**Status:** ✅ Complete
+
+### 🏆 Key Achievements
+1.  **Database Expansion:**
+    - Created `orders` table (Linked to Customers).
+    - Created `deliveries` table (Linked to Riders and Orders).
+
+2.  **Rider Logic:**
+    - **API Endpoint:** `GET /api/rider/my-deliveries/:id` (Fetch assigned tasks).
+    - **API Endpoint:** `PUT /api/rider/update-status` (Mark as Delivered).
+
+3.  **Testing:**
+    - Verified Rider can view their specific orders.
+    - Verified Rider can update status to "delivered" successfully.

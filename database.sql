@@ -51,3 +51,25 @@ INSERT INTO products (category_id, name, description, price, stock_quantity, ima
 
 INSERT INTO users (full_name, email, password_hash, role, phone) VALUES 
 ('Admin User', 'admin@sweetcart.com', 'admin123', 'admin', '9876543210');
+
+-- Created orders table:
+
+CREATE TABLE orders (
+    order_id SERIAL PRIMARY KEY,
+    customer_id INT REFERENCES users(user_id),
+    total_amount DECIMAL(10, 2) NOT NULL,
+    status VARCHAR(20) DEFAULT 'pending',
+    delivery_address TEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Created deliveries table:
+
+CREATE TABLE deliveries (
+    delivery_id SERIAL PRIMARY KEY,
+    order_id INT REFERENCES orders(order_id),
+    rider_id INT REFERENCES users(user_id),
+    status VARCHAR(20) DEFAULT 'assigned',
+    assigned_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    delivered_at TIMESTAMP
+);
