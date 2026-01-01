@@ -7,10 +7,10 @@ export default {
   theme: {
     extend: {
       colors: {
-        'brand-orange': '#F97316', // Saffron (Jalebi)
-        'brand-red': '#991B1B',    // Deep Royal Red
-        'brand-cream': '#FEF3C7',  // Warm Background
-        'brand-dark': '#1F2937',   // Text
+        'brand-orange': '#F97316',
+        'brand-red': '#991B1B',
+        'brand-cream': '#FEF3C7',
+        'brand-dark': '#1F2937',
       }
     },
   },
