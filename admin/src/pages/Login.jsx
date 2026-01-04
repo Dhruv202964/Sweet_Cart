@@ -1,13 +1,32 @@
+import { useNavigate } from 'react-router-dom'; // <--- Add this
 import React, { useState } from 'react';
+import { loginUser } from '../services/api'; // <--- Import the bridge
 
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [error, setError] = useState(''); // To show red error messages
 
-  const handleSubmit = (e) => {
+  const navigate = useNavigate(); // <--- Add this
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Attempting Login with:", email, password);
-    // We will connect this to the Backend API in the next step!
+    setError(''); // Clear previous errors
+
+    try {
+      console.log("Connecting to server...");
+      const data = await loginUser(email, password);
+      
+      // 1. Save the ID Card (Token) so browser remembers us
+      localStorage.setItem('token', data.token);
+      localStorage.setItem('user', JSON.stringify(data.user));
+
+      // 2. No Popup. Just smooth redirection.
+      navigate('/dashboard'); 
+
+    } catch (err) {
+      console.error(err);
+      setError(err.message);
+    }
   };
 
   return (
@@ -20,36 +39,38 @@ const Login = () => {
           <p className="text-gray-500 mt-2">Admin Portal Login</p>
         </div>
 
+        {/* Error Message Display */}
+        {error && (
+          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4 text-sm text-center">
+            {error}
+          </div>
+        )}
+
         {/* Login Form */}
         <form onSubmit={handleSubmit} className="space-y-6">
-          
-          {/* Email Input */}
+          {/* ... (Inputs remain the same) ... */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
             <input 
               type="email" 
               required
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-orange focus:border-transparent outline-none transition"
-              placeholder="admin@sweetcart.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
             />
           </div>
 
-          {/* Password Input */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
             <input 
               type="password" 
               required
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-orange focus:border-transparent outline-none transition"
-              placeholder="••••••••"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
             />
           </div>
 
-          {/* Login Button */}
           <button 
             type="submit" 
             className="w-full bg-brand-orange text-white font-bold py-3 rounded-lg hover:bg-brand-red transition duration-300 shadow-lg"
