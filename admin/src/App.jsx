@@ -1,3 +1,4 @@
+import Orders from './pages/Orders';
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Login from './pages/Login';
@@ -17,7 +18,7 @@ function App() {
         <Route path="/products" element={<Layout><Products /></Layout>} />
         
         {/* Placeholder for future routes */}
-        <Route path="/orders" element={<Layout><div className="text-2xl">🚧 Orders Coming Soon</div></Layout>} />
+        <Route path="/orders" element={<Layout><Orders /></Layout>} />
         <Route path="/riders" element={<Layout><div className="text-2xl">🚧 Riders Coming Soon</div></Layout>} />
       </Routes>
     </Router>
