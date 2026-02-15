@@ -93,7 +93,7 @@ Date: 2026-02-14
 Status: ✅ Complete
 
 🛠️ Critical Fixes
-Offline CSS Architecture: - Fixed a critical issue where Tailwind CSS failed to load during presentations without internet.
+Offline CSS Architecture: Fixed a critical issue where Tailwind CSS failed to load during presentations without internet.
 
 Solution: Configured PostCSS and installed local dependencies to make the project 100% offline-capable (Presentation Proof).
 
@@ -112,9 +112,38 @@ Backend API: Created GET /api/orders to fetch all customer orders with status an
 
 Frontend UI: Built the Orders Table displaying Order ID, Customer Name, Total Amount, and Color-coded Status Badges.
 
-📝 Next Steps (Day 5)
-[ ] Order Details: Implement popup to see specific items inside an order.
+📅 Day 5: Real-Time Dashboard & Advanced Analytics
+Date: 2026-02-15
 
+Status: ✅ Complete
+
+🛠️ Critical Fixes (The "Crash" Loop)
+Database Schema: Fixed a critical missing table error (relation "order_items" does not exist) by manually creating the table in PostgreSQL via SQL Shell.
+
+Backend Routing: Resolved a TypeError in orderRoutes.js where the controller function was missing.
+
+Data Integrity: Switched customer display from u.name (non-existent) to u.email to ensure data loads correctly.
+
+🏆 Key Achievements
+Advanced Order Analytics:
+
+Backend: Updated SQL queries to COUNT() items inside each order dynamically.
+
+Frontend: Added an "Items" column to the Orders Table so the Admin knows the package size instantly (e.g., "2 Items").
+
+Interactive Details Modal:
+
+Built OrderDetailsModal.jsx to fetch and display specific sweets (Name, Price, Qty) inside a popup.
+
+Connected Backend GET /api/orders/:id to serve this data.
+
+Live Dashboard Stats:
+
+Backend: Created getDashboardStats API to calculate Total Revenue (SUM) and Pending Orders (COUNT) directly from the live database.
+
+Frontend: Connected the Dashboard cards to the API. It now reflects actual business metrics (e.g., ₹550 Revenue) instead of static placeholders.
+
+📝 Next Steps (Day 6)
 [ ] Rider Assignment: Add functionality to assign a specific Rider to an Order from the Admin Panel.
 
 [ ] User Shop: Begin building the Customer-facing frontend (client folder).

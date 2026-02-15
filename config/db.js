@@ -2,17 +2,15 @@ const { Pool } = require('pg');
 require('dotenv').config();
 
 const pool = new Pool({
-  user: process.env.DB_USER,
-  password: process.env.DB_PASS,
-  host: process.env.DB_HOST,
-  port: process.env.DB_PORT,
-  database: process.env.DB_NAME,
+  user: 'postgres',
+  host: 'localhost',
+  database: 'sweet_cart_db', // <--- Make sure this matches exactly
+  password: 'admin123',      // <--- Make sure this is 'admin123'
+  port: 5432,
 });
 
-pool.on('connect', () => {
-  console.log('✅ Connected to the Sweet_Cart Database!');
-});
+pool.connect()
+  .then(() => console.log('✅ Connected to Sweet_Cart Database'))
+  .catch(err => console.error('❌ Database Connection Error:', err.message));
 
-module.exports = {
-  query: (text, params) => pool.query(text, params),
-};
+module.exports = pool;
