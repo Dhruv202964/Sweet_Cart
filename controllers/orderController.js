@@ -87,3 +87,22 @@ exports.getDashboardStats = async (req, res) => {
     res.status(500).send('Server Error');
   }
 };
+
+// 5. Get Sales Stats by Area (For the Graph)
+exports.getSalesByArea = async (req, res) => {
+  try {
+    // This query groups orders by address (e.g., "Adajan", "Vesu") 
+    // and sums up the total money from each.
+    const result = await db.query(`
+      SELECT delivery_address AS area, SUM(total_amount) AS total_sales
+      FROM orders
+      GROUP BY delivery_address
+      ORDER BY total_sales DESC
+    `);
+    
+    res.json(result.rows);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send('Server Error');
+  }
+};

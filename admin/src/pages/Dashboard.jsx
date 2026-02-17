@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import SalesChart from '../components/SalesChart'; // <--- Import the Graph
 
 const Dashboard = () => {
   const [stats, setStats] = useState({
@@ -7,7 +8,6 @@ const Dashboard = () => {
     pending_deliveries: 0
   });
 
-  // Fetch Real Stats from Backend
   useEffect(() => {
     fetch('http://localhost:5000/api/orders/stats')
       .then(res => res.json())
@@ -21,7 +21,7 @@ const Dashboard = () => {
       <p className="text-gray-500 mb-8">Welcome to the control center.</p>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         
         {/* Card 1: Total Orders */}
         <div className="bg-white p-6 rounded-xl shadow-md border-l-4 border-brand-orange">
@@ -42,6 +42,12 @@ const Dashboard = () => {
         </div>
 
       </div>
+
+      {/* NEW: Sales Graph Section */}
+      <div className="bg-white p-6 rounded-xl shadow-lg border border-gray-200">
+        <SalesChart />
+      </div>
+
     </div>
   );
 };

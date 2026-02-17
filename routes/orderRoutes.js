@@ -5,8 +5,11 @@ const orderController = require('../controllers/orderController');
 // 1. GET /api/orders (View All)
 router.get('/', orderController.getAllOrders);
 
-// 2. GET /api/orders/stats (Get Dashboard Numbers) <--- NEW! MUST BE ABOVE /:id
+// 2. GET /api/orders/stats (Get Dashboard Numbers)
 router.get('/stats', orderController.getDashboardStats);
+
+// 3. GET /api/orders/analytics (Sales Graph) 
+router.get('/analytics', orderController.getSalesByArea);
 
 // 3. POST /api/orders/assign (Assign Rider)
 router.post('/assign', orderController.assignRider);

@@ -1,3 +1,4 @@
+import SalesChart from '../components/SalesChart';
 import React, { useEffect, useState } from 'react';
 import OrderDetailsModal from '../components/OrderDetailsModal';
 
