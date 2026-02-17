@@ -1,87 +1,103 @@
-import { useNavigate } from 'react-router-dom'; // <--- Add this
 import React, { useState } from 'react';
-import { loginUser } from '../services/api'; // <--- Import the bridge
+import { useNavigate } from 'react-router-dom';
 
 const Login = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState(''); // To show red error messages
+  const [formData, setFormData] = useState({
+    email: '',
+    password: ''
+  });
+  
+  const navigate = useNavigate();
 
-  const navigate = useNavigate(); // <--- Add this
-  const handleSubmit = async (e) => {
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleLogin = async (e) => {
     e.preventDefault();
-    setError(''); // Clear previous errors
-
     try {
-      console.log("Connecting to server...");
-      const data = await loginUser(email, password);
+      const res = await fetch('http://localhost:5000/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData)
+      });
       
-      // 1. Save the ID Card (Token) so browser remembers us
-      localStorage.setItem('token', data.token);
-      localStorage.setItem('user', JSON.stringify(data.user));
+      const data = await res.json();
+      
+      if (res.ok) {
+        // 1. Save Token for security
+        localStorage.setItem('token', data.token);
+        
+        // 2. SAVE ROLE (Critical for Permissions!) 🔐
+        // If the backend doesn't send a role, default to 'admin' to be safe
+        const role = data.user?.role || 'admin'; 
+        localStorage.setItem('role', role);
 
-      // 2. No Popup. Just smooth redirection.
-      navigate('/dashboard'); 
-
+        alert(`Welcome back, ${role.toUpperCase()}! 🔓`);
+        
+        // 3. Force a full reload to update the Sidebar
+        window.location.href = "/dashboard";
+      } else {
+        alert(data.msg || "Login Failed. Check email/password.");
+      }
     } catch (err) {
       console.error(err);
-      setError(err.message);
+      alert("Server Error. Is the backend running?");
     }
   };
 
   return (
-    <div className="min-h-screen bg-brand-cream flex items-center justify-center">
-      <div className="bg-white p-8 rounded-xl shadow-2xl w-full max-w-md border-t-4 border-brand-orange">
+    <div className="min-h-screen flex items-center justify-center bg-orange-50">
+      <div className="bg-white p-10 rounded-2xl shadow-2xl w-full max-w-md border-t-8 border-brand-red">
         
-        {/* Header Section */}
+        {/* Logo Section */}
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-brand-red">Sweet_Cart</h1>
-          <p className="text-gray-500 mt-2">Admin Portal Login</p>
+          <div className="w-16 h-16 bg-brand-red text-white text-3xl font-bold rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
+            S
+          </div>
+          <h2 className="text-3xl font-bold text-gray-800">Sweet<span className="text-brand-red">Cart</span> Admin</h2>
+          <p className="text-gray-500 mt-2">Enter your credentials to access the panel.</p>
         </div>
 
-        {/* Error Message Display */}
-        {error && (
-          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4 text-sm text-center">
-            {error}
-          </div>
-        )}
-
         {/* Login Form */}
-        <form onSubmit={handleSubmit} className="space-y-6">
-          {/* ... (Inputs remain the same) ... */}
+        <form onSubmit={handleLogin} className="space-y-6">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
+            <label className="block text-sm font-bold text-gray-700 mb-2 uppercase">Email Address</label>
             <input 
               type="email" 
-              required
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-orange focus:border-transparent outline-none transition"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              name="email" 
+              value={formData.email} 
+              onChange={handleChange} 
+              className="w-full p-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-brand-red focus:border-transparent outline-none transition" 
+              placeholder="admin@sweetcart.com" 
+              required 
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
+            <label className="block text-sm font-bold text-gray-700 mb-2 uppercase">Password</label>
             <input 
               type="password" 
-              required
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-orange focus:border-transparent outline-none transition"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              name="password" 
+              value={formData.password} 
+              onChange={handleChange} 
+              className="w-full p-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-brand-red focus:border-transparent outline-none transition" 
+              placeholder="••••••••" 
+              required 
             />
           </div>
 
           <button 
             type="submit" 
-            className="w-full bg-brand-orange text-white font-bold py-3 rounded-lg hover:bg-brand-red transition duration-300 shadow-lg"
+            className="w-full bg-brand-red text-white font-bold py-4 rounded-xl shadow-lg hover:bg-red-800 hover:shadow-xl transition transform hover:-translate-y-1"
           >
-            Sign In
+            Secure Login 🔐
           </button>
         </form>
 
-        <p className="text-center text-xs text-gray-400 mt-6">
-          Restricted Area. Authorized Personnel Only.
-        </p>
+        <div className="mt-6 text-center text-sm text-gray-400">
+          <p>Protected by SweetCart Security Systems v2.0</p>
+        </div>
       </div>
     </div>
   );

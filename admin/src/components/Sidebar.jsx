@@ -1,46 +1,69 @@
 import React from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 
 const Sidebar = () => {
-  const navigate = useNavigate();
+  const location = useLocation();
+  
+  // 1. GET THE ROLE FROM STORAGE
+  const userRole = localStorage.getItem('role'); // 'admin', 'manager', or 'staff'
 
-  const handleLogout = () => {
-    localStorage.removeItem('token'); // Destroy the ID Card
-    localStorage.removeItem('user');
-    navigate('/'); // Send back to Login
-  };
+  const isActive = (path) => location.pathname === path 
+    ? "bg-red-800 text-white font-bold shadow-inner" 
+    : "text-red-100 hover:bg-red-700 hover:text-white font-medium";
 
   return (
-    <div className="bg-brand-red text-white w-64 min-h-screen flex flex-col shadow-2xl">
-      {/* Logo Area */}
-      <div className="p-6 border-b border-red-800">
-        <h1 className="text-2xl font-bold tracking-wider">🍬 Sweet_Cart</h1>
-        <p className="text-xs text-red-200 mt-1">Admin Portal</p>
+    <div className="w-56 h-screen bg-brand-red text-white fixed left-0 top-0 shadow-2xl overflow-y-auto z-50">
+      
+      {/* Logo */}
+      <div className="p-6 flex items-center gap-3 border-b border-red-800">
+        <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center text-brand-red font-bold text-xl shadow-sm">S</div>
+        <h1 className="text-xl font-bold tracking-wide">Sweet<span className="text-yellow-300">Cart</span></h1>
       </div>
 
-      {/* Menu Links */}
-      <nav className="flex-1 p-4 space-y-2">
-        <Link to="/dashboard" className="block px-4 py-3 rounded hover:bg-red-800 transition flex items-center gap-3">
-          📊 Dashboard
+      <nav className="p-3 space-y-2 mt-4">
+        <p className="text-xs font-bold text-red-200 uppercase px-3 mb-2 tracking-wider">Main Menu</p>
+        
+        {/* RULE: STAFF CANNOT SEE DASHBOARD */}
+        {userRole !== 'staff' && (
+          <Link to="/dashboard" className={`flex items-center gap-3 px-3 py-3 rounded-xl transition-all ${isActive('/dashboard')}`}>
+            <span>📊</span> Dashboard
+          </Link>
+        )}
+
+        {/* EVERYONE SEES ORDERS & INVENTORY */}
+        <Link to="/orders" className={`flex items-center gap-3 px-3 py-3 rounded-xl transition-all ${isActive('/orders')}`}>
+          <span>📦</span> Orders
         </Link>
-        <Link to="/products" className="block px-4 py-3 rounded hover:bg-red-800 transition flex items-center gap-3">
-          📦 Products
+
+        <Link to="/products" className={`flex items-center gap-3 px-3 py-3 rounded-xl transition-all ${isActive('/products')}`}>
+          <span>🍬</span> Inventory
         </Link>
-        <Link to="/orders" className="block px-4 py-3 rounded hover:bg-red-800 transition flex items-center gap-3">
-          🚚 Orders
+        
+         <Link to="/riders" className={`flex items-center gap-3 px-3 py-3 rounded-xl transition-all ${isActive('/riders')}`}>
+          <span>🛵</span> Riders
         </Link>
-        <Link to="/riders" className="block px-4 py-3 rounded hover:bg-red-800 transition flex items-center gap-3">
-          🛵 Riders
-        </Link>
+
+        {/* RULE: ONLY ADMIN & MANAGER SEE ADMIN SECTION */}
+        {userRole !== 'staff' && (
+          <>
+            <div className="my-6 border-t border-red-800 mx-4"></div>
+            <p className="text-xs font-bold text-red-200 uppercase px-3 mb-2 tracking-wider">Administration</p>
+
+            <Link to="/messages" className={`flex items-center gap-3 px-3 py-3 rounded-xl transition-all ${isActive('/messages')}`}>
+              <span>📩</span> Messages
+            </Link>
+
+            <Link to="/staff" className={`flex items-center gap-3 px-3 py-3 rounded-xl transition-all ${isActive('/staff')}`}>
+              <span>👥</span> Staff / HR
+            </Link>
+          </>
+        )}
       </nav>
 
-      {/* Logout Button */}
-      <div className="p-4 border-t border-red-800">
-        <button 
-          onClick={handleLogout}
-          className="w-full bg-red-900 py-2 rounded hover:bg-brand-orange transition text-sm font-bold"
-        >
-          Logout
+      {/* Logout */}
+      <div className="absolute bottom-0 w-full p-4 bg-red-900 bg-opacity-50">
+        <button onClick={() => { localStorage.clear(); window.location.href = '/'; }} className="w-full text-left flex items-center gap-3 px-4 py-2 text-red-100 font-bold hover:bg-red-800 hover:text-white rounded-xl transition-all">
+          <span>🚪</span> Logout
         </button>
       </div>
     </div>
