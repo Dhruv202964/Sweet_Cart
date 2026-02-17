@@ -195,8 +195,56 @@
 
 
 
-**📝 Next Steps (Day 7)**
+📅 Day 7: RBAC Security, HR Systems & UI Optimization
+Date: 2026-02-17
+Status: ✅ Complete
 
-* [ ] **Fix Inventory Logic:** Patch `products` table and update controller to handle image uploads securely.
-* [ ] **Contact Us Module:** Build the frontend form and backend table for customer inquiries.
-* [ ] **Client Storefront:** Begin development of the User-Facing Shop (Client Folder).
+🛠️ Critical Fixes & Database Patches
+
+Constraint Resolution: Fixed a users_role_check violation that blocked new roles.
+
+Solution: Updated PostgreSQL constraints to allow 'manager' and 'staff' identifiers.
+
+Schema Alignment: Resolved a full_name NOT NULL violation.
+
+Solution: Updated the staff creation form and backend controller to capture and store employee names.
+
+Auth Logic Correction: Fixed a mapping error where the backend expected password_hash but the controller sent password.
+
+UI Layout Repair: Fixed a "cramped" dashboard issue where the sidebar was obstructing data tables.
+
+Solution: Slimmed the Sidebar to w-56 and adjusted main content margins.
+
+🏆 Key Achievements
+
+Role-Based Access Control (RBAC):
+
+Implemented a multi-tier security system: Admin (Owner), Manager (Operational), and Staff (Restricted).
+
+Logic Magic: Modified Sidebar.jsx and Login.jsx to dynamically hide/show modules based on the logged-in user's role.
+
+Staff Management (HR) Module:
+
+Built a professional employee onboarding interface.
+
+Functionality: Admin can now grant secure login credentials to new team members with predefined roles.
+
+Customer Inbox (CRM Module):
+
+Created the "Messages" module to view inquiries.
+
+Data Injection: Populated the system with realistic test messages regarding bulk wedding orders and feedback.
+
+Routing System Cleanup:
+
+Resolved "Ghost Redirection" for the Riders section.
+
+Built a "Module Under Construction" placeholder to maintain professional navigation for the Manager role.
+
+📝 Next Steps (Day 8)
+
+[ ] Financial Data Privacy: Implement logic to hide "Total Revenue" and "Sales Charts" from the Manager role.
+
+[ ] Delete Permissions: Restrict the "Delete" functionality across Orders and Staff lists for non-admin users.
+
+[ ] Client Storefront: Transition to the /client folder to begin the customer-facing shopping experience.
