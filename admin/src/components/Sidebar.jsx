@@ -3,9 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 
 const Sidebar = () => {
   const location = useLocation();
-  
-  // 1. GET THE ROLE FROM STORAGE
-  const userRole = localStorage.getItem('role'); // 'admin', 'manager', or 'staff'
+  const userRole = localStorage.getItem('role');
 
   const isActive = (path) => location.pathname === path 
     ? "bg-red-800 text-white font-bold shadow-inner" 
@@ -14,7 +12,7 @@ const Sidebar = () => {
   return (
     <div className="w-56 h-screen bg-brand-red text-white fixed left-0 top-0 shadow-2xl overflow-y-auto z-50">
       
-      {/* Logo */}
+      {/* Logo Area */}
       <div className="p-6 flex items-center gap-3 border-b border-red-800">
         <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center text-brand-red font-bold text-xl shadow-sm">S</div>
         <h1 className="text-xl font-bold tracking-wide">Sweet<span className="text-yellow-300">Cart</span></h1>
@@ -23,14 +21,15 @@ const Sidebar = () => {
       <nav className="p-3 space-y-2 mt-4">
         <p className="text-xs font-bold text-red-200 uppercase px-3 mb-2 tracking-wider">Main Menu</p>
         
-        {/* RULE: STAFF CANNOT SEE DASHBOARD */}
+        {/* DASHBOARD/HOME LINK: STAFF CANNOT SEE IT */}
         {userRole !== 'staff' && (
           <Link to="/dashboard" className={`flex items-center gap-3 px-3 py-3 rounded-xl transition-all ${isActive('/dashboard')}`}>
-            <span>📊</span> Dashboard
+            {/* Show Home icon for Manager, Dashboard icon for Admin */}
+            <span>{userRole === 'admin' ? '📊' : '🏠'}</span> 
+            {userRole === 'admin' ? 'Dashboard' : 'Home'}
           </Link>
         )}
 
-        {/* EVERYONE SEES ORDERS & INVENTORY */}
         <Link to="/orders" className={`flex items-center gap-3 px-3 py-3 rounded-xl transition-all ${isActive('/orders')}`}>
           <span>📦</span> Orders
         </Link>
@@ -43,7 +42,7 @@ const Sidebar = () => {
           <span>🛵</span> Riders
         </Link>
 
-        {/* RULE: ONLY ADMIN & MANAGER SEE ADMIN SECTION */}
+        {/* ADMINISTRATION: ONLY ADMIN & MANAGER */}
         {userRole !== 'staff' && (
           <>
             <div className="my-6 border-t border-red-800 mx-4"></div>
@@ -53,9 +52,12 @@ const Sidebar = () => {
               <span>📩</span> Messages
             </Link>
 
-            <Link to="/staff" className={`flex items-center gap-3 px-3 py-3 rounded-xl transition-all ${isActive('/staff')}`}>
-              <span>👥</span> Staff / HR
-            </Link>
+            {/* ONLY ADMIN CAN SEE STAFF SECTION */}
+            {userRole === 'admin' && (
+              <Link to="/staff" className={`flex items-center gap-3 px-3 py-3 rounded-xl transition-all ${isActive('/staff')}`}>
+                <span>👥</span> Staff / HR
+              </Link>
+            )}
           </>
         )}
       </nav>

@@ -241,10 +241,49 @@ Resolved "Ghost Redirection" for the Riders section.
 
 Built a "Module Under Construction" placeholder to maintain professional navigation for the Manager role.
 
-📝 Next Steps (Day 8)
+📅 Day 8: Advanced Inventory Ecosystem & Data Precision
+Date: 2026-02-18
 
-[ ] Financial Data Privacy: Implement logic to hide "Total Revenue" and "Sales Charts" from the Manager role.
+Status: ✅ Complete
 
-[ ] Delete Permissions: Restrict the "Delete" functionality across Orders and Staff lists for non-admin users.
+🛠️ Critical Fixes (The "Zombie" & Connection Crisis)
 
-[ ] Client Storefront: Transition to the /client folder to begin the customer-facing shopping experience.
+Connection Stability: Resolved the persistent "Could not connect to server" error during product uploads.
+
+Solution: Restructured server.js to use dedicated productRoutes.js and properly integrated multer middleware to handle multipart/form-data.
+
+Database "Zombie" Deletion: Fixed an issue where deleted products reappeared after a page refresh.
+
+Solution: Implemented ON DELETE CASCADE constraints in PostgreSQL and synchronized frontend state with server-side success responses.
+
+UI Overflow & White Screens: Fixed a React crash during category filtering and a layout issue where the unit dropdown was floating outside the form.
+
+Solution: Added optional chaining (?.) to data mapping and built a unified "Input Group" for the Stock/Unit selection.
+
+🏆 Key Achievements
+
+Full CRUD Inventory Suite:
+
+Edit Functionality: Implemented a real-time edit system for product names, categories, and descriptions.
+
+Image Update Support: Added logic to the edit form to swap product photos or retain existing ones via COALESCE SQL logic.
+
+Modern Stock Management:
+
+Smart Stock Modal: Replaced old browser alerts with a professional, built-in management modal.
+
+Functionality: Admin can now choose to "Delete Entire Item" or simply "Reduce Stock Quantity" by a specific number (e.g., removing 5kg from stock).
+
+Measurement Precision (The Unit System):
+
+Database Expansion: Added the unit column to the products table via a SQL patch.
+
+UI Implementation: Added a professional dropdown to select between KG, G, and PCS during item creation and editing.
+
+Category Display Fix:
+
+SQL Optimization: Updated the backend to explicitly JOIN the categories table, ensuring the category name (Sweets, Namkeen, etc.) is visible in the inventory table.
+
+Automated Directory Handling:
+
+Added logic to automatically detect and create the uploads/ folder if missing, preventing server startup crashes.
