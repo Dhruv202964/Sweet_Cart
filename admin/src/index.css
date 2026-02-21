@@ -1,7 +1,28 @@
+/* 🏠 Local Tailwind Directives */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+/* 🎨 Theme Colors (Purshottam Palette) */
+:root {
+  --brand-red: #8B1A1A;
+  --brand-cream: #FFFDF5;
+  --brand-saffron: #F4A460;
+}
+
 body {
-  background-color: #f9fafb;
+  margin: 0;
+  padding: 0;
+  background-color: var(--brand-cream); /* Cream background for professional look */
+  font-family: sans-serif; /* Uses local system fonts instead of Google Fonts */
+}
+
+/* 🚀 Add any local animations here to avoid external libraries */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.4s ease-out forwards;
 }

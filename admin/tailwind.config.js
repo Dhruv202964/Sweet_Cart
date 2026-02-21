@@ -7,11 +7,9 @@ export default {
   theme: {
     extend: {
       colors: {
-        'brand-orange': '#F97316',
-        'brand-red': '#991B1B',
-        'brand-cream': '#FEF3C7',
-        'brand-dark': '#1F2937',
-      }
+        'brand-red': '#8B1A1A',
+        'brand-saffron': '#F4A460',
+      },
     },
   },
   plugins: [],
