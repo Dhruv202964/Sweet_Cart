@@ -1,289 +1,178 @@
-# 🚀 Sweet_Cart Development Log
+# Sweet_Cart: Development Log
 
-**Team:** 404 ERROR
-
-**Project:** Professional E-commerce & Inventory Ecosystem
-
-**Tech Stack:** React.js, Node.js, Express, PostgreSQL
+> **Team:** 404 ERROR
+> **Project:** Professional E-commerce & Inventory Ecosystem
+> **Tech Stack:** React.js (Vite), Node.js, Express.js, PostgreSQL, Tailwind CSS
 
 ---
 
-### 📅 Day 1: Project Initiation & Backend Foundation
+## Day 1: Project Initiation & Backend Foundation
+**Date:** 2026-02-11 | **Status:** `Complete` | **Phase:** Architecture Setup
 
-**Date:** 2026-02-11
+### 🎯 Objective
+Establish the repository, initialize the PERN stack environment, and design the relational database schema.
 
-**Status:** ✅ Complete
+### ⚙️ Technical Implementation
+* **Repository:** Initialized Git repository `Sweet_Cart` and structured a monorepo with `/client` and `/server` directories.
+* **Backend:** Configured Node.js backend with `express`, `cors`, and `dotenv` for environment variable management.
+* **Database:** Engineered the PostgreSQL database (`sweet_cart_db`) via `pg` pool connections. Designed the core relational tables (`users`, `categories`, `products`) with strict Primary/Foreign Key constraints.
+* **Data Injection:** Wrote raw SQL `INSERT` commands to inject foundational mock data (Kaju Katli, Bhakarwadi) to test relational mapping.
 
-**🏆 Key Achievements**
-
-* **Repository Setup:**
-* Created `Sweet_Cart` repo on GitHub.
-* Established folder structure: `server` (Root) and `client` (React).
-* Added collaborators.
-
-
-* **Database Architecture (PostgreSQL):**
-* Created database: `sweet_cart_db`.
-* Tables Created: `users` (Roles: Admin, Customer, Rider), `categories`, `products`.
-* Data Injection: Inserted mock data (Kaju Katli, Bhakarwadi) to verify relationships.
-
-
-* **Backend Development (Node.js + Express):**
-* Initialized `server.js` with `dotenv` configuration.
-* Built `config/db.js` for PostgreSQL connection.
-* API Created: `GET /api/products` (Tested & Verified).
-
-
-* **Frontend Initialization:**
-* Initialized React app (Vite) inside `/client` folder.
-
-
+### ✅ Milestones
+* Server successfully running on Port 5000.
+* Tested and verified the first endpoint: `GET /api/products` returning clean JSON.
 
 ---
 
-### 📅 Day 2: Authentication Security & User Roles
+## Day 2: Authentication Security & User Roles
+**Date:** 2026-02-12 | **Status:** `Complete` | **Phase:** Security & RBAC Foundation
 
-**Date:** 2026-02-12
+### 🎯 Objective
+Implement secure, encrypted authentication and define system roles.
 
-**Status:** ✅ Complete
+### ⚙️ Technical Implementation
+* **Cryptography:** Integrated `bcryptjs` to ensure zero plain-text passwords are saved in the database.
+* **Session Management:** Implemented stateless sessions using `jsonwebtoken` (JWT). Tokens encode the `user_id` and `role` to validate requests across the app.
+* **Controllers:** Built `authController.js` handling registration and login logic. Added error handling for existing users and invalid credentials to prevent server crashes.
 
-**🏆 Key Achievements**
-
-* **Security Implementation:**
-* Integrated `bcryptjs` for password hashing.
-* Integrated `jsonwebtoken` (JWT) for secure session management.
-
-
-* **Auth API Development:**
-* **Registration:** Endpoint to hash passwords and save new users.
-* **Login:** Endpoint to verify credentials and issue JWT tokens.
-* **Verification:** Created "Super Owner" account and tested login successfully.
-
-
+### ✅ Milestones
+* Passwords successfully hashing in PostgreSQL.
+* "Super Owner" administrative account created and verified.
+* JWTs securely issued upon login.
 
 ---
 
-### 📅 Day 3: Logistics Backend & Admin Panel Kickoff
+## Day 3: Logistics Backend & Admin Panel Kickoff
+**Date:** 2026-02-13 | **Status:** `Complete` | **Phase:** Frontend Bootstrapping & Delivery Logic
 
-**Date:** 2026-02-13
+### 🎯 Objective
+Build the admin interface skeleton and map out the order delivery lifecycle.
 
-**Status:** ✅ Complete
+### ⚙️ Technical Implementation
+* **Frontend Setup:** Initialized the React (Vite) Admin application. Configured the "Purshottam" color palette (Royal Red, Saffron, Cream) via `tailwind.config.js`.
+* **Database Expansion:** Expanded schema to include `orders` and `deliveries` tables.
+* **Logistics API:** Built backend endpoints `GET /api/rider/my-deliveries/:id` and `PUT /api/rider/update-status`.
 
-**🏆 Key Achievements**
-
-* **Rider Logistics API (Backend):**
-* **Database Expansion:** Created `orders` and `deliveries` tables.
-* **Rider Endpoints:**
-* `GET /api/rider/my-deliveries/:id` (Fetch assigned tasks).
-* `PUT /api/rider/update-status` (Mark orders as Delivered).
-
-
-* **Logic Test:** Verified orders move from 'Pending' -> 'Out for Delivery' -> 'Delivered'.
-
-
-* **Admin Panel Setup (Frontend):**
-* Initialized `admin` project using Vite + React.
-* **Theme Setup:** Defined "Purshottam" color palette (Saffron, Royal Red, Cream).
-* **Login Screen:** Built responsive Login UI and connected it to Backend Auth API.
-* **Dashboard Skeleton:** Created the main landing page with summary stats.
-
-
+### ✅ Milestones
+* Responsive Admin Login UI completed and linked to the backend Auth API.
+* Verified the backend logic flow: Orders transitioning from `Pending` -> `Out for Delivery` -> `Delivered`.
 
 ---
 
-### 📅 Day 4: Inventory, Order Management & Offline Stability
+## Day 4: Inventory, Order Management & Offline Stability
+**Date:** 2026-02-14 | **Status:** `Complete` | **Phase:** UI/UX & Presentation Proofing
 
-**Date:** 2026-02-14
+### 🎯 Objective
+Guarantee the app works offline for faculty presentations and build core management tables.
 
-**Status:** ✅ Complete
+### 🛠️ Critical Fixes
+* **Offline CSS Architecture:** Tailwind CSS relied on external CDNs. Configured local PostCSS and installed all Tailwind dependencies locally to achieve 100% "Presentation Proof" status.
 
-**🛠️ Critical Fixes**
+### ⚙️ Technical Implementation
+* **Inventory UI:** Built the Products Table with dynamic category mapping (Sweets, Farsan, Seasonal).
+* **Data Entry:** Engineered the "Add Product" React Modal to insert data directly into PostgreSQL.
+* **Order Management:** Developed the UI with color-coded status badges (Red: Pending, Green: Delivered).
 
-* **Offline CSS Architecture:** Fixed a critical issue where Tailwind CSS failed to load during presentations without internet.
-* *Solution:* Configured PostCSS and installed local dependencies to make the project 100% offline-capable (Presentation Proof).
-
-
-
-**🏆 Key Achievements**
-
-* **Inventory Management (Admin):**
-* **Products Page:** Built a categorized table (Sweets vs. Farsan vs. Seasonal) fetching live data.
-* **Add Product Feature:** Created a Modal popup form to add new items (e.g., Rasgulla) directly to the database.
-* **UX Improvement:** Implemented "Fixed Sidebar" layout for better navigation.
-
-
-* **Order Management System:**
-* **Backend API:** Created `GET /api/orders` to fetch all customer orders with status and rider info.
-* **Frontend UI:** Built the Orders Table displaying Order ID, Customer Name, Total Amount, and Color-coded Status Badges.
-
-
+### ✅ Milestones
+* Admin Sidebar navigation locked in.
+* `GET /api/orders` successfully populating the frontend data tables.
 
 ---
 
-### 📅 Day 5: Real-Time Dashboard & Advanced Analytics
+## Day 5: Real-Time Dashboard & Advanced Analytics
+**Date:** 2026-02-15 | **Status:** `Complete` | **Phase:** Data Aggregation
 
-**Date:** 2026-02-15
+### 🎯 Objective
+Replace static dashboard placeholders with live, real-time database metrics.
 
-**Status:** ✅ Complete
+### 🛠️ Critical Fixes
+* **Database Schema:** Fixed fatal crash (`relation "order_items" does not exist`) by constructing the missing table via SQL shell.
+* **Backend Routing:** Resolved a `TypeError` by restoring a missing controller export in `orderRoutes.js`.
+* **Data Integrity:** Refactored SQL joins to fetch `u.email` instead of non-existent `u.name`.
 
-**🛠️ Critical Fixes (The "Crash" Loop)**
+### ⚙️ Technical Implementation
+* **Aggregations:** Wrote dynamic SQL queries using `SUM(total_amount)` for Revenue and `COUNT(*)` for Pending Orders.
+* **Granular Data:** Built `OrderDetailsModal.jsx` to fetch and render specific item data (Name, Price, Qty) for assigned order IDs.
 
-* **Database Schema:** Fixed a critical missing table error (`relation "order_items" does not exist`) by manually creating the table in PostgreSQL via SQL Shell.
-* **Backend Routing:** Resolved a `TypeError` in `orderRoutes.js` where the controller function was missing.
-* **Data Integrity:** Switched customer display from `u.name` (non-existent) to `u.email` to ensure data loads correctly.
-
-**🏆 Key Achievements**
-
-* **Advanced Order Analytics:**
-* **Backend:** Updated SQL queries to `COUNT()` items inside each order dynamically.
-* **Frontend:** Added an "Items" column to the Orders Table so the Admin knows the package size instantly (e.g., "2 Items").
-
-
-* **Interactive Details Modal:**
-* Built `OrderDetailsModal.jsx` to fetch and display specific sweets (Name, Price, Qty) inside a popup.
-* Connected Backend `GET /api/orders/:id` to serve this data.
-
-
-* **Live Dashboard Stats:**
-* **Backend:** Created `getDashboardStats` API to calculate Total Revenue (SUM) and Pending Orders (COUNT) directly from the live database.
-* **Frontend:** Connected the Dashboard cards to the API. It now reflects actual business metrics (e.g., ₹550 Revenue) instead of static placeholders.
-
-
+### ✅ Milestones
+* Dashboard cards officially pulling live business metrics from PostgreSQL.
 
 ---
 
-### 📅 Day 6: The "Analytics Pivot" & Documentation
+## Day 6: The "Analytics Pivot" & Documentation
+**Date:** 2026-02-16 | **Status:** `Complete` | **Phase:** Strategic Shift & Visualization
 
-**Date:** 2026-02-16
+### 🎯 Objective
+Pivot development based on faculty feedback to prioritize data analytics over rider tracking.
 
-**Status:** ✅ Complete
+### ⚙️ Technical Implementation
+* **Data Visualization:** Integrated `Chart.js` and `react-chartjs-2` into the Admin portal. Built `SalesChart.jsx` mapped to the brand's color palette.
+* **Complex SQL:** Engineered aggregations utilizing `GROUP BY delivery_area` to calculate revenue distribution mathematically on the server.
+* **Documentation:** Generated core academic documents (`PROJECT_STATUS.md`, `TEAM_TASKS.md`, `REPORT_FACULTY.md`, `DB_DOCS.md`).
 
-**🏆 Key Achievements**
+### ✅ Milestones
+* Visual sales analytics successfully rendering on the dashboard.
 
-* **Strategic Pivot:**
-* Paused "Rider App" development based on Faculty Feedback.
-* Shifted focus to **Data Analytics** and **Customer Engagement**.
+---
 
+## Day 7: RBAC Security, HR Systems & UI Optimization
+**Date:** 2026-02-17 | **Status:** `Complete` | **Phase:** Enterprise Features & Constraint Resolution
 
-* **Backend Analytics Engine:**
-* **Complex SQL:** Wrote aggregation query (`GROUP BY delivery_address`) to calculate revenue per area in Surat.
-* **New API:** Implemented `GET /api/orders/analytics` endpoint.
+### 🎯 Objective
+Lock down application security layers and build staff onboarding features.
 
+### 🛠️ Critical Fixes
+* **Constraints:** Fixed a `users_role_check` violation in PostgreSQL blocking new roles. Executed `ALTER TABLE` to allow 'manager' and 'staff'.
+* **Validation:** Resolved a `full_name` NOT NULL violation by updating forms and backend controllers.
 
-* **Visual Dashboard (The Graph):**
-* **Integration:** Installed `chart.js` and `react-chartjs-2`.
-* **Component:** Built `SalesChart.jsx` – A dynamic Bar Chart utilizing a multi-color palette (Red, Blue, Yellow) to visualize sales performance by location.
+### ⚙️ Technical Implementation
+* **Dynamic Rendering:** Sidebar menus and sensitive data charts now hide/show based on the JWT role payload.
+* **HR Module:** Built Staff Management interface allowing the Admin to securely generate credentials for employees.
+* **CRM:** Created a "Messages" inbox populated with realistic test inquiries for presentation purposes.
 
+### ✅ Milestones
+* Multi-tier security (Owner > Manager > Staff) strictly enforced.
+* UI layouts slimmed (`w-56` sidebar) for better data table visibility.
 
-* **Project Management & Documentation:**
-* Generated 4 core documents for team and faculty:
-1. `PROJECT_STATUS.md` (Team Handoff).
-2. `TEAM_TASKS.md` (Role Division).
-3. `REPORT_FACULTY.md` (Academic Submission).
-4. `DB_DOCS.md` (Technical Schema).
+---
 
+## Day 8: Advanced Inventory Ecosystem & Data Precision
+**Date:** 2026-02-18 | **Status:** `Complete` | **Phase:** Complex CRUD Operations
 
+### 🎯 Objective
+Overhaul the inventory system to handle physical file uploads and precise unit measurements.
 
+### 🛠️ Critical Fixes
+* **Connection Stability:** Fixed persistent product upload crashes by segregating `productRoutes.js` and integrating `multer`.
+* **Zombie Data:** Implemented `ON DELETE CASCADE` in SQL to fix UI ghosting where deleted products remained on screen.
 
+### ⚙️ Technical Implementation
+* **File Handling:** Added image update support using `COALESCE` SQL command to safely retain existing images if no new file is uploaded during an edit.
+* **Unit System:** Upgraded database to support a `unit` column (KG, G, PCS) with a unified React input group.
+* **Smart Stock API:** Allowed admins to reduce specific stock quantities rather than deleting the entire product entity.
 
-**⚠️ Known Issues (To Be Fixed Day 7)**
+### ✅ Milestones
+* Automated `/uploads` directory creation to prevent deployment crashes.
+* Inventory system is fully CRUD capable with professional UI modals.
 
-* **Inventory System Instability:**
-* The "Add Product" feature is currently failing.
-* *Root Cause:* Database schema mismatch (`category` text vs `category_id` integer) and missing `image_url` column handling.
-* *Action Plan:* Schedule database patch and backend validation update for next session.
+---
 
+## Day 9: Client-Side API Architecture & Analytics Polish
+**Date:** 2026-02-24 | **Status:** `Complete` | **Phase:** Storefront Backend Readiness
 
+### 🎯 Objective
+Finalize Admin analytics and build the API foundation for the customer-facing React storefront.
 
-📅 Day 7: RBAC Security, HR Systems & UI Optimization
-Date: 2026-02-17
-Status: ✅ Complete
+### 🛠️ Critical Fixes
+* **Node Crash:** Resolved a server crash in `orderRoutes.js` by restoring the missing `updateOrderStatus` method.
+* **SQL Patches:** Executed emergency fixes to add missing `delivery_city`, `delivery_area`, and `delivery_address` columns to prevent charting errors.
+* **Route Hierarchy:** Reordered `productRoutes.js` to ensure `/public` endpoints sit safely above `/:id` parameters.
 
-🛠️ Critical Fixes & Database Patches
+### ⚙️ Technical Implementation
+* **Checkout Engine:** Engineered a highly secure, transactional `placeOrder` API using SQL `BEGIN` and `COMMIT`. It processes orders, loops through cart arrays, and auto-decrements live stock quantities.
+* **Storefront APIs:** Built `registerCustomer`, `loginCustomer`, and `getPublicProducts` (filtered by `stock_quantity > 0`).
+* **Live Analytics:** Upgraded the Admin Sales Chart with an interactive City Switcher (Surat, Ahmedabad, Vadodara). Connected "Total Revenue" and "Pending Deliveries" UI cards to live endpoints.
+* **Modularization:** Extracted all Auth routing into a dedicated `authRoutes.js` module.
 
-Constraint Resolution: Fixed a users_role_check violation that blocked new roles.
-
-Solution: Updated PostgreSQL constraints to allow 'manager' and 'staff' identifiers.
-
-Schema Alignment: Resolved a full_name NOT NULL violation.
-
-Solution: Updated the staff creation form and backend controller to capture and store employee names.
-
-Auth Logic Correction: Fixed a mapping error where the backend expected password_hash but the controller sent password.
-
-UI Layout Repair: Fixed a "cramped" dashboard issue where the sidebar was obstructing data tables.
-
-Solution: Slimmed the Sidebar to w-56 and adjusted main content margins.
-
-🏆 Key Achievements
-
-Role-Based Access Control (RBAC):
-
-Implemented a multi-tier security system: Admin (Owner), Manager (Operational), and Staff (Restricted).
-
-Logic Magic: Modified Sidebar.jsx and Login.jsx to dynamically hide/show modules based on the logged-in user's role.
-
-Staff Management (HR) Module:
-
-Built a professional employee onboarding interface.
-
-Functionality: Admin can now grant secure login credentials to new team members with predefined roles.
-
-Customer Inbox (CRM Module):
-
-Created the "Messages" module to view inquiries.
-
-Data Injection: Populated the system with realistic test messages regarding bulk wedding orders and feedback.
-
-Routing System Cleanup:
-
-Resolved "Ghost Redirection" for the Riders section.
-
-Built a "Module Under Construction" placeholder to maintain professional navigation for the Manager role.
-
-📅 Day 8: Advanced Inventory Ecosystem & Data Precision
-Date: 2026-02-18
-
-Status: ✅ Complete
-
-🛠️ Critical Fixes (The "Zombie" & Connection Crisis)
-
-Connection Stability: Resolved the persistent "Could not connect to server" error during product uploads.
-
-Solution: Restructured server.js to use dedicated productRoutes.js and properly integrated multer middleware to handle multipart/form-data.
-
-Database "Zombie" Deletion: Fixed an issue where deleted products reappeared after a page refresh.
-
-Solution: Implemented ON DELETE CASCADE constraints in PostgreSQL and synchronized frontend state with server-side success responses.
-
-UI Overflow & White Screens: Fixed a React crash during category filtering and a layout issue where the unit dropdown was floating outside the form.
-
-Solution: Added optional chaining (?.) to data mapping and built a unified "Input Group" for the Stock/Unit selection.
-
-🏆 Key Achievements
-
-Full CRUD Inventory Suite:
-
-Edit Functionality: Implemented a real-time edit system for product names, categories, and descriptions.
-
-Image Update Support: Added logic to the edit form to swap product photos or retain existing ones via COALESCE SQL logic.
-
-Modern Stock Management:
-
-Smart Stock Modal: Replaced old browser alerts with a professional, built-in management modal.
-
-Functionality: Admin can now choose to "Delete Entire Item" or simply "Reduce Stock Quantity" by a specific number (e.g., removing 5kg from stock).
-
-Measurement Precision (The Unit System):
-
-Database Expansion: Added the unit column to the products table via a SQL patch.
-
-UI Implementation: Added a professional dropdown to select between KG, G, and PCS during item creation and editing.
-
-Category Display Fix:
-
-SQL Optimization: Updated the backend to explicitly JOIN the categories table, ensuring the category name (Sweets, Namkeen, etc.) is visible in the inventory table.
-
-Automated Directory Handling:
-
-Added logic to automatically detect and create the uploads/ folder if missing, preventing server startup crashes.
+### ✅ Milestones
+* Backend architecture is officially ready for the frontend team to connect the customer shopping cart.
