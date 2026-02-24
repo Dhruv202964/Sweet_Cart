@@ -2,10 +2,8 @@ const express = require('express');
 const router = express.Router();
 const authController = require('../controllers/authController');
 
-// Route for Registration
-router.post('/register', authController.register);
-
-// Route for Login
-router.post('/login', authController.login);
+// The endpoints the React frontend will call:
+router.post('/register', authController.registerCustomer);
+router.post('/login', authController.loginCustomer);
 
 module.exports = router;

@@ -96,3 +96,62 @@ exports.getOrderItems = async (req, res) => {
     res.status(500).json({ msg: "Server Error: Could not fetch order items" });
   }
 };
+
+// 7. Customer Checkout (Place New Order)
+exports.placeOrder = async (req, res) => {
+  const client = await db.connect(); // Use a transaction for safety
+
+  try {
+    const { 
+      customer_id, 
+      cartItems, // Array of objects: [{ product_id, quantity, price }]
+      total_amount, 
+      delivery_address, 
+      delivery_area, 
+      delivery_city 
+    } = req.body;
+
+    // Start SQL Transaction
+    await client.query('BEGIN');
+
+    // 1. Insert the main order into the 'orders' table
+    const orderResult = await client.query(`
+      INSERT INTO orders (customer_id, total_amount, status, delivery_address, delivery_area, delivery_city) 
+      VALUES ($1, $2, 'Pending', $3, $4, $5) 
+      RETURNING order_id
+    `, [customer_id, total_amount, delivery_address, delivery_area, delivery_city]);
+
+    const newOrderId = orderResult.rows[0].order_id;
+
+    // 2. Insert each item from the cart into the 'order_items' table
+    for (let item of cartItems) {
+      await client.query(`
+        INSERT INTO order_items (order_id, product_id, quantity, price_at_time) 
+        VALUES ($1, $2, $3, $4)
+      `, [newOrderId, item.product_id, item.quantity, item.price]);
+      
+      // Optional: Reduce product stock here automatically
+      await client.query(`
+        UPDATE products 
+        SET stock_quantity = stock_quantity - $1 
+        WHERE product_id = $2
+      `, [item.quantity, item.product_id]);
+    }
+
+    // Commit the transaction to save everything
+    await client.query('COMMIT');
+
+    res.status(201).json({ 
+      msg: "Order placed successfully!", 
+      order_id: newOrderId 
+    });
+
+  } catch (err) {
+    // If anything fails, rollback the entire transaction so we don't get partial data
+    await client.query('ROLLBACK');
+    console.error("❌ CHECKOUT ERROR:", err.message);
+    res.status(500).json({ msg: "Server Error: Could not process checkout" });
+  } finally {
+    client.release();
+  }
+};

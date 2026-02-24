@@ -10,6 +10,7 @@ router.get('/:id', orderController.getOrderItems);
 
 // --- POST / PUT Routes ---
 router.post('/assign', orderController.assignRider);
-router.put('/update-status', orderController.updateOrderStatus); // 🚨 The missing link is now here
+router.put('/update-status', orderController.updateOrderStatus);
+router.post('/checkout', orderController.placeOrder);
 
 module.exports = router;

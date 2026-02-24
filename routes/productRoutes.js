@@ -23,8 +23,15 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage: storage });
 
-// 3. --- ROUTES ---
+// ==========================================
+// 🛒 CUSTOMER ROUTES (Must go BEFORE /:id)
+// ==========================================
+router.get('/public', productController.getPublicProducts);
+router.get('/public/:id', productController.getProductDetails);
 
+// ==========================================
+// 🛡️ ADMIN ROUTES 
+// ==========================================
 // GET All Products
 router.get('/', productController.getAllProducts);
 

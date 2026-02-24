@@ -1,6 +1,10 @@
 const db = require('../config/db');
 
-// 1. Get All Products (Includes Category Name & Unit)
+// ==========================================
+// 🛡️ ADMIN PANEL ENDPOINTS
+// ==========================================
+
+// 1. Get All Products (Admin View - shows out of stock too)
 exports.getAllProducts = async (req, res) => {
   try {
     const result = await db.query(`
@@ -36,7 +40,7 @@ exports.addProduct = async (req, res) => {
   }
 };
 
-// 3. Update Product (FIXED: Handles Image Update and Unit)
+// 3. Update Product (Handles Image Update and Unit)
 exports.updateProduct = async (req, res) => {
   try {
     const { id } = req.params;
@@ -85,5 +89,54 @@ exports.deleteProduct = async (req, res) => {
     res.json({ msg: "Product deleted" });
   } catch (err) {
     res.status(500).json({ msg: "Delete failed" });
+  }
+};
+
+
+// ==========================================
+// 🛒 CUSTOMER STOREFRONT ENDPOINTS (PUBLIC)
+// ==========================================
+
+// 6. Get Public Products (Storefront View - only shows IN STOCK items)
+exports.getPublicProducts = async (req, res) => {
+  try {
+    const result = await db.query(`
+      SELECT 
+        p.product_id, p.name, p.description, p.price, 
+        p.stock_quantity, p.unit, p.image_url, 
+        c.name AS category_name 
+      FROM products p
+      LEFT JOIN categories c ON p.category_id = c.category_id
+      WHERE p.stock_quantity > 0
+      ORDER BY c.name ASC, p.name ASC
+    `);
+    res.json(result.rows);
+  } catch (err) {
+    console.error("❌ PUBLIC PRODUCTS ERROR:", err.message);
+    res.status(500).json({ msg: "Server Error: Could not fetch public products" });
+  }
+};
+
+// 7. Get Single Product Details (For Product Page)
+exports.getProductDetails = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const result = await db.query(`
+      SELECT 
+        p.product_id, p.name, p.description, p.price, 
+        p.stock_quantity, p.unit, p.image_url, 
+        c.name AS category_name 
+      FROM products p
+      LEFT JOIN categories c ON p.category_id = c.category_id
+      WHERE p.product_id = $1
+    `, [id]);
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ msg: "Product not found" });
+    }
+    res.json(result.rows[0]);
+  } catch (err) {
+    console.error("❌ PRODUCT DETAILS ERROR:", err.message);
+    res.status(500).json({ msg: "Server Error: Could not fetch product details" });
   }
 };
