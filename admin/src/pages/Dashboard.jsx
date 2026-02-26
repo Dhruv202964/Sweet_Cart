@@ -1,78 +1,180 @@
-import React, { useState, useEffect } from 'react';
-import SalesChart from '../components/SalesChart'; // Make sure this path is correct!
+import React, { useEffect, useState } from 'react';
+import { IndianRupee, ShoppingBag, XCircle, Clock, TrendingUp } from 'lucide-react';
+import { Bar } from 'react-chartjs-2';
+import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from 'chart.js';
+
+ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
 const Dashboard = () => {
-  // 1. Setup State for Live Data
-  const [stats, setStats] = useState({
-    total_revenue: 0,
-    pending_orders: 0
-  });
+  const [stats, setStats] = useState({ total_revenue: 0, monthly_revenue: 0, today_revenue: 0, today_delivered: 0, pending_orders: 0, cancelled_orders: 0 });
+  const [chartData, setChartData] = useState([]);
+  const [recentOrders, setRecentOrders] = useState([]);
+  const [loading, setLoading] = useState(true);
+  
+  const [selectedChartCity, setSelectedChartCity] = useState('All');
 
-  // 2. Fetch Live Stats from Backend
   useEffect(() => {
-    const fetchStats = async () => {
-      try {
-        const res = await fetch('http://localhost:5000/api/orders/stats');
-        if (res.ok) {
-          const data = await res.json();
-          setStats(data);
-        }
-      } catch (err) {
-        console.error("Error fetching dashboard stats:", err);
-      }
-    };
-    
-    fetchStats();
+    fetchDashboardData();
   }, []);
 
+  const fetchDashboardData = async () => {
+    try {
+      try {
+        const statsRes = await fetch('http://localhost:5000/api/orders/stats');
+        if (statsRes.ok) setStats(await statsRes.json());
+      } catch (e) { console.error("Stats API failed:", e); }
+
+      try {
+        const analyticsRes = await fetch('http://localhost:5000/api/orders/analytics');
+        if (analyticsRes.ok) setChartData(await analyticsRes.json());
+      } catch (e) { console.error("Analytics API failed:", e); }
+
+      try {
+        const ordersRes = await fetch('http://localhost:5000/api/orders');
+        if (ordersRes.ok) {
+          const ordersData = await ordersRes.json();
+          setRecentOrders(ordersData.slice(0, 5)); 
+        }
+      } catch (e) { console.error("Orders API failed:", e); }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  let chartLabels = [];
+  let chartValues = [];
+  
+  if (selectedChartCity === 'All') {
+    const cityMap = {};
+    chartData.forEach(item => { cityMap[item.city] = (cityMap[item.city] || 0) + parseFloat(item.revenue); });
+    chartLabels = Object.keys(cityMap);
+    chartValues = Object.values(cityMap);
+  } else {
+    const filtered = chartData.filter(item => item.city === selectedChartCity);
+    chartLabels = filtered.map(item => item.area);
+    chartValues = filtered.map(item => item.revenue);
+  }
+
+  const barColors = ['rgba(239, 68, 68, 0.8)', 'rgba(59, 130, 246, 0.8)', 'rgba(16, 185, 129, 0.8)', 'rgba(245, 158, 11, 0.8)', 'rgba(139, 92, 246, 0.8)'];
+
+  const barChartConfig = {
+    labels: chartLabels,
+    datasets: [{
+      label: 'Revenue (₹)',
+      data: chartValues,
+      backgroundColor: barColors.slice(0, chartLabels.length),
+      borderRadius: 6,
+    }],
+  };
+
+  const chartOptions = { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } };
+  const availableCities = ['All', ...new Set(chartData.map(item => item.city))];
+
+  if (loading) return <div className="p-6 text-center text-gray-500 font-bold mt-10">Loading Dashboard Metrics...</div>;
+
   return (
-    <div className="p-8 bg-orange-50 min-h-screen">
-      
-      {/* Page Header */}
-      <div className="mb-8">
-        <h2 className="text-3xl font-bold text-gray-800">Dashboard</h2>
-        <p className="text-gray-500 text-sm mt-1">Welcome back to the Sweet_Cart control center.</p>
+    <div className="p-6 bg-orange-50 min-h-screen">
+      <div className="mb-6">
+        <h2 className="text-2xl font-bold text-gray-800">Admin Overview</h2>
+        <p className="text-sm text-gray-500">Real-time logistics and revenue tracking.</p>
       </div>
 
-      {/* 📊 LIVE TOP CARDS SECTION */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+      {/* 💳 COMPACT 6-CARD GRID */}
+      <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-4 mb-6">
         
-        {/* Total Revenue Card */}
-        <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex flex-col justify-center relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-16 h-16 bg-brand-saffron opacity-10 rounded-bl-full"></div>
-          <span className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">
-            Total Revenue
-          </span>
-          <div className="text-4xl font-black text-brand-saffron">
-            {/* Format number with commas (e.g., ₹8,000) */}
-            ₹{Number(stats.total_revenue).toLocaleString()}
+        <div className="bg-white p-4 rounded-xl shadow-sm border-l-4 border-gray-800 flex flex-col justify-center relative overflow-hidden">
+          <p className="text-[10px] text-gray-500 font-bold uppercase tracking-wider mb-1">All-Time Rev</p>
+          <h3 className="text-xl font-black text-gray-800">₹{(stats.total_revenue || 0).toLocaleString()}</h3>
+          <IndianRupee className="absolute right-[-10px] bottom-[-10px] text-gray-100 opacity-50" size={64} />
+        </div>
+
+        <div className="bg-white p-4 rounded-xl shadow-sm border-l-4 border-purple-500 flex flex-col justify-center relative overflow-hidden">
+          <p className="text-[10px] text-gray-500 font-bold uppercase tracking-wider mb-1">Month Profit</p>
+          <h3 className="text-xl font-black text-gray-800">₹{(stats.monthly_revenue || 0).toLocaleString()}</h3>
+          <TrendingUp className="absolute right-[-10px] bottom-[-10px] text-purple-100 opacity-50" size={64} />
+        </div>
+
+        <div className="bg-white p-4 rounded-xl shadow-sm border-l-4 border-green-500 flex flex-col justify-center relative overflow-hidden">
+          <p className="text-[10px] text-gray-500 font-bold uppercase tracking-wider mb-1">Today's Profit</p>
+          <h3 className="text-xl font-black text-gray-800">₹{(stats.today_revenue || 0).toLocaleString()}</h3>
+          <IndianRupee className="absolute right-[-10px] bottom-[-10px] text-green-100 opacity-50" size={64} />
+        </div>
+
+        <div className="bg-white p-4 rounded-xl shadow-sm border-l-4 border-blue-500 flex flex-col justify-center relative overflow-hidden">
+          <p className="text-[10px] text-gray-500 font-bold uppercase tracking-wider mb-1">Delivered Today</p>
+          <h3 className="text-xl font-black text-gray-800">{stats.today_delivered || 0}</h3>
+          <ShoppingBag className="absolute right-[-10px] bottom-[-10px] text-blue-100 opacity-50" size={64} />
+        </div>
+
+        <div className="bg-white p-4 rounded-xl shadow-sm border-l-4 border-yellow-500 flex flex-col justify-center relative overflow-hidden">
+          <p className="text-[10px] text-gray-500 font-bold uppercase tracking-wider mb-1">Pending Drops</p>
+          <h3 className="text-xl font-black text-gray-800">{stats.pending_orders || 0}</h3>
+          <Clock className="absolute right-[-10px] bottom-[-10px] text-yellow-100 opacity-50" size={64} />
+        </div>
+
+        <div className="bg-white p-4 rounded-xl shadow-sm border-l-4 border-red-500 flex flex-col justify-center relative overflow-hidden">
+          <p className="text-[10px] text-gray-500 font-bold uppercase tracking-wider mb-1">Cancellations</p>
+          <h3 className="text-xl font-black text-gray-800">{stats.cancelled_orders || 0}</h3>
+          <XCircle className="absolute right-[-10px] bottom-[-10px] text-red-100 opacity-50" size={64} />
+        </div>
+
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* 📈 CHART SECTION (TALLER HEIGHT) */}
+        <div className="lg:col-span-2 bg-white p-5 rounded-xl shadow-sm border border-gray-100">
+          <div className="flex justify-between items-center mb-4">
+            <h3 className="text-lg font-bold text-gray-800 flex items-center gap-2"><TrendingUp size={20} className="text-brand-red" /> Revenue Analysis</h3>
+            <div className="flex gap-1 bg-gray-50 p-1 rounded-lg border border-gray-200">
+              {availableCities.map(city => (
+                <button 
+                  key={city} 
+                  onClick={() => setSelectedChartCity(city)}
+                  className={`px-3 py-1 text-xs font-bold rounded-md transition ${selectedChartCity === city ? 'bg-white shadow text-brand-red' : 'text-gray-500 hover:text-gray-800'}`}
+                >
+                  {city}
+                </button>
+              ))}
+            </div>
+          </div>
+          {/* ⬆️ CHANGED h-56 to h-80 (320px) right here! */}
+          <div className="h-80 relative w-full">
+             {chartLabels.length > 0 ? (
+               <Bar data={barChartConfig} options={chartOptions} />
+             ) : (
+               <p className="text-sm text-gray-400 font-medium text-center mt-20">No revenue data available.</p>
+             )}
           </div>
         </div>
 
-        {/* Pending Deliveries Card */}
-        <div className="bg-white p-6 rounded-3xl shadow-sm border-l-4 border-brand-red flex flex-col justify-center">
-          <span className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">
-            Pending Deliveries
-          </span>
-          <div className="text-4xl font-black text-gray-800">
-            {stats.pending_orders}
+        {/* 📋 RECENT ACTIVITY SECTION */}
+        <div className="bg-white p-5 rounded-xl shadow-sm border border-gray-100 overflow-y-auto max-h-[400px]">
+          <h3 className="text-lg font-bold text-gray-800 mb-4">Recent Activity</h3>
+          <div className="space-y-2">
+            {recentOrders.length === 0 ? (
+              <p className="text-sm text-gray-400">No recent orders.</p>
+            ) : (
+              recentOrders.map(order => (
+                <div key={order.order_id} className="flex justify-between items-center p-3 hover:bg-red-50 rounded-lg transition border border-gray-50">
+                  <div>
+                    <p className="text-sm font-bold text-gray-800">#{order.order_id} {order.customer_name}</p>
+                    <p className="text-[10px] text-gray-500">{order.city}</p>
+                  </div>
+                  <div className="text-right flex flex-col items-end">
+                    <p className="text-sm font-bold text-brand-red">₹{order.total_amount}</p>
+                    <span className={`text-[9px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider mt-1
+                      ${order.status === 'Delivered' ? 'bg-green-100 text-green-700' : 
+                        order.status === 'Cancelled' ? 'bg-red-100 text-red-700' : 
+                        'bg-yellow-100 text-yellow-700'}`}>
+                      {order.status}
+                    </span>
+                  </div>
+                </div>
+              ))
+            )}
           </div>
         </div>
-
       </div>
-
-      {/* 📈 SALES CHART SECTION */}
-      <div className="bg-white p-6 rounded-3xl shadow-xl border border-gray-100 mt-8 relative">
-        {/* Live Data Badge */}
-        <div className="absolute top-0 right-6 -translate-y-1/2">
-          <span className="text-[10px] font-bold text-brand-red bg-red-50 border border-red-100 px-3 py-1 rounded-full uppercase tracking-wider shadow-sm">
-            Live Data
-          </span>
-        </div>
-        
-        <SalesChart />
-      </div>
-
     </div>
   );
 };

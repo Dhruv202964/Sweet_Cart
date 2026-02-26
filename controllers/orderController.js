@@ -1,6 +1,6 @@
 const db = require('../config/db');
 
-// 1. Get All Orders (UPDATED WITH NAMES AND CITIES)
+// 1. Get All Orders
 exports.getAllOrders = async (req, res) => {
   try {
     const result = await db.query(`
@@ -10,9 +10,9 @@ exports.getAllOrders = async (req, res) => {
         o.status, 
         o.created_at,
         o.delivery_area, 
-        o.delivery_city AS city, -- ALIASED FOR FRONTEND
+        o.delivery_city AS city, 
         o.delivery_address,
-        u.full_name AS customer_name, -- FETCHING REAL NAME
+        u.full_name AS customer_name, 
         u.email,
         (SELECT COALESCE(SUM(quantity), 0) FROM order_items WHERE order_id = o.order_id) AS item_count
       FROM orders o
@@ -26,24 +26,36 @@ exports.getAllOrders = async (req, res) => {
   }
 };
 
-// 2. Get Dashboard Stats (UPDATED FOR YOUR NEW ANALYTICS)
+// 2. Get Dashboard Stats (NOW WITH MONTHLY & DAILY METRICS)
 exports.getDashboardStats = async (req, res) => {
   try {
-    // 1. Total Revenue from Delivered Orders
+    // 1. All-Time Total
     const revenueResult = await db.query("SELECT COALESCE(SUM(total_amount), 0) AS total_revenue FROM orders WHERE status = 'Delivered'");
     
-    // 2. Total Orders
-    const totalOrdersResult = await db.query("SELECT COUNT(*) AS total_orders FROM orders");
+    // 2. 📅 THIS MONTH'S PROFIT
+    const monthlyRevenueResult = await db.query(`
+      SELECT COALESCE(SUM(total_amount), 0) AS monthly_revenue 
+      FROM orders 
+      WHERE status = 'Delivered' 
+      AND EXTRACT(MONTH FROM created_at) = EXTRACT(MONTH FROM CURRENT_DATE)
+      AND EXTRACT(YEAR FROM created_at) = EXTRACT(YEAR FROM CURRENT_DATE)
+    `);
+
+    // 3. Today's Profit
+    const todayRevenueResult = await db.query("SELECT COALESCE(SUM(total_amount), 0) AS today_revenue FROM orders WHERE status = 'Delivered' AND DATE(created_at) = CURRENT_DATE");
     
-    // 3. Pending Orders
+    // 4. Delivered Today
+    const todayDeliveredResult = await db.query("SELECT COUNT(*) AS today_delivered FROM orders WHERE status = 'Delivered' AND DATE(created_at) = CURRENT_DATE");
+    
+    // 5. Pending & Cancellations
     const pendingResult = await db.query("SELECT COUNT(*) AS pending_count FROM orders WHERE status IN ('Pending', 'Packed', 'Out for Delivery')");
-    
-    // 4. Cancelled Orders
     const cancelledResult = await db.query("SELECT COUNT(*) AS cancelled_count FROM orders WHERE status = 'Cancelled'");
 
     res.json({
       total_revenue: parseFloat(revenueResult.rows[0].total_revenue),
-      total_orders: parseInt(totalOrdersResult.rows[0].total_orders),
+      monthly_revenue: parseFloat(monthlyRevenueResult.rows[0].monthly_revenue),
+      today_revenue: parseFloat(todayRevenueResult.rows[0].today_revenue),
+      today_delivered: parseInt(todayDeliveredResult.rows[0].today_delivered),
       pending_orders: parseInt(pendingResult.rows[0].pending_count),
       cancelled_orders: parseInt(cancelledResult.rows[0].cancelled_count)
     });
@@ -70,7 +82,7 @@ exports.getSalesByArea = async (req, res) => {
   }
 };
 
-// 4. Assign Rider (Kept for Phase 2)
+// 4. Assign Rider
 exports.assignRider = async (req, res) => {
   try {
     const { order_id, rider_id } = req.body;
@@ -87,7 +99,7 @@ exports.assignRider = async (req, res) => {
 // 5. Update Order Status
 exports.updateOrderStatus = async (req, res) => {
   try {
-    const { id } = req.params; // Changed from req.body to req.params to match typical REST routes
+    const { id } = req.params; 
     const { status } = req.body;
     const result = await db.query("UPDATE orders SET status = $1 WHERE order_id = $2 RETURNING *", [status, id]);
     
@@ -99,7 +111,7 @@ exports.updateOrderStatus = async (req, res) => {
   }
 };
 
-// 6. Get Specific Order Items (ALREADY LOOKS PERFECT)
+// 6. Get Specific Order Items
 exports.getOrderItems = async (req, res) => {
   try {
     const { id } = req.params;
@@ -119,10 +131,8 @@ exports.getOrderItems = async (req, res) => {
 // 7. Customer Checkout (Place New Order)
 exports.placeOrder = async (req, res) => {
   const client = await db.connect(); 
-
   try {
     const { customer_id, cartItems, total_amount, delivery_address, delivery_area, delivery_city } = req.body;
-
     await client.query('BEGIN');
 
     const orderResult = await client.query(`

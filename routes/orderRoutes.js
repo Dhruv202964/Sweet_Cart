@@ -10,7 +10,7 @@ router.get('/:id', orderController.getOrderItems);
 
 // --- POST / PUT Routes ---
 router.post('/assign', orderController.assignRider);
-router.put('/update-status', orderController.updateOrderStatus);
+router.put('/:id/status', orderController.updateOrderStatus);
 router.post('/checkout', orderController.placeOrder);
 
 module.exports = router;

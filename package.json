@@ -20,13 +20,15 @@
   "homepage": "https://github.com/Dhruv202964/Sweet_Cart#readme",
   "dependencies": {
     "bcryptjs": "^3.0.3",
+    "chart.js": "^4.5.1",
     "cors": "^2.8.6",
     "dotenv": "^17.2.3",
     "express": "^5.2.1",
     "jsonwebtoken": "^9.0.3",
     "lucide-react": "^0.574.0",
     "multer": "^2.0.2",
-    "pg": "^8.16.3"
+    "pg": "^8.16.3",
+    "react-chartjs-2": "^5.3.1"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.1.18",
