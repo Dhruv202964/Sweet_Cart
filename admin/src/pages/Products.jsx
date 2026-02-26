@@ -11,8 +11,6 @@ const Products = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [loading, setLoading] = useState(false);
   
-  const userRole = localStorage.getItem('role');
-
   const [formData, setFormData] = useState({
     name: '', category: '1', price: '', stock: '', description: '', unit: 'kg'
   });
@@ -22,6 +20,7 @@ const Products = () => {
 
   useEffect(() => { fetchProducts(); }, []);
 
+  // 🧮 1. Filter Logic (Already perfectly set up to listen to activeFilter!)
   useEffect(() => {
     let result = products;
     if (activeFilter !== 'All') {
@@ -84,11 +83,15 @@ const Products = () => {
     } catch (err) { console.error(err); }
   };
 
+  // Fixed 'Namkeen' to 'Farsan' to perfectly match our Database injection!
   const categories = [
     { id: '1', name: 'Sweets', color: 'bg-pink-100 text-pink-700' },
-    { id: '2', name: 'Namkeen', color: 'bg-yellow-100 text-yellow-700' },
+    { id: '2', name: 'Farsan', color: 'bg-yellow-100 text-yellow-700' },
     { id: '3', name: 'Dairy', color: 'bg-blue-100 text-blue-700' },
   ];
+
+  // 🏙️ Define filter buttons
+  const filterCategories = ['All', 'Sweets', 'Farsan', 'Dairy'];
 
   return (
     <div className="p-8 bg-orange-50 min-h-screen">
@@ -97,6 +100,23 @@ const Products = () => {
         <button onClick={() => { setIsEditing(false); setPreviewUrl(null); setFormData({name:'', category:'1', price:'', stock:'', description:'', unit:'kg'}); setShowModal(true); }} className="bg-brand-red text-white px-6 py-3 rounded-xl flex items-center gap-2 hover:bg-red-800 transition shadow-lg">
           <Plus size={20} /> Add Product
         </button>
+      </div>
+
+      {/* 🍬 CATEGORY FILTER BUTTONS */}
+      <div className="flex flex-wrap gap-3 mb-6 mt-4">
+        {filterCategories.map(category => (
+          <button
+            key={category}
+            onClick={() => setActiveFilter(category)}
+            className={`px-5 py-2 rounded-xl text-sm font-bold transition-all shadow-sm ${
+              activeFilter === category
+                ? 'bg-red-800 text-white border-2 border-red-800 scale-105' 
+                : 'bg-white text-gray-600 border-2 border-gray-200 hover:border-red-300 hover:text-red-600'
+            }`}
+          >
+            {category}
+          </button>
+        ))}
       </div>
 
       {/* Table */}
@@ -113,22 +133,23 @@ const Products = () => {
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100">
-            {filteredProducts.map((p) => (
-              <tr key={p.product_id} className="hover:bg-red-50 transition">
-                <td className="p-4"><img src={`http://localhost:5000${p.image_url}`} className="w-12 h-12 rounded-lg object-cover" onError={(e) => { e.target.src = 'https://placehold.co/100'; }} /></td>
-                <td className="p-4 font-bold text-gray-800">{p.name}</td>
-                <td className="p-4"><span className="px-3 py-1 rounded-full text-xs font-bold bg-gray-100 text-gray-600">{p.category_name || 'General'}</span></td>
-                <td className="p-4 font-bold text-brand-red">₹{p.price}</td>
-                {/* 👈 Now correctly shows quantity + unit */}
-                <td className="p-4 font-medium">{p.stock_quantity} {p.unit || 'kg'}</td>
-                <td className="p-4 text-right flex justify-end gap-2">
-                  <button onClick={() => handleEditClick(p)} className="p-2 text-blue-500 hover:bg-blue-50 rounded-lg"><Edit size={18}/></button>
-                  {userRole === 'admin' && (
+            {filteredProducts.length === 0 ? (
+              <tr><td colSpan="6" className="p-8 text-center text-gray-400 font-medium">No products found for {activeFilter}.</td></tr>
+            ) : (
+              filteredProducts.map((p) => (
+                <tr key={p.product_id} className="hover:bg-red-50 transition">
+                  <td className="p-4"><img src={`http://localhost:5000${p.image_url}`} className="w-12 h-12 rounded-lg object-cover" onError={(e) => { e.target.src = 'https://placehold.co/100'; }} /></td>
+                  <td className="p-4 font-bold text-gray-800">{p.name}</td>
+                  <td className="p-4"><span className="px-3 py-1 rounded-full text-xs font-bold bg-gray-100 text-gray-600">{p.category_name || 'General'}</span></td>
+                  <td className="p-4 font-bold text-brand-red">₹{p.price}</td>
+                  <td className="p-4 font-medium">{p.stock_quantity} {p.unit?.toUpperCase() || 'KG'}</td>
+                  <td className="p-4 text-right flex justify-end gap-2">
+                    <button onClick={() => handleEditClick(p)} className="p-2 text-blue-500 hover:bg-blue-50 rounded-lg"><Edit size={18}/></button>
                     <button onClick={() => handleDelete(p.product_id)} className="p-2 text-red-500 hover:bg-red-50 rounded-lg"><Trash2 size={18}/></button>
-                  )}
-                </td>
-              </tr>
-            ))}
+                  </td>
+                </tr>
+              ))
+            )}
           </tbody>
         </table>
       </div>
@@ -138,7 +159,7 @@ const Products = () => {
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
           <div className="bg-white p-8 rounded-3xl w-full max-w-md shadow-2xl relative">
             <button onClick={() => setShowModal(false)} className="absolute top-4 right-4 text-gray-400 hover:text-red-500 transition"><X size={24} /></button>
-            <h2 className="text-2xl font-bold mb-6 text-gray-800">{isEditing ? "Edit Sweet" : "Add New Sweet"}</h2>
+            <h2 className="text-2xl font-bold mb-6 text-gray-800">{isEditing ? "Edit Product" : "Add New Product"}</h2>
             <form onSubmit={handleSubmit} className="space-y-4">
               <input required name="name" value={formData.name} onChange={(e) => setFormData({...formData, name: e.target.value})} className="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-brand-red/20 focus:border-brand-red" placeholder="Product Name" />
               
@@ -153,7 +174,6 @@ const Products = () => {
               <div className="grid grid-cols-2 gap-4">
                 <input required type="number" value={formData.price} onChange={(e) => setFormData({...formData, price: e.target.value})} className="p-3 bg-gray-50 border border-gray-200 rounded-xl outline-none" placeholder="Price (₹)" />
                 
-                {/* 👈 PROFESSIONAL UNIFIED STOCK-UNIT GROUP */}
                 <div className="relative flex items-center">
                   <input required type="number" value={formData.stock} onChange={(e) => setFormData({...formData, stock: e.target.value})} className="w-full p-3 bg-gray-50 border border-gray-200 rounded-l-xl rounded-r-none outline-none focus:border-brand-red border-r-0" placeholder="Qty" />
                   <select value={formData.unit} onChange={(e) => setFormData({...formData, unit: e.target.value})} className="h-[46px] px-3 bg-gray-100 border border-gray-200 rounded-r-xl border-l-gray-300 text-xs font-bold text-gray-600 outline-none">
@@ -164,7 +184,7 @@ const Products = () => {
                 </div>
               </div>
 
-              {/* 📸 IMAGE SECTION (WITH UPDATE CAPABILITY) */}
+              {/* 📸 IMAGE SECTION */}
               <div className="relative border-2 border-dashed border-gray-300 rounded-xl p-4 text-center cursor-pointer group">
                 <input type="file" accept="image/*" onChange={(e) => { 
                   if(e.target.files[0]) {

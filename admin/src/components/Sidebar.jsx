@@ -3,7 +3,8 @@ import { Link, useLocation } from 'react-router-dom';
 
 const Sidebar = () => {
   const location = useLocation();
-  const userRole = localStorage.getItem('role');
+
+  // No more role-checking logic needed! The admin gets access to everything.
 
   const isActive = (path) => location.pathname === path 
     ? "bg-red-800 text-white font-bold shadow-inner" 
@@ -21,14 +22,9 @@ const Sidebar = () => {
       <nav className="p-3 space-y-2 mt-4">
         <p className="text-xs font-bold text-red-200 uppercase px-3 mb-2 tracking-wider">Main Menu</p>
         
-        {/* DASHBOARD/HOME LINK: STAFF CANNOT SEE IT */}
-        {userRole !== 'staff' && (
-          <Link to="/dashboard" className={`flex items-center gap-3 px-3 py-3 rounded-xl transition-all ${isActive('/dashboard')}`}>
-            {/* Show Home icon for Manager, Dashboard icon for Admin */}
-            <span>{userRole === 'admin' ? '📊' : '🏠'}</span> 
-            {userRole === 'admin' ? 'Dashboard' : 'Home'}
-          </Link>
-        )}
+        <Link to="/dashboard" className={`flex items-center gap-3 px-3 py-3 rounded-xl transition-all ${isActive('/dashboard')}`}>
+          <span>📊</span> Dashboard
+        </Link>
 
         <Link to="/orders" className={`flex items-center gap-3 px-3 py-3 rounded-xl transition-all ${isActive('/orders')}`}>
           <span>📦</span> Orders
@@ -37,29 +33,19 @@ const Sidebar = () => {
         <Link to="/products" className={`flex items-center gap-3 px-3 py-3 rounded-xl transition-all ${isActive('/products')}`}>
           <span>🍬</span> Inventory
         </Link>
-        
+         {/* 🛵 PAUSED FOR RIDER PHASE
+         
          <Link to="/riders" className={`flex items-center gap-3 px-3 py-3 rounded-xl transition-all ${isActive('/riders')}`}>
           <span>🛵</span> Riders
+        </Link>*/}
+
+        {/* ADMINISTRATION */}
+        <div className="my-6 border-t border-red-800 mx-4"></div>
+        <p className="text-xs font-bold text-red-200 uppercase px-3 mb-2 tracking-wider">Administration</p>
+
+        <Link to="/messages" className={`flex items-center gap-3 px-3 py-3 rounded-xl transition-all ${isActive('/messages')}`}>
+          <span>📩</span> Messages
         </Link>
-
-        {/* ADMINISTRATION: ONLY ADMIN & MANAGER */}
-        {userRole !== 'staff' && (
-          <>
-            <div className="my-6 border-t border-red-800 mx-4"></div>
-            <p className="text-xs font-bold text-red-200 uppercase px-3 mb-2 tracking-wider">Administration</p>
-
-            <Link to="/messages" className={`flex items-center gap-3 px-3 py-3 rounded-xl transition-all ${isActive('/messages')}`}>
-              <span>📩</span> Messages
-            </Link>
-
-            {/* ONLY ADMIN CAN SEE STAFF SECTION */}
-            {userRole === 'admin' && (
-              <Link to="/staff" className={`flex items-center gap-3 px-3 py-3 rounded-xl transition-all ${isActive('/staff')}`}>
-                <span>👥</span> Staff / HR
-              </Link>
-            )}
-          </>
-        )}
       </nav>
 
       {/* Logout */}

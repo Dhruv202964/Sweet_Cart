@@ -7,10 +7,8 @@ import Sidebar from './components/Sidebar';
 // Import Pages
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
-import ManagerHome from './pages/ManagerHome'; // Your new safe landing page
 import Products from './pages/Products';
 import Orders from './pages/Orders';
-import Staff from './pages/Staff';
 import Messages from './pages/Messages';
 
 // Placeholder for Riders
@@ -31,7 +29,7 @@ const ProtectedRoute = ({ children }) => {
 };
 
 function App() {
-  const userRole = localStorage.getItem('role'); // Get role to determine landing page
+  // Role checking logic is completely removed. If you have a token, you are the Admin!
 
   return (
     <Router>
@@ -48,18 +46,14 @@ function App() {
                 {/* ml-56 matches our slimmer sidebar width */}
                 <div className="flex-1 ml-56 p-4 transition-all duration-300">
                   <Routes>
-                    {/* 👇 SENSITIVE DATA LOGIC 👇 */}
-                    <Route 
-                      path="/dashboard" 
-                      element={userRole === 'admin' ? <Dashboard /> : <ManagerHome />} 
-                    />
+                    {/* 👇 Streamlined Dashboard Logic 👇 */}
+                    <Route path="/dashboard" element={<Dashboard />} />
                     
                     <Route path="/products" element={<Products />} />
                     <Route path="/orders" element={<Orders />} />
                     <Route path="/riders" element={<Riders />} />
                     
                     {/* Administration Routes */}
-                    <Route path="/staff" element={<Staff />} />
                     <Route path="/messages" element={<Messages />} />
                     
                     {/* Catch-all: Send unknown links to the safe home */}

@@ -4,10 +4,11 @@ import OrderDetailsModal from '../components/OrderDetailsModal';
 
 const Orders = () => {
   const [orders, setOrders] = useState([]);
+  const [selectedCity, setSelectedCity] = useState('All'); // Fixed camelCase here
   const [selectedOrder, setSelectedOrder] = useState(null);
   
-  // 🔐 GET USER ROLE (To hide Delete button for Managers)
-  const userRole = localStorage.getItem('role');
+  // 🏙️ 1. Define your filter cities
+  const filterCities = ['All', 'Surat', 'Ahmedabad', 'Mumbai', 'Vadodara'];
 
   // 1. Fetch Orders
   useEffect(() => {
@@ -34,7 +35,7 @@ const Orders = () => {
     }
   };
 
-  // 3. Handle Delete (Only for Admin)
+  // 3. Handle Delete (Since this is strictly an Admin dashboard now, no need for role checks!)
   const handleDelete = async (id) => {
     if (!window.confirm("Are you sure you want to delete this order?")) return;
 
@@ -59,6 +60,11 @@ const Orders = () => {
     }
   };
 
+  // 🧮 2. Filter Logic: Recalculates automatically whenever selectedCity changes
+  const filteredOrders = selectedCity === 'All' 
+    ? orders 
+    : orders.filter(order => (order.city || 'Surat').toLowerCase() === selectedCity.toLowerCase());
+
   return (
     <div className="p-8 bg-orange-50 min-h-screen">
       
@@ -74,6 +80,23 @@ const Orders = () => {
         </div>
       </div>
 
+      {/* 🏙️ 3. CITY FILTER BUTTONS */}
+      <div className="flex flex-wrap gap-3 mb-6">
+        {filterCities.map(city => (
+          <button
+            key={city}
+            onClick={() => setSelectedCity(city)}
+            className={`px-5 py-2 rounded-xl text-sm font-bold transition-all shadow-sm ${
+              selectedCity === city
+                ? 'bg-red-800 text-white border-2 border-red-800 scale-105' 
+                : 'bg-white text-gray-600 border-2 border-gray-200 hover:border-red-300 hover:text-red-600'
+            }`}
+          >
+            {city}
+          </button>
+        ))}
+      </div>
+
       {/* Orders Table */}
       <div className="bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100">
         <table className="w-full text-left border-collapse">
@@ -81,7 +104,7 @@ const Orders = () => {
             <tr>
               <th className="p-5">Order ID</th>
               <th className="p-5">Customer</th>
-              <th className="p-5">Location (City)</th> {/* 🆕 NEW COLUMN */}
+              <th className="p-5">Location (City)</th>
               <th className="p-5">Items</th>
               <th className="p-5">Total</th>
               <th className="p-5">Status</th>
@@ -89,10 +112,11 @@ const Orders = () => {
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100">
-            {orders.length === 0 ? (
-              <tr><td colSpan="7" className="p-8 text-center text-gray-400">No active orders found.</td></tr>
+            {/* 🔄 4. Use filteredOrders instead of orders here */}
+            {filteredOrders.length === 0 ? (
+              <tr><td colSpan="7" className="p-8 text-center text-gray-400">No active orders found for {selectedCity}.</td></tr>
             ) : (
-              orders.map((order) => (
+              filteredOrders.map((order) => (
                 <tr key={order.order_id} className="hover:bg-red-50 transition">
                   
                   {/* ID */}
@@ -104,7 +128,7 @@ const Orders = () => {
                     <p className="text-xs text-gray-500">{order.email}</p>
                   </td>
 
-                  {/* 🆕 LOCATION BADGE */}
+                  {/* LOCATION BADGE */}
                   <td className="p-5">
                     <span className={`px-2 py-1 rounded-lg text-xs font-bold uppercase tracking-wider 
                       ${(order.city || 'Surat').toLowerCase() === 'surat' 
@@ -149,16 +173,14 @@ const Orders = () => {
                       <Eye size={18} />
                     </button>
                     
-                    {/* 🔐 HIDE DELETE BUTTON IF USER IS NOT ADMIN */}
-                    {userRole === 'admin' && (
-                      <button 
-                        onClick={() => handleDelete(order.order_id)}
-                        className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition" 
-                        title="Delete Order"
-                      >
-                        <Trash2 size={18} />
-                      </button>
-                    )}
+                    {/* HIDE DELETE CHECK REMOVED: Since only Admin uses this dashboard now */}
+                    <button 
+                      onClick={() => handleDelete(order.order_id)}
+                      className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition" 
+                      title="Delete Order"
+                    >
+                      <Trash2 size={18} />
+                    </button>
                   </td>
                 </tr>
               ))

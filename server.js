@@ -29,13 +29,9 @@ app.use('/api/products', require('./routes/productRoutes'));
 app.use('/api/orders', require('./routes/orderRoutes'));
 
 // ==========================================
-// 3. DIRECT ROUTES (Staff & Messages)
+// 3. DIRECT ROUTES (Messages)
 // ==========================================
-const staffController = require('./controllers/staffController');
 const messageController = require('./controllers/messageController');
-
-app.get('/api/staff', staffController.getAllStaff);
-app.post('/api/staff/add', staffController.createStaff);
 
 app.get('/api/messages', messageController.getAllMessages);
 app.delete('/api/messages/:id', messageController.deleteMessage);
