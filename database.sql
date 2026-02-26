@@ -1,17 +1,15 @@
 -- ############################################################
--- # SWEET_CART DATABASE SCHEMA - UPDATED FEB 18, 2026
--- # Team: 4O4 ERROR
+-- # SWEET_CART DATABASE SCHEMA - FINAL PRE-PRESENTATION
+-- # Team: 404 ERROR | Date: Feb 26, 2026
 -- ############################################################
 
--- 1. USERS TABLE (Includes RBAC: admin, manager, staff, rider, customer)
+-- 1. USERS TABLE
 CREATE TABLE users (
     user_id SERIAL PRIMARY KEY,
     full_name VARCHAR(100) NOT NULL,
     email VARCHAR(100) UNIQUE NOT NULL,
     password_hash VARCHAR(255) NOT NULL,
-    -- Updated role constraint to allow Manager and Staff
-    role VARCHAR(20) CHECK (role IN ('customer', 'admin', 'rider', 'manager', 'staff')) DEFAULT 'customer',
-    position VARCHAR(100), -- Used for Staff titles (e.g., 'Inventory Manager')
+    role VARCHAR(20) CHECK (role IN ('customer', 'admin', 'rider')) DEFAULT 'customer',
     phone VARCHAR(20),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
@@ -23,7 +21,7 @@ CREATE TABLE categories (
     description TEXT
 );
 
--- 3. PRODUCTS TABLE
+-- 3. PRODUCTS TABLE (Updated with Unit & Stock)
 CREATE TABLE products (
     product_id SERIAL PRIMARY KEY,
     category_id INT REFERENCES categories(category_id) ON DELETE SET NULL,
@@ -31,32 +29,34 @@ CREATE TABLE products (
     description TEXT,
     price DECIMAL(10, 2) NOT NULL,
     stock_quantity INT DEFAULT 0,
+    unit VARCHAR(20) DEFAULT 'kg', -- Added unit support (kg, g, pcs)
     image_url TEXT,
     is_available BOOLEAN DEFAULT TRUE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- 4. ORDERS TABLE
+-- 4. ORDERS TABLE (Updated for Analytics)
 CREATE TABLE orders (
     order_id SERIAL PRIMARY KEY,
-    customer_id INT REFERENCES users(user_id),
+    customer_id INT REFERENCES users(user_id) ON DELETE SET NULL,
     total_amount DECIMAL(10, 2) NOT NULL,
-    status VARCHAR(20) DEFAULT 'pending', -- pending, packed, out for delivery, delivered
+    status VARCHAR(20) DEFAULT 'Pending' CHECK (status IN ('Pending', 'Packed', 'Out for Delivery', 'Delivered', 'Cancelled')),
     delivery_address TEXT NOT NULL,
+    delivery_area VARCHAR(100), -- For Area-wise Chart
+    delivery_city VARCHAR(100) DEFAULT 'Surat', -- For City-wise Chart
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- 5. DELIVERIES TABLE
-CREATE TABLE deliveries (
-    delivery_id SERIAL PRIMARY KEY,
-    order_id INT REFERENCES orders(order_id),
-    rider_id INT REFERENCES users(user_id),
-    status VARCHAR(20) DEFAULT 'assigned',
-    assigned_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    delivered_at TIMESTAMP
+-- 5. ORDER ITEMS TABLE (Required for accurate Order Details)
+CREATE TABLE order_items (
+    order_item_id SERIAL PRIMARY KEY,
+    order_id INT REFERENCES orders(order_id) ON DELETE CASCADE,
+    product_id INT REFERENCES products(product_id) ON DELETE CASCADE,
+    quantity INT NOT NULL,
+    price_at_time DECIMAL(10, 2) NOT NULL
 );
 
--- 6. CONTACT MESSAGES TABLE (CRM Module)
+-- 6. CONTACT MESSAGES TABLE (CRM)
 CREATE TABLE contact_messages (
     id SERIAL PRIMARY KEY,
     customer_name VARCHAR(100),
@@ -67,24 +67,26 @@ CREATE TABLE contact_messages (
 );
 
 -- ############################################################
--- # SAMPLE DATA INJECTION
+-- # REALISTIC SURAT-BASED DATA INJECTION
 -- ############################################################
 
--- Initial Categories
-INSERT INTO categories (name, description) VALUES 
-('Sweets', 'Delicious traditional Indian sweets'),
-('Namkeen', 'Savory snacks and farsan'),
-('Seasonal Specials', 'Limited time festive items');
+-- Categories
+INSERT INTO categories (name) VALUES ('Sweets'), ('Farsan'), ('Dairy');
 
--- Sample Admin (Note: Use hashed password 'admin123' in production)
-INSERT INTO users (full_name, email, password_hash, role, phone) VALUES 
-('Admin User', 'admin@sweetcart.com', 'admin123', 'admin', '9876543210');
+-- Admin & Users
+INSERT INTO users (full_name, email, password_hash, role) VALUES 
+('Admin', 'admin@sweetcart.com', 'admin123', 'admin'),
+('Rahul Sharma', 'rahul.s@gmail.com', 'pass123', 'customer'),
+('Priya Patel', 'priya.p@gmail.com', 'pass123', 'customer');
 
--- Sample Manager (Rahul Chulbula)
-INSERT INTO users (full_name, email, password_hash, role, position, phone) VALUES 
-('Rahul Chulbula', 'rahul@sweetcart.com', 'manager123', 'manager', 'Manager', '9988776655');
+-- Products
+INSERT INTO products (category_id, name, price, stock_quantity, unit) VALUES 
+(1, 'Premium Pista Ghari', 850.00, 50, 'kg'),
+(2, 'Nylon Khaman', 120.00, 20, 'kg'),
+(3, 'Fresh Paneer', 450.00, 15, 'kg');
 
--- Sample Customer Messages
-INSERT INTO contact_messages (customer_name, email, subject, message) VALUES 
-('Sneha Patel', 'sneha.p@gmail.com', 'Bulk Order', 'Inquiry for 25kg Kaju Katli for March wedding.'),
-('Amit Shah', 'amit88@outlook.com', 'Feedback', 'The Bhakarwadi was excellent!');
+-- Sample Orders for Dashboard
+INSERT INTO orders (customer_id, total_amount, status, delivery_address, delivery_area, delivery_city) VALUES 
+(2, 850.00, 'Delivered', '12, Shyam Nagar', 'Adajan', 'Surat'),
+(3, 1250.00, 'Pending', '45, SG Highway', 'Bodakdev', 'Ahmedabad'),
+(2, 600.00, 'Cancelled', '12, Shyam Nagar', 'Adajan', 'Surat');
