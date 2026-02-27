@@ -41,6 +41,7 @@ const Dashboard = () => {
     }
   };
 
+  // 🧠 DATA CALCULATION
   let chartLabels = [];
   let chartValues = [];
   
@@ -55,14 +56,29 @@ const Dashboard = () => {
     chartValues = filtered.map(item => item.revenue);
   }
 
-  const barColors = ['rgba(239, 68, 68, 0.8)', 'rgba(59, 130, 246, 0.8)', 'rgba(16, 185, 129, 0.8)', 'rgba(245, 158, 11, 0.8)', 'rgba(139, 92, 246, 0.8)'];
+  // 🎨 DYNAMIC CITY COLOR THEMES
+  const cityThemes = {
+    'Mumbai': { main: 'rgba(239, 68, 68, 0.8)', shades: ['rgba(239, 68, 68, 0.9)', 'rgba(248, 113, 113, 0.7)', 'rgba(153, 27, 27, 0.8)'] }, 
+    'Surat': { main: 'rgba(59, 130, 246, 0.8)', shades: ['rgba(37, 99, 235, 0.9)', 'rgba(96, 165, 250, 0.7)', 'rgba(30, 64, 175, 0.8)'] }, 
+    'Ahmedabad': { main: 'rgba(16, 185, 129, 0.8)', shades: ['rgba(5, 150, 105, 0.9)', 'rgba(52, 211, 153, 0.7)', 'rgba(6, 78, 59, 0.8)'] }, 
+    'Vadodara': { main: 'rgba(245, 158, 11, 0.8)', shades: ['rgba(217, 119, 6, 0.9)', 'rgba(251, 191, 36, 0.7)', 'rgba(146, 64, 14, 0.8)'] } 
+  };
+  const defaultShades = ['rgba(139, 92, 246, 0.8)', 'rgba(167, 139, 250, 0.7)', 'rgba(196, 181, 253, 0.6)'];
+
+  let bgColors = [];
+  if (selectedChartCity === 'All') {
+    bgColors = chartLabels.map(city => cityThemes[city] ? cityThemes[city].main : defaultShades[0]);
+  } else {
+    const shades = cityThemes[selectedChartCity] ? cityThemes[selectedChartCity].shades : defaultShades;
+    bgColors = chartLabels.map((area, index) => shades[index % shades.length]);
+  }
 
   const barChartConfig = {
     labels: chartLabels,
     datasets: [{
       label: 'Revenue (₹)',
       data: chartValues,
-      backgroundColor: barColors.slice(0, chartLabels.length),
+      backgroundColor: bgColors,
       borderRadius: 6,
     }],
   };
@@ -79,7 +95,7 @@ const Dashboard = () => {
         <p className="text-sm text-gray-500">Real-time logistics and revenue tracking.</p>
       </div>
 
-      {/* 💳 COMPACT 6-CARD GRID */}
+      {/* 💳 ULTRA-COMPACT SMART GRID (6 CARDS IN A ROW) */}
       <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-4 mb-6">
         
         <div className="bg-white p-4 rounded-xl shadow-sm border-l-4 border-gray-800 flex flex-col justify-center relative overflow-hidden">
@@ -121,7 +137,6 @@ const Dashboard = () => {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* 📈 CHART SECTION (TALLER HEIGHT) */}
         <div className="lg:col-span-2 bg-white p-5 rounded-xl shadow-sm border border-gray-100">
           <div className="flex justify-between items-center mb-4">
             <h3 className="text-lg font-bold text-gray-800 flex items-center gap-2"><TrendingUp size={20} className="text-brand-red" /> Revenue Analysis</h3>
@@ -137,7 +152,7 @@ const Dashboard = () => {
               ))}
             </div>
           </div>
-          {/* ⬆️ CHANGED h-56 to h-80 (320px) right here! */}
+          {/* TALLER CHART HEIGHT */}
           <div className="h-80 relative w-full">
              {chartLabels.length > 0 ? (
                <Bar data={barChartConfig} options={chartOptions} />
@@ -147,7 +162,6 @@ const Dashboard = () => {
           </div>
         </div>
 
-        {/* 📋 RECENT ACTIVITY SECTION */}
         <div className="bg-white p-5 rounded-xl shadow-sm border border-gray-100 overflow-y-auto max-h-[400px]">
           <h3 className="text-lg font-bold text-gray-800 mb-4">Recent Activity</h3>
           <div className="space-y-2">

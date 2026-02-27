@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
+import { X, MapPin, Phone, Mail, User } from 'lucide-react';
 
 const OrderDetailsModal = ({ order, onClose }) => {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // 1. Fetch the specific sweets for this order
   useEffect(() => {
     fetch(`http://localhost:5000/api/orders/${order.order_id}`)
       .then(res => res.json())
@@ -12,80 +12,116 @@ const OrderDetailsModal = ({ order, onClose }) => {
         setItems(data);
         setLoading(false);
       })
-      .catch(err => console.error("Error fetching items:", err));
+      .catch(err => {
+        console.error("Error loading items:", err);
+        setLoading(false);
+      });
   }, [order.order_id]);
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 backdrop-blur-sm">
-      <div className="bg-white rounded-xl shadow-2xl w-full max-w-2xl p-6 relative animate-fade-in border-t-4 border-brand-orange">
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+      <div className="bg-white w-full max-w-2xl rounded-2xl shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-200">
         
-        {/* Close Button (X) */}
-        <button 
-          onClick={onClose}
-          className="absolute top-4 right-4 text-gray-400 hover:text-brand-red font-bold text-2xl transition"
-        >
-          &times;
-        </button>
+        {/* Header */}
+        <div className="flex justify-between items-center p-6 border-b border-gray-100 bg-gray-50">
+          <div className="flex items-center gap-3">
+            <span className="text-2xl">🧾</span>
+            <h2 className="text-2xl font-bold text-brand-red">Order #{order.order_id}</h2>
+          </div>
+          <button onClick={onClose} className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-full transition">
+            <X size={24} />
+          </button>
+        </div>
 
-        {/* Header Section */}
-        <div className="border-b border-gray-100 pb-4 mb-4">
-          <h2 className="text-2xl font-bold text-brand-red flex items-center gap-2">
-            🧾 Order #{order.order_id}
-          </h2>
-          <div className="mt-2 text-sm text-gray-600">
-            <p><strong>Customer:</strong> {order.customer_name}</p>
-            <p><strong>Deliver To:</strong> {order.delivery_address}</p>
+        {/* 🚚 SUPER DETAILED CUSTOMER & SHIPPING INFO */}
+        <div className="p-6 border-b border-gray-100 bg-white grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* Left Column: Contact */}
+          <div>
+            <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider mb-2">Customer Details</p>
+            <div className="space-y-2">
+              <p className="font-bold text-gray-800 text-lg flex items-center gap-2">
+                <User size={16} className="text-gray-400" /> {order.customer_name || "Guest User"}
+              </p>
+              <p className="text-gray-600 text-sm flex items-center gap-2">
+                <Mail size={16} className="text-gray-400" /> {order.email}
+              </p>
+              {order.phone && (
+                <p className="text-gray-600 text-sm flex items-center gap-2">
+                  <Phone size={16} className="text-gray-400" /> +91 {order.phone}
+                </p>
+              )}
+            </div>
+          </div>
+
+          {/* Right Column: Address */}
+          <div>
+            <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider mb-2">Shipping Address</p>
+            <div className="flex gap-2">
+              <MapPin size={18} className="text-brand-red shrink-0 mt-0.5" />
+              <div className="text-sm text-gray-700">
+                <p className="font-bold text-gray-800">{order.flat_house}</p>
+                {order.landmark && <p className="text-gray-500">Landmark: {order.landmark}</p>}
+                <p>{order.delivery_area || order.delivery_address}</p>
+                <p>{order.city}, {order.state} - <span className="font-bold text-gray-900">{order.pincode}</span></p>
+              </div>
+            </div>
           </div>
         </div>
 
         {/* Items Table */}
-        <div className="min-h-[150px]">
+        <div className="p-6">
           {loading ? (
-            <div className="flex justify-center items-center h-32 text-brand-orange font-bold">
-              Loading Sweets...
-            </div>
+            <p className="text-center text-gray-400 font-bold py-8">Loading items...</p>
+          ) : items.length === 0 ? (
+            <p className="text-center text-gray-400 font-bold py-8">No items found for this order.</p>
           ) : (
-            <table className="w-full text-left">
-              <thead className="bg-brand-cream text-brand-dark uppercase text-xs font-bold">
-                <tr>
-                  <th className="p-3 rounded-l-lg">Item Name</th>
-                  <th className="p-3">Price</th>
-                  <th className="p-3">Qty</th>
-                  <th className="p-3 rounded-r-lg">Subtotal</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-100">
-                {items.map((item, index) => (
-                  <tr key={index}>
-                    <td className="p-3 font-medium text-gray-800">
-                      {item.name}
-                    </td>
-                    <td className="p-3 text-gray-500">₹{item.price}</td>
-                    <td className="p-3 font-bold">x {item.quantity}</td>
-                    <td className="p-3 font-bold text-brand-orange">
-                      ₹{item.price * item.quantity}
-                    </td>
+            <div className="bg-orange-50 rounded-xl overflow-hidden border border-orange-100">
+              <table className="w-full text-left">
+                <thead className="bg-orange-100 text-gray-800 text-xs uppercase font-bold tracking-wider">
+                  <tr>
+                    <th className="p-4">Item Name</th>
+                    <th className="p-4">Price</th>
+                    <th className="p-4">Qty</th>
+                    <th className="p-4 text-right">Subtotal</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody className="divide-y divide-orange-100 bg-white">
+                  {items.map((item, index) => {
+                    const price = parseFloat(item.price_at_time) || 0;
+                    const qty = parseInt(item.quantity) || 1;
+                    const subtotal = price * qty;
+                    return (
+                      <tr key={index} className="hover:bg-orange-50/50 transition">
+                        <td className="p-4 font-bold text-gray-800">
+                          {item.product_name}
+                          <span className="text-xs text-gray-400 block font-normal">{item.unit || 'kg'}</span>
+                        </td>
+                        <td className="p-4 text-gray-600">₹{price.toFixed(2)}</td>
+                        <td className="p-4 font-bold text-gray-800">x {qty}</td>
+                        <td className="p-4 text-right font-bold text-brand-red">₹{subtotal.toFixed(2)}</td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
           )}
         </div>
 
-        {/* Footer: Totals & Status */}
-        <div className="mt-6 border-t border-gray-100 pt-4 flex justify-between items-end">
+        {/* Footer & Totals */}
+        <div className="p-6 bg-gray-50 flex justify-between items-end border-t border-gray-100">
           <div>
-            <span className="text-xs text-gray-400 uppercase font-bold">Status</span>
-            <div className={`mt-1 px-3 py-1 rounded-full text-sm font-bold inline-block
-              ${order.status === 'pending' ? 'bg-yellow-100 text-yellow-800' : 
-                order.status === 'delivered' ? 'bg-green-100 text-green-800' : 'bg-blue-100 text-blue-800'}`}>
-              {order.status.toUpperCase()}
-            </div>
+            <span className="text-xs font-bold text-gray-400 uppercase tracking-wider mr-3">Status</span>
+            <span className={`px-4 py-2 rounded-xl text-sm font-bold uppercase tracking-wider
+              ${order.status === 'Delivered' ? 'bg-green-100 text-green-700' : 
+                order.status === 'Cancelled' ? 'bg-red-100 text-red-700' : 
+                'bg-blue-100 text-blue-700'}`}>
+              {order.status}
+            </span>
           </div>
-          
           <div className="text-right">
-            <span className="text-sm text-gray-500">Grand Total</span>
-            <div className="text-3xl font-bold text-brand-red">₹ {order.total_amount}</div>
+            <p className="text-sm font-bold text-gray-500 uppercase tracking-wider mb-1">Grand Total</p>
+            <h3 className="text-3xl font-black text-brand-red">₹{parseFloat(order.total_amount).toFixed(2)}</h3>
           </div>
         </div>
 

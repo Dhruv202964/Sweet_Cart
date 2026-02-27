@@ -9,22 +9,27 @@ exports.getAllOrders = async (req, res) => {
         o.total_amount, 
         o.status, 
         o.created_at,
+        o.customer_name,   -- Fetches the direct order name!
+        o.phone,           -- Fetches the contact number!
+        o.flat_house,      -- Fetches House/Flat
+        o.landmark,        -- Fetches Landmark
+        o.state,           -- Fetches State
+        o.pincode,         -- Fetches Pincode
         o.delivery_area, 
         o.delivery_city AS city, 
         o.delivery_address,
-        u.full_name AS customer_name, 
         u.email,
         (SELECT COALESCE(SUM(quantity), 0) FROM order_items WHERE order_id = o.order_id) AS item_count
       FROM orders o
       LEFT JOIN users u ON o.customer_id = u.user_id
-      ORDER BY o.created_at DESC
+      ORDER BY o.order_id DESC
     `);
     res.json(result.rows);
   } catch (err) {
     console.error("❌ GET ERROR:", err.message);
     res.status(500).json({ msg: "Server Error: Could not fetch orders" });
   }
-};
+};;
 
 // 2. Get Dashboard Stats (NOW WITH MONTHLY & DAILY METRICS)
 exports.getDashboardStats = async (req, res) => {
@@ -42,10 +47,10 @@ exports.getDashboardStats = async (req, res) => {
     `);
 
     // 3. Today's Profit
-    const todayRevenueResult = await db.query("SELECT COALESCE(SUM(total_amount), 0) AS today_revenue FROM orders WHERE status = 'Delivered' AND DATE(created_at) = CURRENT_DATE");
+    const todayRevenueResult = await db.query("SELECT COALESCE(SUM(total_amount), 0) AS today_revenue FROM orders WHERE status = 'Delivered' AND DATE(updated_at) = CURRENT_DATE");
     
     // 4. Delivered Today
-    const todayDeliveredResult = await db.query("SELECT COUNT(*) AS today_delivered FROM orders WHERE status = 'Delivered' AND DATE(created_at) = CURRENT_DATE");
+    const todayDeliveredResult = await db.query("SELECT COUNT(*) AS today_delivered FROM orders WHERE status = 'Delivered' AND DATE(updated_at) = CURRENT_DATE");
     
     // 5. Pending & Cancellations
     const pendingResult = await db.query("SELECT COUNT(*) AS pending_count FROM orders WHERE status IN ('Pending', 'Packed', 'Out for Delivery')");
@@ -101,7 +106,8 @@ exports.updateOrderStatus = async (req, res) => {
   try {
     const { id } = req.params; 
     const { status } = req.body;
-    const result = await db.query("UPDATE orders SET status = $1 WHERE order_id = $2 RETURNING *", [status, id]);
+    // Added updated_at = CURRENT_TIMESTAMP
+    const result = await db.query("UPDATE orders SET status = $1, updated_at = CURRENT_TIMESTAMP WHERE order_id = $2 RETURNING *", [status, id]);
     
     if (result.rows.length === 0) return res.status(404).json({ msg: "Order not found" });
     res.json({ msg: "Status updated successfully", order: result.rows[0] });
@@ -115,12 +121,15 @@ exports.updateOrderStatus = async (req, res) => {
 exports.getOrderItems = async (req, res) => {
   try {
     const { id } = req.params;
+    
+    // 👇 The fix is the [, [id]] right after the SQL string!
     const result = await db.query(`
       SELECT oi.quantity, oi.price_at_time, p.name AS product_name, p.image_url, p.unit
       FROM order_items oi
       JOIN products p ON oi.product_id = p.product_id
       WHERE oi.order_id = $1
-    `);
+    `, [id]); 
+    
     res.json(result.rows);
   } catch (err) {
     console.error("❌ ORDER ITEMS ERROR:", err.message);
