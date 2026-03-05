@@ -2,15 +2,19 @@ const { Pool } = require('pg');
 require('dotenv').config();
 
 const pool = new Pool({
-  user: 'postgres',
-  host: 'localhost',
-  database: 'sweet_cart_db', // <--- Make sure this matches exactly
-  password: 'admin123',      // <--- Make sure this is 'admin123'
-  port: 5432,
+  connectionString: process.env.DATABASE_URL,
+  ssl: {
+    rejectUnauthorized: false // Required for cloud databases!
+  }
 });
 
-pool.connect()
-  .then(() => console.log('✅ Connected to Sweet_Cart Database'))
-  .catch(err => console.error('❌ Database Connection Error:', err.message));
+// 🌟 NEW: Test the connection when the server starts and print a message!
+pool.query('SELECT NOW()', (err, res) => {
+  if (err) {
+    console.error('❌ Failed to connect to Database:', err.message);
+  } else {
+    console.log('✅ Successfully connected to PostgreSQL Cloud Database!');
+  }
+});
 
 module.exports = pool;
