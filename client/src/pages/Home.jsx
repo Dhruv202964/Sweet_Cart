@@ -1,7 +1,37 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { Star, Plus, ChevronRight } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { CartContext } from '../context/CartContext';
+
+// 🌟 NEW: The Magic Auto-Sliding Image Component!
+const AutoSlidingImage = ({ mainImage, gallery, category }) => {
+  const images = [mainImage, ...(gallery || [])].filter(Boolean);
+  const [currentIndex, setCurrentIndex] = useState(0);
+
+  useEffect(() => {
+    if (images.length <= 1) return; // Don't slide if there's only 1 image!
+    
+    // Change picture every 2.5 seconds automatically
+    const interval = setInterval(() => {
+      setCurrentIndex((prev) => (prev + 1) % images.length);
+    }, 2500);
+    
+    return () => clearInterval(interval);
+  }, [images.length]);
+
+  if (images.length === 0) {
+    return <span className="text-7xl group-hover:scale-110 transition duration-500 drop-shadow-md">{category === 'Sweets' ? '🍬' : category === 'Dairy' ? '🥛' : '🥟'}</span>;
+  }
+
+  return (
+    <img 
+      src={images[currentIndex]} 
+      alt="Product view" 
+      className="w-full h-full object-cover rounded-2xl group-hover:scale-110 transition-all duration-700 ease-in-out" 
+    />
+  );
+};
+
 
 const Home = () => {
   const [products, setProducts] = useState([]);
@@ -10,7 +40,6 @@ const Home = () => {
   const [loading, setLoading] = useState(true);
   
   const navigate = useNavigate();
-  // 🌟 Grab the cart array AND both add/decrease functions
   const { cart, addToCart, decreaseQuantity } = useContext(CartContext); 
 
   useEffect(() => {
@@ -82,16 +111,21 @@ const Home = () => {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
               {displayedProducts.map(product => (
                 <div key={product.product_id} className="bg-white rounded-3xl shadow-sm hover:shadow-2xl hover:shadow-amber-500/10 transition-all duration-500 overflow-hidden border border-amber-100 group flex flex-col">
-                  <div className="h-52 bg-amber-50 relative overflow-hidden flex items-center justify-center p-4">
-                    {product.image_url ? (
-                      <img src={product.image_url} alt={product.name} className="w-full h-full object-cover rounded-2xl group-hover:scale-110 transition duration-700" />
-                    ) : (
-                      <span className="text-7xl group-hover:scale-110 transition duration-500 drop-shadow-md">{product.category_name === 'Sweets' ? '🍬' : product.category_name === 'Dairy' ? '🥛' : '🥟'}</span>
-                    )}
-                  </div>
+                  
+                  {/* 🌟 NEW: The Auto-Slider Component replaces the static img! */}
+                  <Link to={`/product/${product.product_id}`} className="block h-52 bg-amber-50 relative overflow-hidden flex items-center justify-center p-4 cursor-pointer">
+                    <AutoSlidingImage 
+                      mainImage={product.image_url} 
+                      gallery={product.gallery_images} 
+                      category={product.category_name} 
+                    />
+                  </Link>
+
                   <div className="p-5 flex flex-col flex-grow">
                     <div className="flex justify-between items-start mb-2 gap-2">
-                      <h3 className="text-md font-bold text-gray-900 group-hover:text-amber-600 transition-colors">{product.name}</h3>
+                      <Link to={`/product/${product.product_id}`} className="cursor-pointer hover:underline decoration-amber-500 decoration-2">
+                        <h3 className="text-md font-bold text-gray-900 group-hover:text-amber-600 transition-colors">{product.name}</h3>
+                      </Link>
                       <div className="flex items-center bg-amber-100 px-2 py-0.5 rounded text-amber-700 text-xs font-bold"><Star size={10} className="mr-1 fill-amber-500 text-amber-500" /> 4.8</div>
                     </div>
                     <p className="text-xs text-gray-500 mb-4 line-clamp-2">{product.description}</p>
@@ -101,35 +135,19 @@ const Home = () => {
                         <span className="text-[10px] text-amber-600 font-bold ml-1 uppercase">/ {product.unit || 'kg'}</span>
                       </div>
                       
-                      {/* 🌟 NEW: Magic Toggle Button Logic */}
                       {(() => {
                         const cartItem = cart.find(c => c.product_id === product.product_id);
                         if (cartItem) {
                           return (
                             <div className="flex items-center bg-amber-100 rounded-xl border border-amber-200 overflow-hidden shadow-sm">
-                              <button 
-                                onClick={() => decreaseQuantity(product.product_id)} 
-                                className="px-3 py-2 text-amber-700 hover:bg-amber-200 hover:text-red-700 transition-colors font-black text-lg leading-none"
-                              >
-                                -
-                              </button>
-                              <span className="px-1 py-2 text-amber-900 font-bold min-w-[24px] text-center text-sm">
-                                {cartItem.quantity}
-                              </span>
-                              <button 
-                                onClick={() => addToCart(product)} 
-                                className="px-3 py-2 text-amber-700 hover:bg-amber-200 hover:text-green-700 transition-colors font-black text-lg leading-none"
-                              >
-                                +
-                              </button>
+                              <button onClick={() => decreaseQuantity(product.product_id)} className="px-3 py-2 text-amber-700 hover:bg-amber-200 hover:text-red-700 transition-colors font-black text-lg leading-none">-</button>
+                              <span className="px-1 py-2 text-amber-900 font-bold min-w-[24px] text-center text-sm">{cartItem.quantity}</span>
+                              <button onClick={() => addToCart(product)} className="px-3 py-2 text-amber-700 hover:bg-amber-200 hover:text-green-700 transition-colors font-black text-lg leading-none">+</button>
                             </div>
                           );
                         }
                         return (
-                          <button 
-                            onClick={() => addToCart(product)} 
-                            className="bg-amber-100 hover:bg-amber-500 text-amber-700 hover:text-white p-2.5 rounded-xl transition-all group-hover:shadow-md"
-                          >
+                          <button onClick={() => addToCart(product)} className="bg-amber-100 hover:bg-amber-500 text-amber-700 hover:text-white p-2.5 rounded-xl transition-all group-hover:shadow-md">
                             <Plus size={18} strokeWidth={3} />
                           </button>
                         );
