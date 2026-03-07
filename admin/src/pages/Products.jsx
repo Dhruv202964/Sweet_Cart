@@ -11,16 +11,19 @@ const Products = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [loading, setLoading] = useState(false);
   
+  // 🌟 ADDED INGREDIENTS TO STATE
   const [formData, setFormData] = useState({
-    name: '', category: '1', price: '', stock: '', description: '', unit: 'kg'
+    name: '', category: '1', price: '', stock: '', description: '', unit: 'kg', ingredients: ''
   });
   
   const [imageFile, setImageFile] = useState(null);
   const [previewUrl, setPreviewUrl] = useState(null);
+  
+  // 🌟 ADDED GALLERY FILES STATE
+  const [galleryFiles, setGalleryFiles] = useState([]);
 
   useEffect(() => { fetchProducts(); }, []);
 
-  // 🧮 1. Filter Logic (Already perfectly set up to listen to activeFilter!)
   useEffect(() => {
     let result = products;
     if (activeFilter !== 'All') {
@@ -49,18 +52,30 @@ const Products = () => {
       price: product.price,
       stock: product.stock_quantity,
       description: product.description || '',
-      unit: product.unit || 'kg'
+      unit: product.unit || 'kg',
+      ingredients: product.ingredients || '' // 🌟 Pull existing ingredients
     });
     setPreviewUrl(`http://localhost:5000${product.image_url}`);
+    setGalleryFiles([]); // Reset gallery selection on edit
     setShowModal(true);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
+    
     const data = new FormData();
     Object.keys(formData).forEach(key => data.append(key, formData[key]));
+    
+    // Append Main Image
     if (imageFile) data.append('image', imageFile);
+    
+    // 🌟 Append Gallery Images Array
+    if (galleryFiles.length > 0) {
+      Array.from(galleryFiles).forEach(file => {
+        data.append('gallery', file);
+      });
+    }
 
     try {
       const url = isEditing ? `http://localhost:5000/api/products/${selectedProduct.product_id}` : 'http://localhost:5000/api/products';
@@ -70,6 +85,7 @@ const Products = () => {
         fetchProducts();
         setImageFile(null);
         setPreviewUrl(null);
+        setGalleryFiles([]);
       }
     } catch (err) { alert("Connection failed"); }
     finally { setLoading(false); }
@@ -83,26 +99,30 @@ const Products = () => {
     } catch (err) { console.error(err); }
   };
 
-  // Fixed 'Namkeen' to 'Farsan' to perfectly match our Database injection!
   const categories = [
     { id: '1', name: 'Sweets', color: 'bg-pink-100 text-pink-700' },
     { id: '2', name: 'Farsan', color: 'bg-yellow-100 text-yellow-700' },
     { id: '3', name: 'Dairy', color: 'bg-blue-100 text-blue-700' },
   ];
 
-  // 🏙️ Define filter buttons
   const filterCategories = ['All', 'Sweets', 'Farsan', 'Dairy'];
 
   return (
     <div className="p-8 bg-orange-50 min-h-screen">
       <div className="flex justify-between items-center mb-8">
         <h2 className="text-3xl font-bold text-gray-800">Inventory</h2>
-        <button onClick={() => { setIsEditing(false); setPreviewUrl(null); setFormData({name:'', category:'1', price:'', stock:'', description:'', unit:'kg'}); setShowModal(true); }} className="bg-brand-red text-white px-6 py-3 rounded-xl flex items-center gap-2 hover:bg-red-800 transition shadow-lg">
+        <button onClick={() => { 
+          setIsEditing(false); 
+          setPreviewUrl(null); 
+          setImageFile(null);
+          setGalleryFiles([]);
+          setFormData({name:'', category:'1', price:'', stock:'', description:'', unit:'kg', ingredients: ''}); 
+          setShowModal(true); 
+        }} className="bg-brand-red text-white px-6 py-3 rounded-xl flex items-center gap-2 hover:bg-red-800 transition shadow-lg">
           <Plus size={20} /> Add Product
         </button>
       </div>
 
-      {/* 🍬 CATEGORY FILTER BUTTONS */}
       <div className="flex flex-wrap gap-3 mb-6 mt-4">
         {filterCategories.map(category => (
           <button
@@ -119,7 +139,6 @@ const Products = () => {
         ))}
       </div>
 
-      {/* Table */}
       <div className="bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100">
         <table className="w-full text-left">
           <thead className="bg-red-50 text-brand-red uppercase text-xs font-bold tracking-wider">
@@ -154,12 +173,12 @@ const Products = () => {
         </table>
       </div>
 
-      {/* MODAL */}
       {showModal && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 overflow-y-auto pt-20 pb-10">
           <div className="bg-white p-8 rounded-3xl w-full max-w-md shadow-2xl relative">
             <button onClick={() => setShowModal(false)} className="absolute top-4 right-4 text-gray-400 hover:text-red-500 transition"><X size={24} /></button>
             <h2 className="text-2xl font-bold mb-6 text-gray-800">{isEditing ? "Edit Product" : "Add New Product"}</h2>
+            
             <form onSubmit={handleSubmit} className="space-y-4">
               <input required name="name" value={formData.name} onChange={(e) => setFormData({...formData, name: e.target.value})} className="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-brand-red/20 focus:border-brand-red" placeholder="Product Name" />
               
@@ -184,22 +203,50 @@ const Products = () => {
                 </div>
               </div>
 
-              {/* 📸 IMAGE SECTION */}
+              {/* 🌟 NEW: INGREDIENTS TEXTAREA */}
+              <textarea 
+                name="ingredients" 
+                value={formData.ingredients} 
+                onChange={(e) => setFormData({...formData, ingredients: e.target.value})} 
+                className="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-brand-red/20 focus:border-brand-red" 
+                placeholder="Ingredients (e.g., Pure Ghee, Premium Kaju...)" 
+                rows="2"
+              />
+
+              {/* 📸 MAIN IMAGE UPLOAD */}
               <div className="relative border-2 border-dashed border-gray-300 rounded-xl p-4 text-center cursor-pointer group">
                 <input type="file" accept="image/*" onChange={(e) => { 
                   if(e.target.files[0]) {
                     setImageFile(e.target.files[0]); 
                     setPreviewUrl(URL.createObjectURL(e.target.files[0]));
                   }
-                }} className="absolute inset-0 opacity-0 cursor-pointer" />
+                }} className="absolute inset-0 opacity-0 cursor-pointer z-10" />
                 {previewUrl ? (
                   <div className="relative">
                     <img src={previewUrl} className="h-32 w-full object-contain rounded-lg" alt="Preview" />
-                    <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 flex items-center justify-center rounded-lg transition text-white text-xs font-bold">Change Image</div>
+                    <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 flex items-center justify-center rounded-lg transition text-white text-xs font-bold">Change Main Image</div>
                   </div>
                 ) : (
-                  <div className="text-gray-400 py-4 flex flex-col items-center"><UploadCloud size={32} /><span className="text-xs mt-2">Upload Image</span></div>
+                  <div className="text-gray-400 py-4 flex flex-col items-center"><UploadCloud size={32} /><span className="text-xs mt-2">Upload Main Image</span></div>
                 )}
+              </div>
+
+              {/* 📸 🌟 NEW: MULTIPLE GALLERY IMAGES UPLOAD */}
+              <div className="relative border-2 border-dashed border-gray-300 bg-gray-50 rounded-xl p-4 text-center cursor-pointer group">
+                <input 
+                  type="file" 
+                  multiple 
+                  accept="image/*" 
+                  onChange={(e) => setGalleryFiles(e.target.files)} 
+                  className="absolute inset-0 opacity-0 cursor-pointer z-10" 
+                />
+                <div className="text-gray-500 py-2 flex flex-col items-center">
+                  <UploadCloud size={24} className="mb-1" />
+                  <span className="text-sm font-bold text-gray-700">Add Gallery Images (Max 4)</span>
+                  <span className="text-xs mt-1 text-gray-400">
+                    {galleryFiles.length > 0 ? `${galleryFiles.length} files selected` : 'Hold Ctrl/Cmd to select multiple'}
+                  </span>
+                </div>
               </div>
 
               <button type="submit" className="w-full py-4 rounded-xl font-bold text-white bg-brand-red hover:bg-red-800 transition shadow-lg">

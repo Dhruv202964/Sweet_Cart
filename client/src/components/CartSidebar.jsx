@@ -1,8 +1,10 @@
 import { useContext } from 'react';
+import { useNavigate } from 'react-router-dom'; // 🌟 NEW: We need this to travel between pages!
 import { CartContext } from '../context/CartContext';
 
 const CartSidebar = ({ isOpen, onClose }) => {
   const { cart, addToCart, decreaseQuantity, removeFromCart, getCartTotal } = useContext(CartContext);
+  const navigate = useNavigate(); // 🌟 NEW: Initialize the navigator
 
   if (!isOpen) return null;
 
@@ -101,9 +103,18 @@ const CartSidebar = ({ isOpen, onClose }) => {
                 ₹{getCartTotal()}
               </span>
             </div>
-            <button className="w-full bg-red-800 hover:bg-red-900 text-white font-bold py-3 px-4 rounded-lg shadow-md transition-colors text-lg">
+            
+            {/* 🌟 NEW: This button now closes the cart AND travels to the checkout page! */}
+            <button 
+              onClick={() => {
+                onClose();
+                navigate('/checkout');
+              }}
+              className="w-full bg-red-800 hover:bg-red-900 text-white font-bold py-3 px-4 rounded-lg shadow-md transition-colors text-lg"
+            >
               Proceed to Checkout 🚀
             </button>
+            
           </div>
         )}
       </div>

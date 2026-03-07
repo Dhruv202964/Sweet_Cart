@@ -262,3 +262,26 @@ Global Footer: Designed a responsive, 4-column enterprise footer (`Footer.jsx`) 
 ✅ Milestones
 Products now have dedicated, shareable URL endpoints.
 Application UI mirrors top-tier enterprise e-commerce platforms.
+
+Day 15: Enterprise Authentication, Dynamic Checkout & Advanced State Management
+Date: 2026-03-07 | Status: Complete | Phase: Checkout Engine & Security Polish
+
+🎯 Objective
+Finalize the checkout UI, implement user registration/authentication, engineer global authentication state, and upgrade the admin inventory system to handle multi-image uploads.
+
+🛠️ Critical Fixes
+Context API Race Conditions: Resolved a fatal "White Screen of Death" by implementing optional chaining (?.) and null-safety nets when CartContext attempts to read from AuthContext during initial render.
+Chart.js Caching Crash: Squashed a `useRef` rendering error in the Admin Dashboard by forcing a Vite cache clear (`--force`) and realigning package dependencies.
+The "F5 Wipeout" & "Ghost Cart": Eliminated volatile state loss by anchoring the shopping cart to `localStorage` and `sessionStorage`. Implemented route-based conditional rendering in `Navbar.jsx` to dynamically hide the cart on checkout and auth pages.
+
+⚙️ Technical Implementation
+Multi-File Architecture: Upgraded `multer` configuration in `productRoutes.js` to utilize `upload.fields`, enabling the backend to map multiple gallery images to PostgreSQL array columns alongside custom product ingredients.
+Dynamic Checkout UI: Engineered `Checkout.jsx` featuring cascading State-to-City dropdown logic, strict regex pattern validation (10-digit mobile lock), and dynamic form pre-filling based on global auth state.
+Global Authentication: Built `AuthContext.jsx` to manage user sessions globally. Designed and wired premium `Login.jsx` and `Register.jsx` interfaces directly to the backend PostgreSQL database.
+User-Specific Carts: Refactored `CartContext.jsx` to generate unique browser storage keys based on the logged-in user's email (`sweetcart_cart_[email]`), preventing cart crossover between guests and registered users.
+Smart Navbar Navigation: Integrated Lucide React icons to build an interactive User Profile dropdown. Engineered the UI to dynamically grant exclusive "Admin Dashboard" access links based strictly on JWT role payloads.
+
+✅ Milestones
+Users can successfully register, log in, and maintain persistent, individualized shopping carts.
+Admin panel fully supports multi-image gallery uploads and rich text ingredient tracking.
+Frontend application state is now 100% stable, context-aware, and crash-resistant.
