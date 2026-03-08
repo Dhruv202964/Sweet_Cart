@@ -29,15 +29,13 @@ exports.getAllOrders = async (req, res) => {
     console.error("❌ GET ERROR:", err.message);
     res.status(500).json({ msg: "Server Error: Could not fetch orders" });
   }
-};;
+};
 
-// 2. Get Dashboard Stats (NOW WITH MONTHLY & DAILY METRICS)
+// 2. Get Dashboard Stats
 exports.getDashboardStats = async (req, res) => {
   try {
-    // 1. All-Time Total
     const revenueResult = await db.query("SELECT COALESCE(SUM(total_amount), 0) AS total_revenue FROM orders WHERE status = 'Delivered'");
     
-    // 2. 📅 THIS MONTH'S PROFIT
     const monthlyRevenueResult = await db.query(`
       SELECT COALESCE(SUM(total_amount), 0) AS monthly_revenue 
       FROM orders 
@@ -46,13 +44,8 @@ exports.getDashboardStats = async (req, res) => {
       AND EXTRACT(YEAR FROM created_at) = EXTRACT(YEAR FROM CURRENT_DATE)
     `);
 
-    // 3. Today's Profit
     const todayRevenueResult = await db.query("SELECT COALESCE(SUM(total_amount), 0) AS today_revenue FROM orders WHERE status = 'Delivered' AND DATE(updated_at) = CURRENT_DATE");
-    
-    // 4. Delivered Today
     const todayDeliveredResult = await db.query("SELECT COUNT(*) AS today_delivered FROM orders WHERE status = 'Delivered' AND DATE(updated_at) = CURRENT_DATE");
-    
-    // 5. Pending & Cancellations
     const pendingResult = await db.query("SELECT COUNT(*) AS pending_count FROM orders WHERE status IN ('Pending', 'Packed', 'Out for Delivery')");
     const cancelledResult = await db.query("SELECT COUNT(*) AS cancelled_count FROM orders WHERE status = 'Cancelled'");
 
@@ -70,7 +63,7 @@ exports.getDashboardStats = async (req, res) => {
   }
 };
 
-// 3. Get Sales Analytics (For Chart)
+// 3. Get Sales Analytics
 exports.getSalesByArea = async (req, res) => {
   try {
     const result = await db.query(`
@@ -106,7 +99,6 @@ exports.updateOrderStatus = async (req, res) => {
   try {
     const { id } = req.params; 
     const { status } = req.body;
-    // Added updated_at = CURRENT_TIMESTAMP
     const result = await db.query("UPDATE orders SET status = $1, updated_at = CURRENT_TIMESTAMP WHERE order_id = $2 RETURNING *", [status, id]);
     
     if (result.rows.length === 0) return res.status(404).json({ msg: "Order not found" });
@@ -121,37 +113,97 @@ exports.updateOrderStatus = async (req, res) => {
 exports.getOrderItems = async (req, res) => {
   try {
     const { id } = req.params;
-    
-    // 👇 The fix is the [, [id]] right after the SQL string!
     const result = await db.query(`
       SELECT oi.quantity, oi.price_at_time, p.name AS product_name, p.image_url, p.unit
       FROM order_items oi
       JOIN products p ON oi.product_id = p.product_id
       WHERE oi.order_id = $1
     `, [id]); 
-    
     res.json(result.rows);
   } catch (err) {
     console.error("❌ ORDER ITEMS ERROR:", err.message);
     res.status(500).json({ msg: "Server Error: Could not fetch order items" });
   }
 };
+ 
+// 7. 🌟 SUPER-POWERED Track Order (Fetches Items + Address)
+exports.trackOrder = async (req, res) => {
+  try {
+    const { order_id, email } = req.query;
 
-// 7. Customer Checkout (Place New Order)
+    let query = `
+      SELECT 
+        o.order_id, o.status, o.created_at, o.customer_name, o.total_amount, 
+        o.delivery_address, o.flat_house, o.landmark, o.delivery_city, o.state, o.pincode, o.phone,
+        (
+          SELECT json_agg(json_build_object('name', p.name, 'quantity', oi.quantity, 'price', oi.price_at_time))
+          FROM order_items oi 
+          JOIN products p ON oi.product_id = p.product_id 
+          WHERE oi.order_id = o.order_id
+        ) as items
+      FROM orders o
+      WHERE 1=1
+    `;
+    const values = [];
+
+    if (order_id) {
+      values.push(order_id);
+      query += ` AND o.order_id = $${values.length}`;
+    } else if (email) {
+      values.push(email);
+      query += ` AND o.email = $${values.length}`;
+    } else {
+      return res.status(400).json({ msg: "Please provide an Order ID or Email." });
+    }
+
+    query += ` ORDER BY o.created_at DESC LIMIT 5`; 
+
+    const result = await db.query(query, values);
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ msg: "No orders found for this information." });
+    }
+
+    res.json(result.rows);
+  } catch (err) {
+    console.error("❌ TRACK ORDER ERROR:", err.message);
+    res.status(500).json({ msg: "Server Error: Could not track order" });
+  }
+};
+
+// 8. UPGRADED Customer Checkout (Place New Order)
 exports.placeOrder = async (req, res) => {
   const client = await db.connect(); 
   try {
-    const { customer_id, cartItems, total_amount, delivery_address, delivery_area, delivery_city } = req.body;
+    const { 
+      customer_id, firstName, lastName, email, mobile, 
+      address, area, landmark, state, city, pincode, 
+      cartItems, total_amount 
+    } = req.body;
+    
     await client.query('BEGIN');
 
+    const customer_name = `${firstName} ${lastName}`;
+    const full_address = `${address}, ${landmark}`;
+
+    // Insert the main order with ALL the new details
     const orderResult = await client.query(`
-      INSERT INTO orders (customer_id, total_amount, status, delivery_address, delivery_area, delivery_city) 
-      VALUES ($1, $2, 'Pending', $3, $4, $5) 
+      INSERT INTO orders (
+        customer_id, customer_name, email, phone, 
+        delivery_address, flat_house, landmark, delivery_area, delivery_city, state, pincode, 
+        total_amount, status
+      ) 
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, 'Pending') 
       RETURNING order_id
-    `, [customer_id, total_amount, delivery_address, delivery_area, delivery_city]);
+    `, [
+      customer_id || null, customer_name, email, mobile, 
+      full_address, address, landmark, area, city, state, pincode, 
+      total_amount
+    ]);
 
     const newOrderId = orderResult.rows[0].order_id;
 
+    // Insert the items and update live stock
     for (let item of cartItems) {
       await client.query(`
         INSERT INTO order_items (order_id, product_id, quantity, price_at_time) 

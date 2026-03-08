@@ -2,9 +2,9 @@ import './index.css';
 import React from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 
-// New Context Imports
+// Context Imports
 import { CartProvider } from './context/CartContext';
-import { AuthProvider } from './context/AuthContext'; // 🌟 NEW!
+import { AuthProvider } from './context/AuthContext'; 
 
 // Component Imports
 import Navbar from './components/Navbar';
@@ -18,15 +18,16 @@ import Checkout from './pages/Checkout';
 import ProductDetails from './pages/ProductDetails';
 import Login from './pages/Login';
 import Register from './pages/Register';
+import TrackOrder from './pages/TrackOrder';
 
 function App() {
   return (
-    <AuthProvider> {/* 🌟 Wrap everything in AuthProvider first! */}
+    <AuthProvider> 
       <CartProvider>
         <BrowserRouter>
           <Navbar />
           
-          <main className="min-h-screen bg-cream-50">
+          <main className="min-h-screen bg-[#FFFDF8]">
             <Routes>
               <Route path="/" element={<Home />} />
               <Route path="/menu" element={<Menu />} /> 
@@ -35,6 +36,7 @@ function App() {
               <Route path="/register" element={<Register />} />
               <Route path="/product/:id" element={<ProductDetails />} />
               <Route path="/admin" element={<Dashboard />} />
+              <Route path="/track-order" element={<TrackOrder />} />
             </Routes>
           </main>
 

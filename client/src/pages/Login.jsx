@@ -1,12 +1,17 @@
 import React, { useState, useContext } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { AuthContext } from '../context/AuthContext'; // 🌟 NEW
+import { AuthContext } from '../context/AuthContext'; 
+import { CheckCircle } from 'lucide-react'; // 🌟 Premium Icon
 
 const Login = () => {
   const navigate = useNavigate();
-  const { login } = useContext(AuthContext); // 🌟 Pull global login function
+  const { login } = useContext(AuthContext); 
   const [formData, setFormData] = useState({ email: '', password: '' });
   const [loading, setLoading] = useState(false);
+  
+  // 🌟 Controls the beautiful welcome screen
+  const [loginSuccess, setLoginSuccess] = useState(false);
+  const [welcomeName, setWelcomeName] = useState('');
 
   const handleInputChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -26,16 +31,9 @@ const Login = () => {
       const data = await res.json();
 
       if (res.ok) {
-        // 🌟 NEW: Call global context login function
         login(data.user, data.token);
-        
-        const savedOrder = localStorage.getItem('sweetcart_order');
-        if(savedOrder && JSON.parse(savedOrder).length > 0) {
-            navigate('/checkout');
-        } else {
-            navigate('/');
-        }
-
+        setWelcomeName(data.user.full_name);
+        setLoginSuccess(true); // 🌟 Trigger the premium UI!
       } else {
         alert(data.msg || "Invalid credentials.");
       }
@@ -46,6 +44,38 @@ const Login = () => {
       setLoading(false);
     }
   };
+
+  const handleProceed = () => {
+      const savedOrder = sessionStorage.getItem('sweetcart_cart_' + formData.email);
+      if(savedOrder && JSON.parse(savedOrder).length > 0) {
+          navigate('/checkout');
+      } else {
+          navigate('/');
+      }
+  };
+
+  // 🌟 THE PREMIUM WELCOME UI
+  if (loginSuccess) {
+    return (
+      <div className="min-h-screen bg-[#FFFDF8] flex flex-col items-center justify-center p-6 font-sans">
+        <div className="bg-white p-10 md:p-14 rounded-[40px] shadow-2xl border border-amber-100 max-w-lg w-full text-center">
+          <div className="flex justify-center mb-6">
+            <CheckCircle className="text-amber-500 w-24 h-24 drop-shadow-md" />
+          </div>
+          <h2 className="text-4xl font-black text-gray-800 mb-4 tracking-tighter">Login Successful!</h2>
+          <p className="text-lg text-gray-600 mb-10 leading-relaxed">
+            Welcome back, <span className="font-black text-amber-700">{welcomeName}</span>! It is great to see you again.
+          </p>
+          <button 
+            onClick={handleProceed}
+            className="w-full py-4 rounded-2xl font-black text-white text-xl bg-amber-600 hover:bg-amber-700 transition-all shadow-xl hover:-translate-y-1"
+          >
+            Continue ➔
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-[#FFFDF8] flex flex-col justify-center py-12 sm:px-6 lg:px-8">

@@ -5,7 +5,8 @@ const orderController = require('../controllers/orderController');
 // --- GET Routes ---
 router.get('/', orderController.getAllOrders);
 router.get('/stats', orderController.getDashboardStats);
-router.get('/analytics', orderController.getSalesByArea); 
+router.get('/analytics', orderController.getSalesByArea);
+router.get('/track', orderController.trackOrder); 
 router.get('/:id', orderController.getOrderItems);
 
 // --- POST / PUT Routes ---

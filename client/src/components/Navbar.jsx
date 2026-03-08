@@ -2,7 +2,8 @@ import { useState, useContext, useRef, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { CartContext } from '../context/CartContext';
 import { AuthContext } from '../context/AuthContext'; 
-import { CircleUser, Menu, X, Settings, LogOut } from 'lucide-react'; 
+// 🌟 Added Package and LogIn icons here!
+import { CircleUser, Menu, X, Settings, LogOut, Package, LogIn } from 'lucide-react'; 
 import CartSidebar from './CartSidebar';
 
 const Navbar = () => {
@@ -35,14 +36,6 @@ const Navbar = () => {
     setSearchQuery(e.target.value);
     if (location.pathname !== '/menu') {
       navigate('/menu');
-    }
-  };
-
-  const handleUserIconClick = () => {
-    if (isAuthenticated) {
-      setIsUserDropdownOpen(!isUserDropdownOpen);
-    } else {
-      navigate('/login');
     }
   };
 
@@ -90,52 +83,73 @@ const Navbar = () => {
                 </button>
               )}
 
-              {/* 👤 THE USER MENU BOSS */}
+              {/* 👤 THE UPGRADED USER MENU BOSS */}
               <div className="relative" ref={dropdownRef}>
                 <button 
-                  onClick={handleUserIconClick}
+                  onClick={() => setIsUserDropdownOpen(!isUserDropdownOpen)} 
                   className="flex items-center gap-2 p-2 rounded-full hover:bg-amber-50 group transition-colors"
                 >
                   <CircleUser size={28} className={`transition-colors ${isAuthenticated ? 'text-amber-600' : 'text-gray-600'}`} />
-                  {/* 🌟 Added Optional Chaining (?) for safety */}
                   {isAuthenticated && <span className="text-sm font-bold text-gray-800 hidden lg:block">{user?.full_name}</span>}
                 </button>
 
-                {isAuthenticated && isUserDropdownOpen && (
-                  <div className="absolute right-0 mt-3 w-60 bg-white rounded-2xl shadow-2xl border border-gray-100 p-3 z-50">
-                      <div className="px-3 py-2 border-b border-gray-100 mb-2">
-                          <p className="font-extrabold text-lg text-gray-900">{user?.full_name}</p>
-                          <p className="text-xs text-amber-700 font-medium uppercase tracking-wider">{user?.role}</p>
-                          <p className="text-sm text-gray-500 truncate mt-0.5">{user?.email}</p>
-                      </div>
-
-                      <ul className="space-y-1">
-                          <li>
-                              <Link to="/account" onClick={() => setIsUserDropdownOpen(false)} className="flex items-center gap-3 p-3 rounded-lg text-gray-800 font-semibold hover:bg-amber-50 text-sm">
-                                <Settings size={18} className="text-amber-600" />
-                                My Account & Details
-                              </Link>
-                          </li>
-                          
-                          {/* 🌟 Added Optional Chaining (?) for safety */}
-                          {user?.role === 'admin' && (
+                {isUserDropdownOpen && (
+                  <div className="absolute right-0 mt-3 w-64 bg-white rounded-2xl shadow-2xl border border-gray-100 p-3 z-50">
+                      
+                      {/* 🟢 IF LOGGED IN */}
+                      {isAuthenticated ? (
+                        <>
+                          <div className="px-3 py-2 border-b border-gray-100 mb-2">
+                              <p className="font-extrabold text-lg text-gray-900">{user?.full_name}</p>
+                              <p className="text-xs text-amber-700 font-medium uppercase tracking-wider">{user?.role}</p>
+                              <p className="text-sm text-gray-500 truncate mt-0.5">{user?.email}</p>
+                          </div>
+                          <ul className="space-y-1">
                               <li>
-                                <Link to="/admin" onClick={() => setIsUserDropdownOpen(false)} className="flex items-center gap-3 p-3 rounded-lg text-brand-red font-bold hover:bg-red-50 text-sm">
-                                  <span>🔒</span>
-                                  Admin Dashboard
-                                </Link>
+                                  <Link to="/account" onClick={() => setIsUserDropdownOpen(false)} className="flex items-center gap-3 p-3 rounded-lg text-gray-800 font-semibold hover:bg-amber-50 text-sm">
+                                    <Settings size={18} className="text-amber-600" /> My Account & Details
+                                  </Link>
                               </li>
-                          )}
-                          <li className="pt-2 mt-1 border-t border-gray-100">
-                              <button 
-                                onClick={logout}
-                                className="w-full flex items-center gap-3 p-3 rounded-lg text-red-700 font-bold hover:bg-red-100 text-sm"
-                              >
-                                <LogOut size={18} />
-                                Logout
-                              </button>
-                          </li>
-                      </ul>
+                              <li>
+                                  <Link to="/track-order" onClick={() => setIsUserDropdownOpen(false)} className="flex items-center gap-3 p-3 rounded-lg text-gray-800 font-semibold hover:bg-amber-50 text-sm">
+                                    <Package size={18} className="text-amber-600" /> Track Order
+                                  </Link>
+                              </li>
+                              {user?.role === 'admin' && (
+                                  <li>
+                                    <Link to="/admin" onClick={() => setIsUserDropdownOpen(false)} className="flex items-center gap-3 p-3 rounded-lg text-brand-red font-bold hover:bg-red-50 text-sm">
+                                      <span>🔒</span> Admin Dashboard
+                                    </Link>
+                                  </li>
+                              )}
+                              <li className="pt-2 mt-1 border-t border-gray-100">
+                                  <button onClick={logout} className="w-full flex items-center gap-3 p-3 rounded-lg text-red-700 font-bold hover:bg-red-100 text-sm">
+                                    <LogOut size={18} /> Logout
+                                  </button>
+                              </li>
+                          </ul>
+                        </>
+                      ) : (
+                        /* 🟡 IF GUEST USER */
+                        <>
+                          <div className="px-3 py-2 border-b border-gray-100 mb-2">
+                              <p className="font-extrabold text-lg text-gray-900">Welcome, Guest!</p>
+                              <p className="text-xs text-gray-500 mt-0.5">Sign in for faster checkout.</p>
+                          </div>
+                          <ul className="space-y-1">
+                              <li>
+                                  <Link to="/login" onClick={() => setIsUserDropdownOpen(false)} className="flex items-center gap-3 p-3 rounded-lg text-gray-800 font-semibold hover:bg-amber-50 text-sm">
+                                    <LogIn size={18} className="text-amber-600" /> Login / Register
+                                  </Link>
+                              </li>
+                              <li>
+                                  <Link to="/track-order" onClick={() => setIsUserDropdownOpen(false)} className="flex items-center gap-3 p-3 rounded-lg text-gray-800 font-semibold hover:bg-amber-50 text-sm">
+                                    <Package size={18} className="text-amber-600" /> Track Order
+                                  </Link>
+                              </li>
+                          </ul>
+                        </>
+                      )}
                   </div>
                 )}
               </div>

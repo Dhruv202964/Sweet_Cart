@@ -1,15 +1,14 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { CheckCircle } from 'lucide-react'; // 🌟 Premium Icon
 
 const Register = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
-    full_name: '',
-    email: '',
-    mobile: '',
-    password: ''
+    full_name: '', email: '', mobile: '', password: ''
   });
   const [loading, setLoading] = useState(false);
+  const [registerSuccess, setRegisterSuccess] = useState(false); // 🌟 Controls the success screen
 
   const handleInputChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -20,7 +19,6 @@ const Register = () => {
     setLoading(true);
     
     try {
-      // Assuming your auth routes are set up at /api/auth/register
       const res = await fetch('http://localhost:5000/api/auth/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -28,13 +26,12 @@ const Register = () => {
           full_name: formData.full_name,
           email: formData.email,
           password: formData.password,
-          role: 'customer' // Force role to customer!
+          role: 'customer' 
         })
       });
 
       if (res.ok) {
-        alert("Registration Successful! Please login.");
-        navigate('/login');
+        setRegisterSuccess(true); // 🌟 Show beautiful screen instead of alert!
       } else {
         const data = await res.json();
         alert(data.msg || "Registration failed.");
@@ -46,6 +43,29 @@ const Register = () => {
       setLoading(false);
     }
   };
+
+  // 🌟 THE PREMIUM SUCCESS UI
+  if (registerSuccess) {
+    return (
+      <div className="min-h-screen bg-[#FFFDF8] flex flex-col items-center justify-center p-6 font-sans">
+        <div className="bg-white p-10 md:p-14 rounded-[40px] shadow-2xl border border-amber-100 max-w-lg w-full text-center">
+          <div className="flex justify-center mb-6">
+            <CheckCircle className="text-green-500 w-24 h-24 drop-shadow-md" />
+          </div>
+          <h2 className="text-4xl font-black text-gray-800 mb-4 tracking-tighter">Account Created! 🎉</h2>
+          <p className="text-lg text-gray-600 mb-10 leading-relaxed">
+            Welcome to the SweetCart family, <span className="font-bold text-amber-700">{formData.full_name}</span>! Your account has been successfully registered.
+          </p>
+          <button 
+            onClick={() => navigate('/login')}
+            className="w-full py-4 rounded-2xl font-black text-white text-xl bg-red-800 hover:bg-red-900 transition-all shadow-xl hover:-translate-y-1"
+          >
+            Proceed to Login ➔
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-[#FFFDF8] flex flex-col justify-center py-12 sm:px-6 lg:px-8">
