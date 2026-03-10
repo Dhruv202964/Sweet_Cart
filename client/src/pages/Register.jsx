@@ -1,14 +1,17 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { CheckCircle } from 'lucide-react'; // 🌟 Premium Icon
+import { AuthContext } from '../context/AuthContext'; // 🌟 We need context to auto-login!
+import { CheckCircle, Loader2 } from 'lucide-react'; 
 
 const Register = () => {
   const navigate = useNavigate();
+  const { login } = useContext(AuthContext); // 🌟 Pull login function from context
+  
   const [formData, setFormData] = useState({
-    full_name: '', email: '', mobile: '', password: ''
+    full_name: '', email: '', phone: '', password: '' // 🌟 Changed mobile to phone here just in case!
   });
   const [loading, setLoading] = useState(false);
-  const [registerSuccess, setRegisterSuccess] = useState(false); // 🌟 Controls the success screen
+  const [registerSuccess, setRegisterSuccess] = useState(false);
 
   const handleInputChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -26,42 +29,49 @@ const Register = () => {
           full_name: formData.full_name,
           email: formData.email,
           password: formData.password,
+          phone: formData.phone, // 🌟 Make sure we send phone
           role: 'customer' 
         })
       });
 
+      const data = await res.json();
+
       if (res.ok) {
-        setRegisterSuccess(true); // 🌟 Show beautiful screen instead of alert!
+        // 🌟 INSTANT AUTO-LOGIN! We use the token and user sent back from your DB!
+        login(data.user, data.token);
+        setRegisterSuccess(true); 
+        
+        // 🌟 AUTO-REDIRECT after 1.5s
+        setTimeout(() => {
+            navigate('/');
+        }, 1500);
+
       } else {
-        const data = await res.json();
         alert(data.msg || "Registration failed.");
+        setLoading(false);
       }
     } catch (err) {
       console.error(err);
       alert("Server connection error.");
-    } finally {
       setLoading(false);
     }
   };
 
-  // 🌟 THE PREMIUM SUCCESS UI
+  // 🌟 THE PREMIUM SUCCESS UI (Auto-redirects!)
   if (registerSuccess) {
     return (
       <div className="min-h-screen bg-[#FFFDF8] flex flex-col items-center justify-center p-6 font-sans">
-        <div className="bg-white p-10 md:p-14 rounded-[40px] shadow-2xl border border-amber-100 max-w-lg w-full text-center">
+        <div className="bg-white p-10 md:p-14 rounded-[40px] shadow-2xl border border-amber-100 max-w-sm w-full text-center animate-in zoom-in duration-300">
           <div className="flex justify-center mb-6">
-            <CheckCircle className="text-green-500 w-24 h-24 drop-shadow-md" />
+            <CheckCircle className="text-green-500 w-24 h-24 drop-shadow-md animate-bounce" />
           </div>
-          <h2 className="text-4xl font-black text-gray-800 mb-4 tracking-tighter">Account Created! 🎉</h2>
-          <p className="text-lg text-gray-600 mb-10 leading-relaxed">
-            Welcome to the SweetCart family, <span className="font-bold text-amber-700">{formData.full_name}</span>! Your account has been successfully registered.
+          <h2 className="text-3xl font-black text-gray-800 mb-2 tracking-tighter">Account Created!</h2>
+          <p className="text-gray-600 mb-8 leading-relaxed font-medium">
+            Welcome to SweetCart, <span className="font-black text-amber-700">{formData.full_name}</span>!
           </p>
-          <button 
-            onClick={() => navigate('/login')}
-            className="w-full py-4 rounded-2xl font-black text-white text-xl bg-red-800 hover:bg-red-900 transition-all shadow-xl hover:-translate-y-1"
-          >
-            Proceed to Login ➔
-          </button>
+          <div className="flex items-center justify-center gap-2 text-green-600 font-bold">
+            <Loader2 className="animate-spin" size={20} /> Logging you in...
+          </div>
         </div>
       </div>
     );
@@ -104,7 +114,7 @@ const Register = () => {
             <div>
               <label className="block text-sm font-bold text-gray-700">Mobile Number</label>
               <div className="mt-1">
-                <input required name="mobile" type="tel" pattern="[0-9]{10}" maxLength="10" onChange={handleInputChange} className="appearance-none block w-full px-4 py-3 border border-gray-300 rounded-xl shadow-sm placeholder-gray-400 focus:outline-none focus:ring-amber-500 focus:border-amber-500 sm:text-sm transition-colors invalid:focus:border-red-500" placeholder="10-digit mobile number" />
+                <input required name="phone" type="tel" pattern="[0-9]{10}" maxLength="10" onChange={handleInputChange} className="appearance-none block w-full px-4 py-3 border border-gray-300 rounded-xl shadow-sm placeholder-gray-400 focus:outline-none focus:ring-amber-500 focus:border-amber-500 sm:text-sm transition-colors invalid:focus:border-red-500" placeholder="10-digit mobile number" />
               </div>
             </div>
 

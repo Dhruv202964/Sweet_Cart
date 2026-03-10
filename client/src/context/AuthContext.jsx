@@ -1,4 +1,4 @@
-import { createContext, useState, useEffect } from 'react';
+import React, { createContext, useState, useEffect } from 'react';
 
 export const AuthContext = createContext();
 
@@ -6,43 +6,43 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [token, setToken] = useState(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [loading, setLoading] = useState(true);
 
+  // Check if user is already logged in when the app loads
   useEffect(() => {
-    // 🌟 CHANGED TO sessionStorage: Dies when the browser tab closes!
-    const savedToken = sessionStorage.getItem('token');
-    const savedUser = sessionStorage.getItem('user');
-    
-    if (savedToken && savedUser) {
-      setToken(savedToken);
-      setUser(JSON.parse(savedUser));
+    const storedUser = localStorage.getItem('user');
+    const storedToken = localStorage.getItem('token');
+    if (storedUser && storedToken) {
+      setUser(JSON.parse(storedUser));
+      setToken(storedToken);
       setIsAuthenticated(true);
     }
-    setLoading(false);
   }, []);
 
-  const login = (userData, userToken) => {
-    // 🌟 CHANGED TO sessionStorage
-    sessionStorage.setItem('token', userToken);
-    sessionStorage.setItem('user', JSON.stringify(userData));
+  const login = (userData, authToken) => {
     setUser(userData);
-    setToken(userToken);
+    setToken(authToken);
     setIsAuthenticated(true);
+    localStorage.setItem('user', JSON.stringify(userData));
+    localStorage.setItem('token', authToken);
   };
 
   const logout = () => {
-    // 🌟 CHANGED TO sessionStorage
-    sessionStorage.removeItem('token');
-    sessionStorage.removeItem('user');
     setUser(null);
     setToken(null);
-    setIsAuthenticated(false); // Fix: set to false on logout!
-    window.location.href = '/login'; 
+    setIsAuthenticated(false);
+    localStorage.removeItem('user');
+    localStorage.removeItem('token');
+  };
+
+  // 🌟 THIS IS THE FIX: Updates the profile data in React's memory instantly!
+  const updateContextUser = (updatedUser) => {
+    setUser(updatedUser);
+    localStorage.setItem('user', JSON.stringify(updatedUser));
   };
 
   return (
-    <AuthContext.Provider value={{ user, token, isAuthenticated, login, logout, loading }}>
-      {!loading && children}
+    <AuthContext.Provider value={{ user, token, isAuthenticated, login, logout, updateContextUser }}>
+      {children}
     </AuthContext.Provider>
   );
 };

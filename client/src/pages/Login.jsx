@@ -1,7 +1,7 @@
 import React, { useState, useContext } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext'; 
-import { CheckCircle } from 'lucide-react'; // 🌟 Premium Icon
+import { CheckCircle, Loader2 } from 'lucide-react'; 
 
 const Login = () => {
   const navigate = useNavigate();
@@ -9,7 +9,6 @@ const Login = () => {
   const [formData, setFormData] = useState({ email: '', password: '' });
   const [loading, setLoading] = useState(false);
   
-  // 🌟 Controls the beautiful welcome screen
   const [loginSuccess, setLoginSuccess] = useState(false);
   const [welcomeName, setWelcomeName] = useState('');
 
@@ -33,45 +32,44 @@ const Login = () => {
       if (res.ok) {
         login(data.user, data.token);
         setWelcomeName(data.user.full_name);
-        setLoginSuccess(true); // 🌟 Trigger the premium UI!
+        setLoginSuccess(true); 
+        
+        // 🌟 THE MAGIC AUTO-REDIRECT! Wait 1.5 seconds, then go!
+        setTimeout(() => {
+          const savedOrder = sessionStorage.getItem('sweetcart_cart_' + formData.email);
+          if(savedOrder && JSON.parse(savedOrder).length > 0) {
+              navigate('/checkout');
+          } else {
+              navigate('/');
+          }
+        }, 1500);
+
       } else {
         alert(data.msg || "Invalid credentials.");
+        setLoading(false); // Only stop loading if there's an error
       }
     } catch (err) {
       console.error(err);
       alert("Server connection error.");
-    } finally {
       setLoading(false);
     }
   };
 
-  const handleProceed = () => {
-      const savedOrder = sessionStorage.getItem('sweetcart_cart_' + formData.email);
-      if(savedOrder && JSON.parse(savedOrder).length > 0) {
-          navigate('/checkout');
-      } else {
-          navigate('/');
-      }
-  };
-
-  // 🌟 THE PREMIUM WELCOME UI
+  // 🌟 THE PREMIUM WELCOME UI (NO BUTTON CLICK NEEDED!)
   if (loginSuccess) {
     return (
       <div className="min-h-screen bg-[#FFFDF8] flex flex-col items-center justify-center p-6 font-sans">
-        <div className="bg-white p-10 md:p-14 rounded-[40px] shadow-2xl border border-amber-100 max-w-lg w-full text-center">
+        <div className="bg-white p-10 md:p-14 rounded-[40px] shadow-2xl border border-amber-100 max-w-sm w-full text-center animate-in zoom-in duration-300">
           <div className="flex justify-center mb-6">
-            <CheckCircle className="text-amber-500 w-24 h-24 drop-shadow-md" />
+            <CheckCircle className="text-amber-500 w-24 h-24 drop-shadow-md animate-bounce" />
           </div>
-          <h2 className="text-4xl font-black text-gray-800 mb-4 tracking-tighter">Login Successful!</h2>
-          <p className="text-lg text-gray-600 mb-10 leading-relaxed">
-            Welcome back, <span className="font-black text-amber-700">{welcomeName}</span>! It is great to see you again.
+          <h2 className="text-3xl font-black text-gray-800 mb-2 tracking-tighter">Success!</h2>
+          <p className="text-gray-600 mb-8 leading-relaxed font-medium">
+            Welcome back, <span className="font-black text-amber-700">{welcomeName}</span>!
           </p>
-          <button 
-            onClick={handleProceed}
-            className="w-full py-4 rounded-2xl font-black text-white text-xl bg-amber-600 hover:bg-amber-700 transition-all shadow-xl hover:-translate-y-1"
-          >
-            Continue ➔
-          </button>
+          <div className="flex items-center justify-center gap-2 text-amber-600 font-bold">
+            <Loader2 className="animate-spin" size={20} /> Redirecting...
+          </div>
         </div>
       </div>
     );

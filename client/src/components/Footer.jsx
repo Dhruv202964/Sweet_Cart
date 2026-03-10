@@ -1,104 +1,96 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { MapPin, Phone, Mail, Heart, Instagram, Facebook, Twitter } from 'lucide-react';
+import { Instagram, Facebook, Twitter, MapPin, Phone, Mail } from 'lucide-react';
 
 const Footer = () => {
   return (
-    <footer className="bg-amber-950 text-amber-50 pt-16 pb-8 border-t-[6px] border-amber-500">
+    <footer className="bg-[#3b1700] text-[#FFFDF8] pt-16 pb-8 border-t-[8px] border-amber-500 font-sans">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        
-        {/* Top Grid Section */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-12">
-          
-          {/* Column 1: Brand & Story */}
-          <div className="space-y-4">
+
+          {/* Column 1: Brand Info */}
+          <div>
             <div className="flex items-center gap-3 mb-6">
-              <div className="bg-amber-500 text-black font-extrabold w-10 h-10 rounded-full flex items-center justify-center text-lg shadow-sm">
-                SC
-              </div>
-              <span className="text-2xl font-extrabold text-white tracking-tight">
-                SweetCart
-              </span>
+              <div className="bg-amber-500 text-black font-extrabold w-10 h-10 rounded-full flex items-center justify-center text-lg shadow-sm">SC</div>
+              <span className="text-2xl font-black text-white tracking-tight">SweetCart</span>
             </div>
-            <p className="text-amber-200/80 text-sm leading-relaxed">
+            <p className="text-[#e8d5c4] text-sm leading-relaxed mb-6 font-medium">
               Born in the heart of Surat, we have been crafting the finest, 100% pure vegetarian sweets and farsan. Our journey started with a single pan of premium ghee, and today we deliver smiles across the city.
             </p>
-            <div className="flex gap-4 pt-2">
-              <a href="#" className="text-amber-400 hover:text-white transition-colors"><Instagram size={20} /></a>
-              <a href="#" className="text-amber-400 hover:text-white transition-colors"><Facebook size={20} /></a>
-              <a href="#" className="text-amber-400 hover:text-white transition-colors"><Twitter size={20} /></a>
+            <div className="flex gap-4 text-amber-500">
+              <span className="hover:text-amber-400 cursor-pointer transition-colors"><Instagram size={20} /></span>
+              <span className="hover:text-amber-400 cursor-pointer transition-colors"><Facebook size={20} /></span>
+              <span className="hover:text-amber-400 cursor-pointer transition-colors"><Twitter size={20} /></span>
             </div>
           </div>
 
           {/* Column 2: Quick Links */}
           <div>
-            <h3 className="text-lg font-bold text-white mb-6 flex items-center gap-2">
+            <h4 className="text-xl font-black mb-6 text-white flex items-center gap-2">
               <span className="w-4 h-1 bg-amber-500 rounded-full"></span> Quick Links
-            </h3>
-            <ul className="space-y-3">
-              <li><Link to="/" className="text-amber-200/80 hover:text-amber-400 transition-colors text-sm">Home</Link></li>
-              <li><Link to="/menu" className="text-amber-200/80 hover:text-amber-400 transition-colors text-sm">Full Menu</Link></li>
-              <li><Link to="#" className="text-amber-200/80 hover:text-amber-400 transition-colors text-sm">About Us</Link></li>
-              <li><Link to="#" className="text-amber-200/80 hover:text-amber-400 transition-colors text-sm">Contact & Support</Link></li>
+            </h4>
+            <ul className="space-y-4 text-[#e8d5c4] text-sm font-medium">
+              <li><Link to="/" className="hover:text-amber-500 transition-colors">Home</Link></li>
+              <li><Link to="/menu" className="hover:text-amber-500 transition-colors">Full Menu</Link></li>
+              <li><Link to="/about" className="hover:text-amber-500 transition-colors">About Us</Link></li>
+              <li><Link to="/contact" className="hover:text-amber-500 transition-colors">Contact & Support</Link></li>
             </ul>
           </div>
 
-          {/* Column 3: Contact & Address */}
+          {/* Column 3: Visit Us */}
           <div>
-            <h3 className="text-lg font-bold text-white mb-6 flex items-center gap-2">
+            <h4 className="text-xl font-black mb-6 text-white flex items-center gap-2">
               <span className="w-4 h-1 bg-amber-500 rounded-full"></span> Visit Us
-            </h3>
-            <ul className="space-y-4">
-              <li className="flex items-start gap-3 text-sm text-amber-200/80">
-                <MapPin size={18} className="text-amber-500 shrink-0 mt-0.5" />
+            </h4>
+            <ul className="space-y-6 text-[#e8d5c4] text-sm font-medium">
+              <li className="flex items-start gap-3">
+                <MapPin size={20} className="text-amber-500 shrink-0" />
                 <span>101 Premium Complex,<br/>Adajan, Surat, Gujarat 395009</span>
               </li>
-              <li className="flex items-center gap-3 text-sm text-amber-200/80">
-                <Phone size={18} className="text-amber-500 shrink-0" />
+              <li className="flex items-center gap-3">
+                <Phone size={20} className="text-amber-500 shrink-0" />
                 <span>+91 98765 43210</span>
               </li>
-              <li className="flex items-center gap-3 text-sm text-amber-200/80">
-                <Mail size={18} className="text-amber-500 shrink-0" />
+              <li className="flex items-center gap-3">
+                <Mail size={20} className="text-amber-500 shrink-0" />
                 <span>hello@sweetcart.com</span>
               </li>
             </ul>
           </div>
 
-          {/* Column 4: Expansion / Coming Soon */}
+          {/* Column 4: Our Branches */}
           <div>
-            <h3 className="text-lg font-bold text-white mb-6 flex items-center gap-2">
+            <h4 className="text-xl font-black mb-6 text-white flex items-center gap-2">
               <span className="w-4 h-1 bg-amber-500 rounded-full"></span> Our Branches
-            </h3>
-            <div className="bg-amber-900/50 p-4 rounded-xl border border-amber-800/50">
-              <div className="mb-3 border-b border-amber-800/50 pb-3">
-                <span className="block text-xs text-amber-400 font-bold uppercase tracking-wider mb-1">Currently Serving</span>
-                <span className="text-white font-medium flex items-center gap-2">
-                  <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span> Surat (3 Outlets)
-                </span>
+            </h4>
+            <div className="bg-[#240e00] border border-[#592300] p-6 rounded-2xl shadow-inner">
+              <p className="text-amber-500 font-bold text-xs uppercase tracking-widest mb-2">Currently Serving</p>
+              <div className="flex items-center gap-2 mb-4 pb-4 border-b border-[#592300]">
+                <span className="w-2.5 h-2.5 bg-green-500 rounded-full animate-pulse"></span>
+                <span className="text-white font-black">Surat (3 Outlets)</span>
               </div>
-              <div>
-                <span className="block text-xs text-amber-400 font-bold uppercase tracking-wider mb-2">Coming Soon 🚀</span>
-                <div className="flex flex-wrap gap-2">
-                  <span className="text-xs bg-amber-950 border border-amber-700/50 text-amber-200/80 px-2 py-1 rounded">Ahmedabad</span>
-                  <span className="text-xs bg-amber-950 border border-amber-700/50 text-amber-200/80 px-2 py-1 rounded">Vadodara</span>
-                  <span className="text-xs bg-amber-950 border border-amber-700/50 text-amber-200/80 px-2 py-1 rounded">Mumbai</span>
-                </div>
+              <p className="text-amber-500 font-bold text-xs uppercase tracking-widest mb-3">Coming Soon 🚀</p>
+              <div className="flex gap-2 flex-wrap">
+                <span className="text-xs font-bold text-[#e8d5c4] bg-[#3b1700] px-3 py-1.5 rounded-lg border border-[#592300]">Ahmedabad</span>
+                <span className="text-xs font-bold text-[#e8d5c4] bg-[#3b1700] px-3 py-1.5 rounded-lg border border-[#592300]">Vadodara</span>
+                <span className="text-xs font-bold text-[#e8d5c4] bg-[#3b1700] px-3 py-1.5 rounded-lg border border-[#592300]">Mumbai</span>
               </div>
             </div>
           </div>
 
         </div>
 
-        {/* Bottom Copyright Bar */}
-        <div className="pt-8 border-t border-amber-900/50 flex flex-col md:flex-row justify-between items-center gap-4">
-          <p className="text-amber-500/60 text-sm">
-            © 2026 SweetCart. All rights reserved.
-          </p>
-          <p className="text-amber-500/60 text-sm flex items-center gap-1">
-            Made with <Heart size={14} className="text-red-500 fill-red-500" /> by Team 404 ERROR
-          </p>
+        {/* Bottom Bar */}
+        <div className="border-t border-[#592300] pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-[#e8d5c4] text-sm font-medium">
+          <div className="flex flex-col md:flex-row items-center gap-2 md:gap-6">
+            <p>&copy; {new Date().getFullYear()} SweetCart. All rights reserved.</p>
+            {/* 🌟 PRIVACY POLICY LINK ADDED HERE */}
+            <Link to="/privacy" className="hover:text-amber-500 transition-colors font-bold border-b border-transparent hover:border-amber-500">
+              Privacy Policy
+            </Link>
+          </div>
+          <p>Made with <span className="text-red-500 animate-pulse">❤️</span> by <Link to="/team" className="text-amber-500 font-bold hover:text-amber-400 transition-colors border-b border-transparent hover:border-amber-400">Team 4O4 ERROR</Link></p>
         </div>
-
       </div>
     </footer>
   );

@@ -19,6 +19,11 @@ import ProductDetails from './pages/ProductDetails';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import TrackOrder from './pages/TrackOrder';
+import MyAccount from './pages/MyAccount';
+import About from './pages/About';
+import Contact from './pages/Contact';
+import PrivacyPolicy from './pages/PrivacyPolicy';
+import Team from './pages/Team';
 
 function App() {
   return (
@@ -37,6 +42,11 @@ function App() {
               <Route path="/product/:id" element={<ProductDetails />} />
               <Route path="/admin" element={<Dashboard />} />
               <Route path="/track-order" element={<TrackOrder />} />
+              <Route path="/account" element={<MyAccount />} />
+              <Route path="/about" element={<About />} />
+              <Route path="/contact" element={<Contact />} />
+              <Route path="/privacy" element={<PrivacyPolicy />} />
+              <Route path="/team" element={<Team />} />
             </Routes>
           </main>
 
