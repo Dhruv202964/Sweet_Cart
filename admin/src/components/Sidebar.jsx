@@ -43,6 +43,11 @@ const Sidebar = () => {
         <div className="my-6 border-t border-red-800 mx-4"></div>
         <p className="text-xs font-bold text-red-200 uppercase px-3 mb-2 tracking-wider">Administration</p>
 
+        {/* 🔥 NEW CRM LINK ADDED HERE */}
+        <Link to="/customers" className={`flex items-center gap-3 px-3 py-3 rounded-xl transition-all ${isActive('/customers')}`}>
+          <span>👥</span> Customers
+        </Link>
+
         <Link to="/messages" className={`flex items-center gap-3 px-3 py-3 rounded-xl transition-all ${isActive('/messages')}`}>
           <span>📩</span> Messages
         </Link>

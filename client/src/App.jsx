@@ -9,10 +9,11 @@ import { AuthProvider } from './context/AuthContext';
 // Component Imports
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
+import ProtectedRoute from './components/ProtectedRoute';
 
 // Page Imports
 import Home from './pages/Home';
-import Dashboard from './pages/Dashboard';
+import Dashboard from './pages/Dashboard'; // Admin Dashboard
 import Menu from './pages/Menu';
 import Checkout from './pages/Checkout';
 import ProductDetails from './pages/ProductDetails';
@@ -34,19 +35,26 @@ function App() {
           
           <main className="min-h-screen bg-[#FFFDF8]">
             <Routes>
+              {/* 🟢 PUBLIC ROUTES */}
               <Route path="/" element={<Home />} />
               <Route path="/menu" element={<Menu />} /> 
               <Route path="/checkout" element={<Checkout />} />
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
               <Route path="/product/:id" element={<ProductDetails />} />
-              <Route path="/admin" element={<Dashboard />} />
               <Route path="/track-order" element={<TrackOrder />} />
               <Route path="/account" element={<MyAccount />} />
               <Route path="/about" element={<About />} />
               <Route path="/contact" element={<Contact />} />
               <Route path="/privacy" element={<PrivacyPolicy />} />
               <Route path="/team" element={<Team />} />
+
+              {/* 🛡️ PROTECTED ADMIN ROUTES (THE VAULT) 🛡️ */}
+              <Route element={<ProtectedRoute />}>
+                <Route path="/admin" element={<Dashboard />} />
+                {/* Any future admin pages (like /admin/products) go inside here too! */}
+              </Route>
+
             </Routes>
           </main>
 

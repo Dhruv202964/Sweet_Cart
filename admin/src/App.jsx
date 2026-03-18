@@ -10,6 +10,7 @@ import Dashboard from './pages/Dashboard';
 import Products from './pages/Products';
 import Orders from './pages/Orders';
 import Messages from './pages/Messages';
+import ManageCustomers from './pages/ManageCustomers'; // 🔥 NEW IMPORT ADDED
 
 // Placeholder for Riders
 const Riders = () => (
@@ -54,6 +55,7 @@ function App() {
                     <Route path="/riders" element={<Riders />} />
                     
                     {/* Administration Routes */}
+                    <Route path="/customers" element={<ManageCustomers />} />
                     <Route path="/messages" element={<Messages />} />
                     
                     {/* Catch-all: Send unknown links to the safe home */}

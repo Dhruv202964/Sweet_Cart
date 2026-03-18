@@ -11,6 +11,7 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     const storedUser = localStorage.getItem('user');
     const storedToken = localStorage.getItem('token');
+    
     if (storedUser && storedToken) {
       setUser(JSON.parse(storedUser));
       setToken(storedToken);
@@ -27,11 +28,20 @@ export const AuthProvider = ({ children }) => {
   };
 
   const logout = () => {
+    // 1. Wipe React State
     setUser(null);
     setToken(null);
     setIsAuthenticated(false);
+    
+    // 2. Annihilate Local Storage
     localStorage.removeItem('user');
     localStorage.removeItem('token');
+    
+    // 🔥 THE GHOST BUSTER (NUCLEAR OPTION) 🔥
+    // This forces the browser to completely dump the React memory tree.
+    // It prevents Khiloshiya Ji from hitting the 'Back' button and seeing
+    // the cached Admin Dashboard charts. It rebuilds the app from scratch.
+    window.location.href = '/login';
   };
 
   // 🌟 THIS IS THE FIX: Updates the profile data in React's memory instantly!

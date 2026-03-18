@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Instagram, Facebook, Twitter, MapPin, Phone, Mail } from 'lucide-react';
+import { Instagram, Facebook, Twitter, MapPin, Phone } from 'lucide-react'; // Removed Mail import
 
 const Footer = () => {
   return (
@@ -15,7 +15,7 @@ const Footer = () => {
               <span className="text-2xl font-black text-white tracking-tight">SweetCart</span>
             </div>
             <p className="text-[#e8d5c4] text-sm leading-relaxed mb-6 font-medium">
-              Born in the heart of Surat, we have been crafting the finest, 100% pure vegetarian sweets and farsan. Our journey started with a single pan of premium ghee, and today we deliver smiles across the city.
+              Born in the heart of Surat, we have been crafting the finest, 100% pure vegetarian sweets and farsan. Originally Shreenathji Farsan, our journey started with a single pan of premium ghee, and today we deliver smiles across the city.
             </p>
             <div className="flex gap-4 text-amber-500">
               <span className="hover:text-amber-400 cursor-pointer transition-colors"><Instagram size={20} /></span>
@@ -37,24 +37,49 @@ const Footer = () => {
             </ul>
           </div>
 
-          {/* Column 3: Visit Us */}
+          {/* Column 3: Visit Us (GROUPED CONTACT DETAILS) */}
           <div>
             <h4 className="text-xl font-black mb-6 text-white flex items-center gap-2">
               <span className="w-4 h-1 bg-amber-500 rounded-full"></span> Visit Us
             </h4>
             <ul className="space-y-6 text-[#e8d5c4] text-sm font-medium">
-              <li className="flex items-start gap-3">
-                <MapPin size={20} className="text-amber-500 shrink-0" />
-                <span>101 Premium Complex,<br/>Adajan, Surat, Gujarat 395009</span>
+              
+              {/* Main Branch Block */}
+              <li className="flex flex-col gap-2">
+                <div className="flex items-start gap-3">
+                  <MapPin size={20} className="text-amber-500 shrink-0 mt-1" />
+                  <span>
+                    <strong className="text-amber-500">Main Branch:</strong><br/>
+                    Navsari Bazar Rd, Rustampura,<br/>
+                    Surat, Gujarat 395002
+                  </span>
+                </div>
+                {/* Indented Phone Number */}
+                <div className="flex items-center gap-3 pl-8">
+                  <Phone size={16} className="text-amber-500 shrink-0" />
+                  <span className="text-amber-400 font-bold hover:text-white transition-colors cursor-pointer">+91 98251 53531</span>
+                </div>
               </li>
-              <li className="flex items-center gap-3">
-                <Phone size={20} className="text-amber-500 shrink-0" />
-                <span>+91 98765 43210</span>
+
+              {/* Adajan Branch Block */}
+              <li className="flex flex-col gap-2">
+                <div className="flex items-start gap-3">
+                  <MapPin size={20} className="text-amber-500 shrink-0 mt-1" />
+                  <span>
+                    <strong className="text-amber-500">Adajan Branch:</strong><br/>
+                    Shop No.3, Green Plaza,<br/>
+                    Subhash Chandra Bose Marg,<br/>
+                    Adajan, Surat 395009
+                  </span>
+                </div>
+                {/* Indented Phone Number */}
+                <div className="flex items-center gap-3 pl-8">
+                  <Phone size={16} className="text-amber-500 shrink-0" />
+                  <span className="text-amber-400 font-bold hover:text-white transition-colors cursor-pointer">+91 88667 98147</span>
+                </div>
               </li>
-              <li className="flex items-center gap-3">
-                <Mail size={20} className="text-amber-500 shrink-0" />
-                <span>hello@sweetcart.com</span>
-              </li>
+              
+              {/* Email Block Removed */}
             </ul>
           </div>
 
@@ -67,7 +92,7 @@ const Footer = () => {
               <p className="text-amber-500 font-bold text-xs uppercase tracking-widest mb-2">Currently Serving</p>
               <div className="flex items-center gap-2 mb-4 pb-4 border-b border-[#592300]">
                 <span className="w-2.5 h-2.5 bg-green-500 rounded-full animate-pulse"></span>
-                <span className="text-white font-black">Surat (3 Outlets)</span>
+                <span className="text-white font-black">Surat (2 Outlets)</span>
               </div>
               <p className="text-amber-500 font-bold text-xs uppercase tracking-widest mb-3">Coming Soon 🚀</p>
               <div className="flex gap-2 flex-wrap">
@@ -84,7 +109,6 @@ const Footer = () => {
         <div className="border-t border-[#592300] pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-[#e8d5c4] text-sm font-medium">
           <div className="flex flex-col md:flex-row items-center gap-2 md:gap-6">
             <p>&copy; {new Date().getFullYear()} SweetCart. All rights reserved.</p>
-            {/* 🌟 PRIVACY POLICY LINK ADDED HERE */}
             <Link to="/privacy" className="hover:text-amber-500 transition-colors font-bold border-b border-transparent hover:border-amber-500">
               Privacy Policy
             </Link>

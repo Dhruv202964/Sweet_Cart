@@ -7,6 +7,21 @@ const TrackOrder = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
+  // 🔥 THE CLEAN DATE FIXER (NO TIME, NO HEADACHE) 🔥
+  const formatDate = (dateString) => {
+    // Force UTC marker just in case, to prevent shifting days
+    const safeDate = dateString.endsWith('Z') ? dateString : `${dateString}Z`;
+    const d = new Date(safeDate);
+    
+    // Just returning the clean Date in IST, dropping the time completely!
+    return d.toLocaleDateString('en-IN', {
+      timeZone: 'Asia/Kolkata',
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric'
+    }).toUpperCase(); 
+  };
+
   const handleTrack = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -131,8 +146,10 @@ const TrackOrder = () => {
                             <p><span className="text-gray-500">Phone:</span> +91 {order.phone}</p>
                             <p><span className="text-gray-500">Address:</span> {order.flat_house}, {order.delivery_address}, {order.landmark}</p>
                             <p><span className="text-gray-500">Location:</span> {order.delivery_city}, {order.state} - {order.pincode}</p>
+                            
+                            {/* 🔥 CLEAN DATE FIX APPLIED HERE 🔥 */}
                             <p className="pt-2 mt-2 border-t border-amber-200/50 text-amber-800 font-bold">
-                              Placed on {new Date(order.created_at).toLocaleDateString()} at {new Date(order.created_at).toLocaleTimeString()}
+                              Placed on {formatDate(order.created_at)}
                             </p>
                         </div>
                     </div>
