@@ -1,5 +1,5 @@
 Sweet_Cart: Development Log
-Team: 404 ERROR
+Team: TEAM 404 ERROR
 Project: Professional E-commerce & Inventory Ecosystem
 Tech Stack: React.js (Vite), Node.js, Express.js, PostgreSQL, Tailwind CSS
 
@@ -295,7 +295,7 @@ Premium UI Design: Developed Home.jsx utilizing a luxury "Purshottam" amber and 
 
 Sectioned Menu Page: Engineered Menu.jsx to dynamically render distinct, scrollable category sections (Sweets, Farsan, Dairy) rather than hiding items behind filter tabs.
 
-Database Enrichment: Executed SQL scripts to inject rich, professional descriptions for 18 authentic Surati products. Mapped local .jpg assets (via public/uploads) to the PostgreSQL image_url column with object-cover CSS for uniform sizing.
+Database Enrichment: Executed SQL scripts to inject rich, professional descriptions for 18 authentic Surati products. Mapped local .jpg assets (via /public/uploads) to the PostgreSQL image_url column with object-cover CSS for uniform sizing.
 
 ✅ Milestones
 
@@ -476,3 +476,33 @@ Global Link Wiring: Fully integrated react-router-dom <Link> components across t
 ✅ Milestones
 
 The entire Client-Side storefront is officially locked in, feature-complete, and visually flawless for the final faculty presentation.
+
+Day 19: Full-Stack Cloud Deployment & Production Readiness
+Date: 2026-03-28 | Status: Complete | Phase: Live Production
+
+🎯 Objective
+Deploy the local PERN stack application to the public internet to enable seamless client testing and faculty presentations without local environment dependencies.
+
+🛠️ Critical Fixes
+
+Environment Variable Migration: Securely transferred local .env secrets (Neon PostgreSQL Database URLs, server ports) into Render's cloud environment settings to prevent database connection failures.
+
+CORS Policy Resolution: Ensured the backend server.js was configured to accept cross-origin requests from the new live Netlify frontend domains, bypassing browser security blocks.
+
+Route Re-Wiring: Safely executed a global codebase swap, replacing all local development fetch endpoints (localhost:5000) with the new, permanent production API links.
+
+⚙️ Technical Implementation
+
+Backend Deployment (Render): Connected the GitHub monorepo to Render's web service. Configured the automated build (npm install) and start (node server.js) commands to host the Node/Express server securely in the cloud.
+
+Frontend Build Process: Utilized Vite's compiler (npm run build) to generate highly optimized, minified dist folders for both the client and admin React applications.
+
+Frontend Deployment (Netlify): Deployed the compiled React builds via Netlify Drop, generating fast, secure HTTPS URLs for the separate Client Storefront and Admin CRM interfaces.
+
+✅ Milestones
+
+Backend API is officially hosted and running 24/7 in the cloud.
+
+Client Storefront and Admin CRM were successfully tested live on production-grade Netlify URLs.
+
+The application architecture is verified as fully accessible globally on mobile and desktop, requiring zero software installation for the end-user.
