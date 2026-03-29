@@ -2,14 +2,17 @@ import { useState, useContext, useRef, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { CartContext } from '../context/CartContext';
 import { AuthContext } from '../context/AuthContext'; 
-// 🌟 Added Package and LogIn icons here!
-import { CircleUser, Menu, X, Settings, LogOut, Package, LogIn } from 'lucide-react'; 
+import { CircleUser, Menu, X, Settings, LogOut, Package, LogIn, Globe } from 'lucide-react'; 
 import CartSidebar from './CartSidebar';
+import { useTranslation } from 'react-i18next';
 
 const Navbar = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const dropdownRef = useRef(null); 
+
+  // 🌍 Initialize the translation engine
+  const { t, i18n } = useTranslation();
 
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false); 
@@ -39,7 +42,11 @@ const Navbar = () => {
     }
   };
 
-  // 🌟 MAGIC UX: Hide cart on checkout, login, AND register pages!
+  // 🌍 The function to switch languages instantly
+  const changeLanguage = (e) => {
+    i18n.changeLanguage(e.target.value);
+  };
+
   const hideCartPages = ['/checkout', '/login', '/register'];
   const shouldHideCart = hideCartPages.includes(location.pathname);
 
@@ -59,15 +66,19 @@ const Navbar = () => {
 
             {/* Desktop Navigation */}
             <div className="hidden md:flex flex-1 items-center justify-center px-8 gap-8">
-              <Link to="/" className={`font-semibold text-lg transition-colors ${location.pathname === '/' ? 'text-amber-600' : 'text-gray-700 hover:text-amber-600'}`}>Home</Link>
-              <Link to="/menu" className={`font-semibold text-lg transition-colors ${location.pathname === '/menu' ? 'text-amber-600' : 'text-gray-700 hover:text-amber-600'}`}>Full Menu</Link>
+              <Link to="/" className={`font-semibold text-lg transition-colors ${location.pathname === '/' ? 'text-amber-600' : 'text-gray-700 hover:text-amber-600'}`}>
+                {t('home', 'Home')}
+              </Link>
+              <Link to="/menu" className={`font-semibold text-lg transition-colors ${location.pathname === '/menu' ? 'text-amber-600' : 'text-gray-700 hover:text-amber-600'}`}>
+                {t('full_menu', 'Full Menu')}
+              </Link>
               
               <div className="max-w-md w-full ml-4 hidden lg:block">
                 <div className="relative">
                   <span className="absolute inset-y-0 left-0 pl-3 flex items-center text-amber-500">
                     <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
                   </span>
-                  <input type="text" value={searchQuery} onChange={handleSearch} placeholder="Search for premium sweets, farsan..." className="w-full pl-10 pr-4 py-2.5 border border-amber-300 rounded-full focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent text-sm bg-amber-50/30" />
+                  <input type="text" value={searchQuery} onChange={handleSearch} placeholder={t('search_placeholder', 'Search for premium sweets, farsan...')} className="w-full pl-10 pr-4 py-2.5 border border-amber-300 rounded-full focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent text-sm bg-amber-50/30" />
                 </div>
               </div>
             </div>
@@ -75,7 +86,23 @@ const Navbar = () => {
             {/* Right Side Icons */}
             <div className="flex items-center gap-4">
               
-              {/* 🛒 Cart Button (Hidden on specific pages) */}
+              {/* 🌍 THE UI FLEX: Premium Language Switcher */}
+              {/*<div className="hidden sm:flex items-center gap-1 bg-amber-50 px-2 py-1 rounded-full border border-amber-100">
+                <Globe size={18} className="text-amber-600" />
+                <select 
+                  onChange={changeLanguage} 
+                  defaultValue={i18n.language}
+                  className="bg-transparent text-sm font-bold text-amber-900 focus:outline-none cursor-pointer border-none"
+                >
+                  {/* 🌟 3-LETTER VALUES LOCKED IN */}
+                  {/*<option value="eng">ENG</option>
+                  <option value="hin">HIN</option>
+                  <option value="guj">GUJ</option>
+                </select>
+              </div>
+              */}
+
+              {/* 🛒 Cart Button */}
               {!shouldHideCart && (
                 <button onClick={() => setIsCartOpen(true)} className="relative p-2 text-gray-700 hover:text-amber-600 transition-colors">
                   <svg className="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
@@ -107,24 +134,24 @@ const Navbar = () => {
                           <ul className="space-y-1">
                               <li>
                                   <Link to="/account" onClick={() => setIsUserDropdownOpen(false)} className="flex items-center gap-3 p-3 rounded-lg text-gray-800 font-semibold hover:bg-amber-50 text-sm">
-                                    <Settings size={18} className="text-amber-600" /> My Account & Details
+                                    <Settings size={18} className="text-amber-600" /> {t('my_account', 'My Account & Details')}
                                   </Link>
                               </li>
                               <li>
                                   <Link to="/track-order" onClick={() => setIsUserDropdownOpen(false)} className="flex items-center gap-3 p-3 rounded-lg text-gray-800 font-semibold hover:bg-amber-50 text-sm">
-                                    <Package size={18} className="text-amber-600" /> Track Order
+                                    <Package size={18} className="text-amber-600" /> {t('track_order', 'Track Order')}
                                   </Link>
                               </li>
                               {user?.role === 'admin' && (
                                   <li>
-                                    <Link to="/admin" onClick={() => setIsUserDropdownOpen(false)} className="flex items-center gap-3 p-3 rounded-lg text-brand-red font-bold hover:bg-red-50 text-sm">
-                                      <span>🔒</span> Admin Dashboard
+                                    <Link to="/admin" onClick={() => setIsUserDropdownOpen(false)} className="flex items-center gap-3 p-3 rounded-lg text-red-600 font-bold hover:bg-red-50 text-sm">
+                                      <span>🔒</span> {t('admin_dash', 'Admin Dashboard')}
                                     </Link>
                                   </li>
                               )}
                               <li className="pt-2 mt-1 border-t border-gray-100">
                                   <button onClick={logout} className="w-full flex items-center gap-3 p-3 rounded-lg text-red-700 font-bold hover:bg-red-100 text-sm">
-                                    <LogOut size={18} /> Logout
+                                    <LogOut size={18} /> {t('logout', 'Logout')}
                                   </button>
                               </li>
                           </ul>
@@ -133,18 +160,18 @@ const Navbar = () => {
                         /* 🟡 IF GUEST USER */
                         <>
                           <div className="px-3 py-2 border-b border-gray-100 mb-2">
-                              <p className="font-extrabold text-lg text-gray-900">Welcome, Guest!</p>
-                              <p className="text-xs text-gray-500 mt-0.5">Sign in for faster checkout.</p>
+                              <p className="font-extrabold text-lg text-gray-900">{t('welcome_guest', 'Welcome, Guest!')}</p>
+                              <p className="text-xs text-gray-500 mt-0.5">{t('sign_in_fast', 'Sign in for faster checkout.')}</p>
                           </div>
                           <ul className="space-y-1">
                               <li>
                                   <Link to="/login" onClick={() => setIsUserDropdownOpen(false)} className="flex items-center gap-3 p-3 rounded-lg text-gray-800 font-semibold hover:bg-amber-50 text-sm">
-                                    <LogIn size={18} className="text-amber-600" /> Login / Register
+                                    <LogIn size={18} className="text-amber-600" /> {t('login_register', 'Login / Register')}
                                   </Link>
                               </li>
                               <li>
                                   <Link to="/track-order" onClick={() => setIsUserDropdownOpen(false)} className="flex items-center gap-3 p-3 rounded-lg text-gray-800 font-semibold hover:bg-amber-50 text-sm">
-                                    <Package size={18} className="text-amber-600" /> Track Order
+                                    <Package size={18} className="text-amber-600" /> {t('track_order', 'Track Order')}
                                   </Link>
                               </li>
                           </ul>

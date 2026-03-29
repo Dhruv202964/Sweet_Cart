@@ -1,13 +1,22 @@
 import React, { useEffect, useState } from 'react';
-import { Eye, Trash2 } from 'lucide-react';
+import { Eye, Trash2, BellRing, Map, PackageOpen, CheckCircle, XCircle, CalendarDays } from 'lucide-react'; // 🌟 Swapped Clock for CalendarDays
 import OrderDetailsModal from '../components/OrderDetailsModal';
+import toast from 'react-hot-toast'; 
+
+// 🗺️ THE EXPANDED NATIONAL LOCATION DICTIONARY
+const locationData = {
+  'Gujarat': ['Surat', 'Ahmedabad', 'Vadodara', 'Rajkot', 'Gandhinagar'],
+  'Maharashtra': ['Mumbai', 'Pune', 'Nagpur', 'Nashik'],
+  'Rajasthan': ['Jaipur', 'Udaipur', 'Jodhpur'],
+  'Delhi': ['New Delhi', 'Dwarka']
+};
 
 const Orders = () => {
   const [orders, setOrders] = useState([]);
+  const [activeTab, setActiveTab] = useState('Active');
+  const [selectedState, setSelectedState] = useState('All');
   const [selectedCity, setSelectedCity] = useState('All');
   const [selectedOrder, setSelectedOrder] = useState(null);
-  
-  const filterOptions = ['All', 'Surat', 'Ahmedabad', 'Mumbai', 'Vadodara', 'Cancelled'];
 
   useEffect(() => {
     fetch('http://localhost:5000/api/orders')
@@ -25,22 +34,30 @@ const Orders = () => {
       });
       if (res.ok) {
         setOrders(orders.map(o => o.order_id === id ? { ...o, status: newStatus } : o));
+        
+        if (newStatus === 'Delivered') {
+          toast.success(`Order #${id} Moved to Delivered! 🎉`, { style: { border: '2px solid #10b981', backgroundColor: '#1f2937', color: '#fff' }});
+        } else if (newStatus === 'Cancelled') {
+          toast.error(`Order #${id} Cancelled.`, { style: { border: '2px solid #ef4444', backgroundColor: '#1f2937', color: '#fff' }});
+        } else {
+          toast.success(`Order #${id} marked as ${newStatus}! 🚚`, { style: { border: '2px solid #3b82f6', backgroundColor: '#1f2937', color: '#fff' }});
+        }
       }
     } catch (err) {
       console.error(err);
+      toast.error("Failed to update status.");
     }
   };
 
   const handleDelete = async (id) => {
-    if (!window.confirm("Are you sure you want to delete this order?")) return;
+    if (!window.confirm("Are you sure you want to delete this order entirely?")) return;
     try {
       const res = await fetch(`http://localhost:5000/api/orders/${id}`, { method: 'DELETE' });
       if (res.ok) {
         setOrders(orders.filter(o => o.order_id !== id));
+        toast.success('Order Deleted 🗑️', { style: { border: '2px solid #ef4444', backgroundColor: '#1f2937', color: '#fff' }});
       }
-    } catch (err) {
-      console.error(err);
-    }
+    } catch (err) { console.error(err); }
   };
 
   const getStatusBadge = (status) => {
@@ -53,41 +70,130 @@ const Orders = () => {
     }
   };
 
-  const filteredOrders = selectedCity === 'All' 
-    ? orders 
-    : selectedCity === 'Cancelled'
-      ? orders.filter(order => order.status === 'Cancelled')
-      : orders.filter(order => (order.city || 'Surat').toLowerCase() === selectedCity.toLowerCase());
+  const filteredOrders = orders.filter(order => {
+    const isActiveTab = activeTab === 'Active' && !['Delivered', 'Cancelled'].includes(order.status);
+    const isDeliveredTab = activeTab === 'Delivered' && order.status === 'Delivered';
+    const isCancelledTab = activeTab === 'Cancelled' && order.status === 'Cancelled';
+    
+    if (!isActiveTab && !isDeliveredTab && !isCancelledTab) return false;
+
+    if (selectedState !== 'All') {
+      const orderCity = order.city || 'Surat'; 
+      const belongsToState = locationData[selectedState]?.includes(orderCity);
+      if (!belongsToState) return false;
+      
+      if (selectedCity !== 'All' && orderCity.toLowerCase() !== selectedCity.toLowerCase()) {
+        return false;
+      }
+    }
+    
+    return true;
+  });
+
+  const simulateNewOrder = () => {
+    toast.custom((t) => (
+      <div className={`${t.visible ? 'animate-enter' : 'animate-leave'} max-w-md w-full bg-white shadow-2xl rounded-2xl pointer-events-auto flex border-l-8 border-green-500`}>
+        <div className="flex-1 w-0 p-4">
+          <div className="flex items-start">
+            <div className="flex-shrink-0 pt-0.5">
+              <span className="text-3xl animate-bounce inline-block">🛎️</span>
+            </div>
+            <div className="ml-3 flex-1">
+              <p className="text-lg font-black text-gray-900 uppercase tracking-wide">New Order Received!</p>
+              <p className="mt-1 text-sm text-gray-500 font-bold">Action Required: Prepare for Dispatch</p>
+            </div>
+          </div>
+        </div>
+        <div className="flex border-l border-gray-200">
+          <button onClick={() => toast.dismiss(t.id)} className="w-full border border-transparent rounded-none rounded-r-2xl p-4 flex items-center justify-center text-sm font-bold text-brand-red hover:text-red-800 focus:outline-none focus:ring-2 focus:ring-brand-red">
+            Dismiss
+          </button>
+        </div>
+      </div>
+    ), { duration: 6000, position: 'top-right' });
+  };
 
   return (
     <div className="p-8 bg-orange-50 min-h-screen">
       
-      <div className="flex justify-between items-center mb-8">
+      <div className="flex justify-between items-center mb-6">
         <div>
           <h2 className="text-3xl font-bold text-gray-800">Order Management</h2>
-          <p className="text-gray-500">Track and manage customer shipments.</p>
+          <p className="text-gray-500">Track and manage customer shipments across regions.</p>
         </div>
-        <div className="bg-white px-4 py-2 rounded-xl shadow-sm border border-gray-200">
-          <span className="text-gray-500 font-bold text-sm">Total Orders:</span>
-          <span className="text-2xl font-bold text-brand-red ml-2">{orders.length}</span>
+        <div className="flex items-center gap-4">
+          <button 
+            onClick={simulateNewOrder}
+            className="flex items-center gap-2 bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-xl shadow-lg transition-transform hover:scale-105"
+          >
+            <BellRing size={18} className="animate-pulse" /> Demo Notification
+          </button>
+          <div className="bg-white px-4 py-2 rounded-xl shadow-sm border border-gray-200">
+            <span className="text-gray-500 font-bold text-sm">Showing {activeTab}:</span>
+            <span className="text-2xl font-bold text-brand-red ml-2">{filteredOrders.length}</span>
+          </div>
         </div>
       </div>
 
-      <div className="flex flex-wrap gap-3 mb-6">
-        {filterOptions.map(city => (
+      <div className="flex gap-4 mb-6 border-b border-gray-200 pb-4">
+        <button 
+          onClick={() => setActiveTab('Active')}
+          className={`flex items-center gap-2 px-6 py-3 rounded-t-xl font-bold transition-all ${activeTab === 'Active' ? 'bg-white text-brand-red border-t-4 border-brand-red shadow-sm' : 'text-gray-500 hover:text-gray-800 hover:bg-white/50'}`}
+        >
+          <PackageOpen size={20} /> Active Queue
+        </button>
+        <button 
+          onClick={() => setActiveTab('Delivered')}
+          className={`flex items-center gap-2 px-6 py-3 rounded-t-xl font-bold transition-all ${activeTab === 'Delivered' ? 'bg-white text-green-600 border-t-4 border-green-500 shadow-sm' : 'text-gray-500 hover:text-gray-800 hover:bg-white/50'}`}
+        >
+          <CheckCircle size={20} /> Delivered History
+        </button>
+        <button 
+          onClick={() => setActiveTab('Cancelled')}
+          className={`flex items-center gap-2 px-6 py-3 rounded-t-xl font-bold transition-all ${activeTab === 'Cancelled' ? 'bg-white text-red-600 border-t-4 border-red-500 shadow-sm' : 'text-gray-500 hover:text-gray-800 hover:bg-white/50'}`}
+        >
+          <XCircle size={20} /> Cancelled
+        </button>
+      </div>
+
+      <div className="flex flex-wrap items-center gap-3 mb-4 bg-white p-3 rounded-2xl shadow-sm border border-gray-200">
+        <div className="flex items-center gap-2 text-brand-red font-bold px-3 border-r border-gray-100">
+          <Map size={20} />
+          <span>Region:</span>
+        </div>
+        {['All', 'Gujarat', 'Maharashtra', 'Rajasthan', 'Delhi'].map(state => (
           <button
-            key={city}
-            onClick={() => setSelectedCity(city)}
-            className={`px-5 py-2 rounded-xl text-sm font-bold transition-all shadow-sm ${
-              selectedCity === city
-                ? 'bg-red-800 text-white border-2 border-red-800 scale-105' 
-                : 'bg-white text-gray-600 border-2 border-gray-200 hover:border-red-300 hover:text-red-600'
+            key={state}
+            onClick={() => { setSelectedState(state); setSelectedCity('All'); }}
+            className={`px-4 py-2 rounded-xl text-sm font-bold transition-all shadow-sm ${
+              selectedState === state ? 'bg-brand-red text-white scale-105' : 'bg-gray-50 text-gray-600 border border-transparent hover:border-red-300 hover:text-brand-red'
             }`}
           >
-            {city}
+            {state}
           </button>
         ))}
       </div>
+
+      {selectedState !== 'All' && (
+        <div className="flex flex-wrap items-center gap-3 mb-6 animate-in fade-in slide-in-from-top-2 duration-300 pl-4">
+          <span className="text-xs font-bold text-gray-400 uppercase tracking-wider">Filter by City:</span>
+          <button
+            onClick={() => setSelectedCity('All')}
+            className={`px-4 py-1.5 rounded-full text-xs font-bold transition-all ${selectedCity === 'All' ? 'bg-gray-800 text-white' : 'bg-white text-gray-500 border border-gray-200 hover:bg-gray-100'}`}
+          >
+            All of {selectedState}
+          </button>
+          {locationData[selectedState].map(city => (
+            <button
+              key={city}
+              onClick={() => setSelectedCity(city)}
+              className={`px-4 py-1.5 rounded-full text-xs font-bold transition-all ${selectedCity === city ? 'bg-gray-800 text-white shadow-md' : 'bg-white text-gray-500 border border-gray-200 hover:bg-gray-100'}`}
+            >
+              {city}
+            </button>
+          ))}
+        </div>
+      )}
 
       <div className="bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100">
         <table className="w-full text-left border-collapse">
@@ -95,16 +201,15 @@ const Orders = () => {
             <tr>
               <th className="p-5">Order ID</th>
               <th className="p-5">Customer</th>
-              <th className="p-5">Location (City)</th>
-              <th className="p-5">Items</th>
+              <th className="p-5">Location</th>
               <th className="p-5">Total</th>
-              <th className="p-5">Status</th>
+              <th className="p-5">Status / Date</th>
               <th className="p-5 text-right">Actions</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100">
             {filteredOrders.length === 0 ? (
-              <tr><td colSpan="7" className="p-8 text-center text-gray-400">No orders found for {selectedCity}.</td></tr>
+              <tr><td colSpan="6" className="p-12 text-center text-gray-400 font-medium">No {activeTab} orders found for {selectedCity !== 'All' ? selectedCity : selectedState}.</td></tr>
             ) : (
               filteredOrders.map((order) => (
                 <tr key={order.order_id} className="hover:bg-red-50 transition">
@@ -113,39 +218,46 @@ const Orders = () => {
                   
                   <td className="p-5">
                     <p className="font-bold text-gray-800">{order.customer_name || "Guest User"}</p>
-                    <p className="text-xs text-gray-500">{order.email}</p>
+                    <p className="text-xs text-gray-500">{order.item_count || 1} Items</p>
                   </td>
 
                   <td className="p-5">
                     <span className={`px-2 py-1 rounded-lg text-xs font-bold uppercase tracking-wider 
-                      ${(order.city || 'Surat').toLowerCase() === 'surat' 
-                        ? 'bg-green-100 text-green-700 border border-green-200' 
-                        : 'bg-indigo-100 text-indigo-700 border border-indigo-200'}`}>
-                      {order.city || 'Surat'} 🚀
+                      ${(order.city || 'Surat').toLowerCase() === 'surat' ? 'bg-green-100 text-green-700 border border-green-200' : 'bg-indigo-100 text-indigo-700 border border-indigo-200'}`}>
+                      {order.city || 'Surat'}
                     </span>
-                    <p className="text-xs text-gray-400 mt-1">{order.delivery_address || '395006'}</p>
+                    <p className="text-[10px] text-gray-400 mt-1 font-bold uppercase">{Object.keys(locationData).find(key => locationData[key].includes(order.city || 'Surat'))}</p>
                   </td>
 
-                  <td className="p-5 font-medium text-gray-600">
-                    {order.item_count || 1} Items
-                  </td>
-
-                  <td className="p-5 font-bold text-gray-800">
+                  <td className="p-5 font-black text-gray-800">
                     ₹{order.total_amount}
                   </td>
 
                   <td className="p-5">
-                    <select 
-                      value={order.status} 
-                      onChange={(e) => updateStatus(order.order_id, e.target.value)}
-                      className={`px-3 py-1 rounded-lg text-xs font-bold border outline-none cursor-pointer appearance-none ${getStatusBadge(order.status)}`}
-                    >
-                      <option value="Pending">Pending</option>
-                      <option value="Packed">Packed</option>
-                      <option value="Out for Delivery">Out for Delivery</option>
-                      <option value="Delivered">Delivered</option>
-                      <option value="Cancelled">Cancelled</option>
-                    </select>
+                    {activeTab === 'Active' ? (
+                      <select 
+                        value={order.status} 
+                        onChange={(e) => updateStatus(order.order_id, e.target.value)}
+                        className={`px-3 py-1 rounded-lg text-xs font-bold border outline-none cursor-pointer appearance-none shadow-sm ${getStatusBadge(order.status)}`}
+                      >
+                        <option value="Pending">Pending</option>
+                        <option value="Packed">Packed</option>
+                        <option value="Out for Delivery">Out for Delivery</option>
+                        <option value="Delivered">Mark Delivered</option>
+                        <option value="Cancelled">Cancel Order</option>
+                      </select>
+                    ) : (
+                      <div>
+                        <span className={`px-3 py-1 rounded-lg text-xs font-bold border ${getStatusBadge(order.status)}`}>
+                          {order.status}
+                        </span>
+                        {/* 🌟 FIX: Date only! No messy timezones. */}
+                        <div className="flex items-center gap-1 mt-2 text-[10px] text-gray-500 font-bold">
+                          <CalendarDays size={12} />
+                          {new Date(order.created_at).toLocaleDateString()}
+                        </div>
+                      </div>
+                    )}
                   </td>
 
                   <td className="p-5 text-right flex justify-end gap-2">
@@ -156,14 +268,15 @@ const Orders = () => {
                     >
                       <Eye size={18} />
                     </button>
-                    
-                    <button 
-                      onClick={() => handleDelete(order.order_id)}
-                      className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition" 
-                      title="Delete Order"
-                    >
-                      <Trash2 size={18} />
-                    </button>
+                    {activeTab !== 'Active' && (
+                      <button 
+                        onClick={() => handleDelete(order.order_id)}
+                        className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition" 
+                        title="Delete Permanently"
+                      >
+                        <Trash2 size={18} />
+                      </button>
+                    )}
                   </td>
                 </tr>
               ))
@@ -173,10 +286,7 @@ const Orders = () => {
       </div>
 
       {selectedOrder && (
-        <OrderDetailsModal 
-          order={selectedOrder} 
-          onClose={() => setSelectedOrder(null)} 
-        />
+        <OrderDetailsModal order={selectedOrder} onClose={() => setSelectedOrder(null)} />
       )}
     </div>
   );

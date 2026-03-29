@@ -1,5 +1,6 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { Toaster } from 'react-hot-toast'; // 🔥 1. IMPORT TOASTER
 
 // Import Layout Components
 import Sidebar from './components/Sidebar';
@@ -10,9 +11,8 @@ import Dashboard from './pages/Dashboard';
 import Products from './pages/Products';
 import Orders from './pages/Orders';
 import Messages from './pages/Messages';
-import ManageCustomers from './pages/ManageCustomers'; // 🔥 NEW IMPORT ADDED
+import ManageCustomers from './pages/ManageCustomers';
 
-// Placeholder for Riders
 const Riders = () => (
   <div className="p-8 bg-orange-50 min-h-screen flex items-center justify-center">
     <div className="text-center bg-white p-12 rounded-3xl shadow-xl border-b-8 border-brand-red">
@@ -23,17 +23,28 @@ const Riders = () => (
   </div>
 );
 
-// Protected Route Wrapper
 const ProtectedRoute = ({ children }) => {
   const token = localStorage.getItem('token');
   return token ? children : <Navigate to="/" />;
 };
 
 function App() {
-  // Role checking logic is completely removed. If you have a token, you are the Admin!
-
   return (
     <Router>
+      {/* 🔥 2. INJECT THE TOASTER ENGINE HERE */}
+      <Toaster 
+        position="top-center" 
+        toastOptions={{
+          style: {
+            background: '#1f2937', // Dark mode premium background
+            color: '#fff',
+            border: '2px solid #ef4444', // Brand red border
+            fontWeight: 'bold',
+            borderRadius: '12px',
+          },
+        }}
+      />
+
       <Routes>
         <Route path="/" element={<Login />} />
 
@@ -43,22 +54,14 @@ function App() {
             <ProtectedRoute>
               <div className="flex bg-orange-50 min-h-screen">
                 <Sidebar />
-                
-                {/* ml-56 matches our slimmer sidebar width */}
                 <div className="flex-1 ml-56 p-4 transition-all duration-300">
                   <Routes>
-                    {/* 👇 Streamlined Dashboard Logic 👇 */}
                     <Route path="/dashboard" element={<Dashboard />} />
-                    
                     <Route path="/products" element={<Products />} />
                     <Route path="/orders" element={<Orders />} />
                     <Route path="/riders" element={<Riders />} />
-                    
-                    {/* Administration Routes */}
                     <Route path="/customers" element={<ManageCustomers />} />
                     <Route path="/messages" element={<Messages />} />
-                    
-                    {/* Catch-all: Send unknown links to the safe home */}
                     <Route path="*" element={<Navigate to="/dashboard" />} />
                   </Routes>
                 </div>

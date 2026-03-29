@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Plus, Trash2, Search, Edit, X, UploadCloud, Check } from 'lucide-react';
+import toast from 'react-hot-toast'; // 🔥 1. IMPORT TOAST
 
 const Products = () => {
   const [products, setProducts] = useState([]);
@@ -11,15 +12,12 @@ const Products = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [loading, setLoading] = useState(false);
   
-  // 🌟 ADDED INGREDIENTS TO STATE
   const [formData, setFormData] = useState({
     name: '', category: '1', price: '', stock: '', description: '', unit: 'kg', ingredients: ''
   });
   
   const [imageFile, setImageFile] = useState(null);
   const [previewUrl, setPreviewUrl] = useState(null);
-  
-  // 🌟 ADDED GALLERY FILES STATE
   const [galleryFiles, setGalleryFiles] = useState([]);
 
   useEffect(() => { fetchProducts(); }, []);
@@ -53,10 +51,10 @@ const Products = () => {
       stock: product.stock_quantity,
       description: product.description || '',
       unit: product.unit || 'kg',
-      ingredients: product.ingredients || '' // 🌟 Pull existing ingredients
+      ingredients: product.ingredients || ''
     });
     setPreviewUrl(`http://localhost:5000${product.image_url}`);
-    setGalleryFiles([]); // Reset gallery selection on edit
+    setGalleryFiles([]); 
     setShowModal(true);
   };
 
@@ -64,13 +62,14 @@ const Products = () => {
     e.preventDefault();
     setLoading(true);
     
+    // 🔥 Loading Toast
+    const loadingToast = toast.loading(isEditing ? 'Updating product...' : 'Saving new product...', {
+      style: { border: '2px solid #f59e0b', backgroundColor: '#1f2937', color: '#fff' }
+    });
+    
     const data = new FormData();
     Object.keys(formData).forEach(key => data.append(key, formData[key]));
-    
-    // Append Main Image
     if (imageFile) data.append('image', imageFile);
-    
-    // 🌟 Append Gallery Images Array
     if (galleryFiles.length > 0) {
       Array.from(galleryFiles).forEach(file => {
         data.append('gallery', file);
@@ -86,8 +85,18 @@ const Products = () => {
         setImageFile(null);
         setPreviewUrl(null);
         setGalleryFiles([]);
+        
+        // 🔥 Success Toast!
+        toast.dismiss(loadingToast);
+        toast.success(isEditing ? 'Product Updated! 📦' : 'New Product Added! 🎉', {
+          style: { border: '2px solid #10b981', backgroundColor: '#1f2937', color: '#fff' }
+        });
       }
-    } catch (err) { alert("Connection failed"); }
+    } catch (err) { 
+      // 🔥 Error Toast!
+      toast.dismiss(loadingToast);
+      toast.error("Connection failed. Server offline?"); 
+    }
     finally { setLoading(false); }
   };
 
@@ -96,6 +105,10 @@ const Products = () => {
     try {
       await fetch(`http://localhost:5000/api/products/${id}`, { method: 'DELETE' });
       fetchProducts();
+      // 🔥 Delete Toast!
+      toast.success('Product Deleted 🗑️', {
+        style: { border: '2px solid #ef4444', backgroundColor: '#1f2937', color: '#fff' }
+      });
     } catch (err) { console.error(err); }
   };
 
@@ -203,7 +216,6 @@ const Products = () => {
                 </div>
               </div>
 
-              {/* 🌟 NEW: INGREDIENTS TEXTAREA */}
               <textarea 
                 name="ingredients" 
                 value={formData.ingredients} 
@@ -213,7 +225,6 @@ const Products = () => {
                 rows="2"
               />
 
-              {/* 📸 MAIN IMAGE UPLOAD */}
               <div className="relative border-2 border-dashed border-gray-300 rounded-xl p-4 text-center cursor-pointer group">
                 <input type="file" accept="image/*" onChange={(e) => { 
                   if(e.target.files[0]) {
@@ -231,7 +242,6 @@ const Products = () => {
                 )}
               </div>
 
-              {/* 📸 🌟 NEW: MULTIPLE GALLERY IMAGES UPLOAD */}
               <div className="relative border-2 border-dashed border-gray-300 bg-gray-50 rounded-xl p-4 text-center cursor-pointer group">
                 <input 
                   type="file" 
