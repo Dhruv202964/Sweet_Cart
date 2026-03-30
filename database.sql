@@ -1,7 +1,11 @@
 -- ############################################################
 -- # SWEET_CART DATABASE SCHEMA - PRODUCTION NEON CLOUD
--- # Team: 4O4 ERROR | Updated: March 29, 2026 (Phase 7)
+-- # Team: 4O4 ERROR | Updated: March 31, 2026 (Phase 8)
 -- ############################################################
+
+-- 0. SYSTEM LOCALIZATION
+-- Enforces Indian Standard Time (IST) globally across the cloud server
+ALTER DATABASE "neondb" SET timezone TO 'Asia/Kolkata';
 
 -- 1. USERS TABLE
 CREATE TABLE users (

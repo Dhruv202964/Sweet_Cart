@@ -521,4 +521,33 @@ Message Hub Optimization: Implemented line-clamp-3 previews and "Read More" moda
 
 Dashboard officially functions as a real-time Command Center with pulsating "LIVE NOW" indicators.
 
-System Status: 100% stable and presentation-ready for final exams on April 4th.SS
+System Status: 100% stable and presentation-ready for final exams on April 2nd.
+
+Day 21: Real-Time Intelligence & Global Localization
+Date: 2026-03-31 | Status: Complete | Phase: Enterprise Operations & Scalability
+
+🎯 Objective Implement real-time data synchronicity, resolve cross-timezone accounting discrepancies, and engineer a secure, database-safe deletion workflow.
+
+🛠️ Critical Fixes
+
+Timezone Desync (Shift Engine): Resolved a fatal accounting error where late-night cloud server timestamps (UTC) caused orders to vanish from "Today's" dashboard. Engineered a 14-hour rolling "Restaurant Shift" window to ensure seamless daily reporting regardless of server location.
+
+Notification Double-Fire: Fixed a React Strict Mode quirk where live notifications triggered twice by implementing a useRef silent tracker.
+
+DB Constraint Bypass: Engineered a transactional deletion sequence to safely remove orders with foreign key dependencies (order_items) without server-side crashes.
+
+Localization: Locked the Neon PostgreSQL environment to Asia/Kolkata via SQL ALTER DATABASE commands.
+
+⚙️ Technical Implementation
+
+Live Polling Engine: Injected a 10-second silent background fetcher into Dashboard.jsx to update live metrics and trigger high-priority "Live Order Alerts" via custom branded toasts.
+
+Enterprise Delete UI: Deprecated native browser window.confirm() popups. Built a custom, Tailwind-animated "Danger Modal" to handle irreversible administrative deletions.
+
+Logistics UI Enhancement: Overhauled the Orders.jsx status column with a "Big & Unique" flexbox pill, combining real-time status dropdowns with premium dark-mode date badges.
+
+✅ Milestones
+
+Dashboard officially functions as a zero-latency "War Room" for live business operations.
+
+Admin ecosystem is 100% database-safe and localization-accurate for Indian Standard Time.

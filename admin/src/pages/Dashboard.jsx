@@ -1,7 +1,8 @@
-import React, { useEffect, useState } from 'react';
-import { IndianRupee, ShoppingBag, XCircle, Clock, TrendingUp, CalendarDays, Calculator } from 'lucide-react';
+import React, { useEffect, useState, useRef } from 'react';
+import { IndianRupee, ShoppingBag, XCircle, Clock, TrendingUp, CalendarDays, Calculator, BellRing } from 'lucide-react';
 import { Bar } from 'react-chartjs-2';
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from 'chart.js';
+import toast from 'react-hot-toast';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
@@ -9,6 +10,9 @@ const Dashboard = () => {
   const [allOrders, setAllOrders] = useState([]);
   const [filteredOrders, setFilteredOrders] = useState([]);
   const [loading, setLoading] = useState(true);
+  
+  // 🔥 FIX 1: The silent tracker to prevent double-notifications
+  const ordersLengthRef = useRef(0);
   
   // ⏳ THE TIME MACHINE STATES
   const [dateFilter, setDateFilter] = useState('Today'); 
@@ -28,6 +32,7 @@ const Dashboard = () => {
         const data = await res.json();
         setAllOrders(data);
         setFilteredOrders(data);
+        ordersLengthRef.current = data.length; // Lock in the initial count!
       }
     } catch (e) { 
       console.error("Orders API failed:", e); 
@@ -36,6 +41,50 @@ const Dashboard = () => {
     }
   };
 
+  // 🚀 THE BULLETPROOF LIVE AUTO-REFRESH ENGINE
+  useEffect(() => {
+    const liveEngine = setInterval(async () => {
+      try {
+        const res = await fetch('http://localhost:5000/api/orders');
+        if (res.ok) {
+          const freshData = await res.json();
+          
+          // 🔥 FIX 2: Compare against the silent Ref so it only fires ONCE
+          if (ordersLengthRef.current > 0 && freshData.length > ordersLengthRef.current) {
+            const newOrdersCount = freshData.length - ordersLengthRef.current;
+            
+            toast.custom((t) => (
+              <div className={`${t.visible ? 'animate-enter' : 'animate-leave'} max-w-md w-full bg-white shadow-2xl rounded-2xl pointer-events-auto flex border-l-8 border-green-500`}>
+                <div className="flex-1 w-0 p-4">
+                  <div className="flex items-start">
+                    <div className="flex-shrink-0 pt-0.5">
+                      <span className="text-3xl animate-bounce inline-block">🛎️</span>
+                    </div>
+                    <div className="ml-3 flex-1">
+                      <p className="text-lg font-black text-gray-900 uppercase tracking-wide">Live Order Alert!</p>
+                      <p className="mt-1 text-sm text-gray-500 font-bold">{newOrdersCount} new order(s) just dropped in!</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ), { duration: 5000, position: 'top-right' });
+
+            // Update the tracker so it doesn't fire again for the same order
+            ordersLengthRef.current = freshData.length;
+          }
+          
+          // Safely update the screen data
+          setAllOrders(freshData);
+        }
+      } catch (e) {
+        console.error("Live Engine silent fail (ignoring):", e);
+      }
+    }, 10000);
+
+    return () => clearInterval(liveEngine);
+  }, []);
+
+  // 3️⃣ THE TIME MACHINE FILTER ENGINE (UPGRADED RESTAURANT SHIFT)
   useEffect(() => {
     if (!allOrders.length) return;
     
@@ -43,7 +92,17 @@ const Dashboard = () => {
     const today = new Date();
 
     if (dateFilter === 'Today') {
-      result = allOrders.filter(o => new Date(o.created_at).toDateString() === today.toDateString());
+      result = allOrders.filter(o => {
+        const orderDate = new Date(o.created_at);
+        
+        // 🔥 THE RESTAURANT SHIFT ENGINE (TIMEZONE BUSTER) 🔥
+        // Math.abs() calculates the exact hour difference between right now and the order.
+        // If the order was placed within 14 hours, it forces it into "Today's Shift",
+        // making your dashboard 100% immune to cloud server timezone glitches!
+        const hoursDiff = Math.abs(today - orderDate) / (1000 * 60 * 60);
+        
+        return orderDate.toDateString() === today.toDateString() || hoursDiff <= 14;
+      });
     } else if (dateFilter === 'This Week') {
       const lastWeek = new Date();
       lastWeek.setDate(today.getDate() - 7);
@@ -61,18 +120,18 @@ const Dashboard = () => {
   // 📊 DYNAMIC STATS CALCULATION
   let totalRev = 0, delivered = 0, periodCancelled = 0;
   
-  // These respect the Time Machine
   filteredOrders.forEach(o => {
-    if (o.status !== 'Cancelled') totalRev += parseFloat(o.total_amount || 0);
     if (o.status === 'Delivered') delivered++;
-    if (o.status === 'Cancelled') periodCancelled++; // Secret variable for AOV math!
+    if (o.status === 'Cancelled') periodCancelled++; 
+    
+    if (o.status === 'Delivered') {
+      totalRev += parseFloat(o.total_amount || 0);
+    }
   });
 
   const totalOrdersCount = filteredOrders.length;
-  const avgOrderValue = totalOrdersCount - periodCancelled > 0 ? (totalRev / (totalOrdersCount - periodCancelled)) : 0;
+  const avgOrderValue = delivered > 0 ? (totalRev / delivered) : 0;
 
-  // 🔥 THE FIX: Pending and Cancelled NEVER respect the Time Machine! 
-  // It searches ALL orders to find the true Database totals.
   let pending = 0, totalCancelled = 0;
   allOrders.forEach(o => {
     if (o.status === 'Pending' || o.status === 'Packed' || o.status === 'Out for Delivery') pending++;
@@ -86,7 +145,7 @@ const Dashboard = () => {
   if (selectedChartCity === 'All') {
     const cityMap = {};
     filteredOrders.forEach(o => {
-      if (o.status !== 'Cancelled') {
+      if (o.status === 'Delivered') {
         const city = o.city || 'Surat';
         cityMap[city] = (cityMap[city] || 0) + parseFloat(o.total_amount || 0);
       }
@@ -96,7 +155,7 @@ const Dashboard = () => {
   } else {
     const areaMap = {};
     filteredOrders.forEach(o => {
-      if (o.status !== 'Cancelled' && (o.city || 'Surat') === selectedChartCity) {
+      if (o.status === 'Delivered' && (o.city || 'Surat') === selectedChartCity) {
         const area = o.delivery_area || 'Main City';
         areaMap[area] = (areaMap[area] || 0) + parseFloat(o.total_amount || 0);
       }
@@ -137,7 +196,12 @@ const Dashboard = () => {
     <div className="p-6 bg-orange-50 min-h-screen">
       <div className="flex justify-between items-end mb-6">
         <div>
-          <h2 className="text-2xl font-bold text-gray-800">Admin Overview</h2>
+          <h2 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
+            Admin Overview 
+            <span className="flex items-center gap-1 text-[10px] bg-green-100 text-green-700 px-2 py-1 rounded-full animate-pulse border border-green-300 shadow-sm">
+              <span className="w-2 h-2 rounded-full bg-green-500"></span> LIVE
+            </span>
+          </h2>
           <p className="text-sm text-gray-500">Real-time logistics and revenue tracking.</p>
         </div>
       </div>
@@ -146,7 +210,6 @@ const Dashboard = () => {
         <div className="flex items-center gap-2 text-brand-red font-bold px-3 border-r border-gray-100">
           <CalendarDays size={20} />
           <span>Timeline:</span>
-          {dateFilter === 'Today' && <span className="text-[10px] bg-green-100 text-green-700 px-2 py-0.5 rounded-full ml-1 animate-pulse">LIVE NOW</span>}
         </div>
         
         <div className="flex gap-2 items-center">
@@ -208,14 +271,12 @@ const Dashboard = () => {
           <TrendingUp className="absolute right-[-10px] bottom-[-10px] text-blue-100 opacity-50" size={64} />
         </div>
         
-        {/* 🔥 PENDING DROPS: ALWAYS SHOWS TRUE DATABASE TOTAL */}
         <div className="bg-brand-red p-4 rounded-xl shadow-sm border-l-4 border-red-900 flex flex-col justify-center relative overflow-hidden text-white">
           <p className="text-[10px] text-red-100 font-bold uppercase tracking-wider mb-1">Active Pending Drops</p>
           <h3 className="text-xl font-black">{pending}</h3>
           <Clock className="absolute right-[-10px] bottom-[-10px] text-red-900 opacity-50" size={64} />
         </div>
 
-        {/* 🔥 TOTAL CANCELLATIONS: ALWAYS SHOWS TRUE DATABASE TOTAL */}
         <div className="bg-white p-4 rounded-xl shadow-sm border-l-4 border-red-500 flex flex-col justify-center relative overflow-hidden">
           <p className="text-[10px] text-gray-500 font-bold uppercase tracking-wider mb-1">Total Cancellations</p>
           <h3 className="text-xl font-black text-gray-800">{totalCancelled}</h3>

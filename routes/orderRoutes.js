@@ -14,4 +14,7 @@ router.post('/assign', orderController.assignRider);
 router.put('/:id/status', orderController.updateOrderStatus);
 router.post('/checkout', orderController.placeOrder);
 
+// 🔥 NEW: DELETE Route!
+router.delete('/:id', orderController.deleteOrder);
+
 module.exports = router;

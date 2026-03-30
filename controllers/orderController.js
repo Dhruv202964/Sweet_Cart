@@ -228,3 +228,34 @@ exports.placeOrder = async (req, res) => {
     client.release();
   }
 };
+
+// 9. 🗑️ DELETE ORDER (Safely removes items first to prevent DB constraints)
+exports.deleteOrder = async (req, res) => {
+  const client = await db.connect();
+  try {
+    const { id } = req.params;
+    
+    await client.query('BEGIN');
+
+    // 1. Delete all items attached to this order first
+    await client.query('DELETE FROM order_items WHERE order_id = $1', [id]);
+    
+    // 2. Delete the actual order
+    const result = await client.query('DELETE FROM orders WHERE order_id = $1 RETURNING *', [id]);
+
+    if (result.rows.length === 0) {
+      await client.query('ROLLBACK');
+      return res.status(404).json({ error: "Order not found in database." });
+    }
+
+    await client.query('COMMIT');
+    res.json({ msg: `Order #${id} completely deleted! 🗑️` });
+
+  } catch (err) {
+    await client.query('ROLLBACK');
+    console.error("❌ DELETE ERROR:", err.message);
+    res.status(500).json({ error: "Database constraint error. Could not delete." });
+  } finally {
+    client.release();
+  }
+};
