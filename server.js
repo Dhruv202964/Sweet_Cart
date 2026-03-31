@@ -13,10 +13,13 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 // ==========================================
 // 📈 ANALYTICS ENGINE (Auto-Track Visitors)
 // ==========================================
-// This tiny function runs every time the site is accessed to count visitors for "Today"
 app.use(async (req, res, next) => {
-    // Only track if it's a real page request, not just a CSS/Image file
-    if (req.path.startsWith('/api')) {
+    // 🔥 THE FIX: Tell the analytics to IGNORE the 10-second background radar!
+    const isPollingOrders = req.path === '/api/orders' && req.method === 'GET';
+    const isPollingCustomers = req.path.startsWith('/api/admin/customers') && req.method === 'GET';
+
+    // Only track if it's a real API request AND it's not our silent radar
+    if (req.path.startsWith('/api') && !isPollingOrders && !isPollingCustomers) {
         try {
             await db.query(`
                 INSERT INTO daily_stats (stat_date, total_visitors)
@@ -25,7 +28,7 @@ app.use(async (req, res, next) => {
                 DO UPDATE SET total_visitors = daily_stats.total_visitors + 1
             `);
         } catch (err) {
-            // Silently fail so it doesn't break the app if DB is busy
+            // This will now stay quiet because it's not being spammed every 10 seconds!
             console.log("Analytics error ignored");
         }
     }
@@ -50,5 +53,5 @@ app.delete('/api/messages/:id', messageController.deleteMessage);
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);
-  console.log(`📂 Analytics Active: Tracking daily stats...`);
+  console.log(`📂 Analytics Active: Tracking daily stats (Radar ignored)...`);
 });

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { Eye, Trash2, BellRing, Map, PackageOpen, CheckCircle, XCircle, CalendarDays, X, AlertTriangle } from 'lucide-react'; 
 import OrderDetailsModal from '../components/OrderDetailsModal';
 import toast from 'react-hot-toast'; 
@@ -18,14 +18,64 @@ const Orders = () => {
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [selectedDate, setSelectedDate] = useState('');
   
-  // 🔥 NEW STATE FOR THE CUSTOM DELETE MODAL
   const [orderToDelete, setOrderToDelete] = useState(null);
 
+  // 🔥 THE RADAR MEMORY: Stores old orders to compare with new ones!
+  const previousOrders = useRef([]);
+
+  // 🚀 THE LIVE POLLING ENGINE (10-Second Radar)
   useEffect(() => {
-    fetch('http://localhost:5000/api/orders')
-      .then(res => res.json())
-      .then(data => setOrders(data))
-      .catch(err => console.error("Error loading orders:", err));
+    const fetchOrders = async () => {
+      try {
+        const res = await fetch('http://localhost:5000/api/orders');
+        const currentOrders = await res.json();
+
+        // 🧠 Detect changes in the last 10 seconds
+        if (previousOrders.current.length > 0) {
+          currentOrders.forEach(newOrder => {
+            const oldOrder = previousOrders.current.find(o => o.order_id === newOrder.order_id);
+
+            // 1. Did the User just cancel an order?
+            if (oldOrder && oldOrder.status !== 'Cancelled by User' && newOrder.status === 'Cancelled by User') {
+              toast.error(
+                `🚨 ALERT: Order #${newOrder.order_id} CANCELLED BY USER!`, 
+                { 
+                  duration: 8000, 
+                  position: 'top-right',
+                  style: { border: '2px solid #ef4444', backgroundColor: '#7f1d1d', color: '#fff', padding: '16px', fontWeight: '900', fontSize: '1.1rem' }
+                }
+              );
+            }
+            // 2. Did a completely brand new order come in?
+            else if (!oldOrder) {
+               toast.success(
+                 `🛎️ NEW ORDER RECEIVED: #${newOrder.order_id}`, 
+                 {
+                   duration: 6000,
+                   position: 'top-right',
+                   style: { border: '2px solid #10b981', backgroundColor: '#064e3b', color: '#fff', padding: '16px', fontWeight: '900', fontSize: '1.1rem' }
+                 }
+               );
+            }
+          });
+        }
+
+        // Update the radar memory and UI
+        previousOrders.current = currentOrders;
+        setOrders(currentOrders);
+      } catch (err) {
+        console.error("Error loading live orders:", err);
+      }
+    };
+
+    // Fetch immediately on load
+    fetchOrders();
+
+    // Turn on the 10-Second Radar
+    const intervalId = setInterval(fetchOrders, 10000);
+
+    // Clean up if the Admin leaves the page
+    return () => clearInterval(intervalId);
   }, []);
 
   const updateStatus = async (id, newStatus) => {
@@ -40,8 +90,8 @@ const Orders = () => {
         
         if (newStatus === 'Delivered') {
           toast.success(`Order #${id} Moved to Delivered! 🎉`, { style: { border: '2px solid #10b981', backgroundColor: '#1f2937', color: '#fff' }});
-        } else if (newStatus === 'Cancelled') {
-          toast.error(`Order #${id} Cancelled.`, { style: { border: '2px solid #ef4444', backgroundColor: '#1f2937', color: '#fff' }});
+        } else if (newStatus.includes('Cancel')) {
+          toast.error(`Order #${id} Cancelled by Admin.`, { style: { border: '2px solid #ef4444', backgroundColor: '#1f2937', color: '#fff' }});
         } else {
           toast.success(`Order #${id} marked as ${newStatus}! 🚚`, { style: { border: '2px solid #3b82f6', backgroundColor: '#1f2937', color: '#fff' }});
         }
@@ -52,7 +102,6 @@ const Orders = () => {
     }
   };
 
-  // 🔥 THE UPGRADED DELETE FUNCTION WITH ADVANCED ERROR HANDLING
   const executeDelete = async () => {
     if (!orderToDelete) return;
     
@@ -63,7 +112,6 @@ const Orders = () => {
         setOrders(orders.filter(o => o.order_id !== orderToDelete));
         toast.success(`Order #${orderToDelete} Deleted Permanently 🗑️`, { style: { border: '2px solid #ef4444', backgroundColor: '#1f2937', color: '#fff' }});
       } else {
-        // If the backend refuses (like a foreign key constraint), catch it!
         const errorData = await res.json().catch(() => ({}));
         toast.error(`Failed to delete. Backend says: ${errorData.error || 'Check server constraints!'}`, { duration: 4000 });
       }
@@ -71,25 +119,29 @@ const Orders = () => {
       console.error(err); 
       toast.error("Network Error: Could not reach the backend.");
     } finally {
-      // Always close the modal after trying
       setOrderToDelete(null);
     }
   };
 
+  // 🔥 THE BADGE ENGINE
   const getStatusBadge = (status) => {
     switch (status) {
       case 'Delivered': return 'bg-green-100 text-green-700 border-green-200';
       case 'Out for Delivery': return 'bg-blue-100 text-blue-700 border-blue-200';
       case 'Packed': return 'bg-yellow-100 text-yellow-700 border-yellow-200';
-      case 'Cancelled': return 'bg-red-100 text-red-700 border-red-200';
+      case 'Cancelled by User': return 'bg-orange-100 text-orange-800 border-orange-300 font-black shadow-sm';
+      case 'Cancelled': 
+      case 'Cancelled by Admin': return 'bg-red-100 text-red-800 border-red-300 font-black shadow-sm';
       default: return 'bg-gray-100 text-gray-700 border-gray-200';
     }
   };
 
+  // 🔥 FILTERING UPGRADE
   const filteredOrders = orders.filter(order => {
-    const isActiveTab = activeTab === 'Active' && !['Delivered', 'Cancelled'].includes(order.status);
+    const isCancelledStatus = ['Cancelled', 'Cancelled by User', 'Cancelled by Admin'].includes(order.status);
+    const isActiveTab = activeTab === 'Active' && !isCancelledStatus && order.status !== 'Delivered';
     const isDeliveredTab = activeTab === 'Delivered' && order.status === 'Delivered';
-    const isCancelledTab = activeTab === 'Cancelled' && order.status === 'Cancelled';
+    const isCancelledTab = activeTab === 'Cancelled' && isCancelledStatus;
     
     if (!isActiveTab && !isDeliveredTab && !isCancelledTab) return false;
 
@@ -280,10 +332,10 @@ const Orders = () => {
                           <option value="Packed">Packed</option>
                           <option value="Out for Delivery">Out for Delivery</option>
                           <option value="Delivered">Mark Delivered</option>
-                          <option value="Cancelled">Cancel Order</option>
+                          <option value="Cancelled by Admin">Cancel Order (Admin)</option>
                         </select>
                       ) : (
-                        <span className={`px-3 py-1.5 rounded-lg text-sm font-black border shadow-sm ${getStatusBadge(order.status)}`}>
+                        <span className={`px-3 py-1.5 rounded-lg text-sm font-black border ${getStatusBadge(order.status)}`}>
                           {order.status}
                         </span>
                       )}
@@ -304,7 +356,6 @@ const Orders = () => {
                       <Eye size={18} />
                     </button>
                     
-                    {/* 🔥 THE NEW DELETE TRIGGER */}
                     <button 
                       onClick={() => setOrderToDelete(order.order_id)}
                       className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition" 
@@ -320,7 +371,6 @@ const Orders = () => {
         </table>
       </div>
 
-      {/* 🚀 CUSTOM ENTERPRISE DELETE MODAL */}
       {orderToDelete && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
           <div className="bg-white rounded-3xl shadow-2xl w-full max-w-sm overflow-hidden animate-in zoom-in-95 duration-200 border border-gray-100">

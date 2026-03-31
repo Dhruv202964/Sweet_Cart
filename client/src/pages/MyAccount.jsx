@@ -1,13 +1,17 @@
 import React, { useState, useContext, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
-import { User, Package, MapPin, LogOut, ShieldAlert, Trash2, AlertTriangle, PackageCheck, ShieldCheck, Edit3, Save, X, LayoutDashboard, CheckCircle } from 'lucide-react';
+import { User, Package, MapPin, LogOut, ShieldAlert, Trash2, AlertTriangle, PackageCheck, ShieldCheck, Edit3, Save, X, LayoutDashboard, CheckCircle, Clock, Truck, Ban, ShoppingBag } from 'lucide-react';
 
 const MyAccount = () => {
   const { user, logout, isAuthenticated, updateContextUser } = useContext(AuthContext);
   const navigate = useNavigate();
 
   const [activeTab, setActiveTab] = useState('profile');
+  
+  // 🔥 NEW: Sub-Tab specifically for sorting the orders!
+  const [orderTab, setOrderTab] = useState('active'); 
+  
   const [orders, setOrders] = useState([]);
   const [loadingOrders, setLoadingOrders] = useState(false);
 
@@ -104,6 +108,15 @@ const MyAccount = () => {
     }
   };
 
+  // 🔥 NEW: Smart Order Sorting Engine (Matches TrackOrder exactly!)
+  const activeOrders = orders?.filter(o => o.status === 'Pending') || [];
+  const completedOrders = orders?.filter(o => o.status === 'Delivered' || o.status === 'Out for Delivery') || [];
+  const cancelledOrders = orders?.filter(o => o.status.includes('Cancel')) || [];
+
+  const displayOrders = orderTab === 'active' ? activeOrders 
+                      : orderTab === 'completed' ? completedOrders 
+                      : cancelledOrders;
+
   if (!user) return null;
 
   return (
@@ -129,7 +142,7 @@ const MyAccount = () => {
               <button onClick={() => setActiveTab('profile')} className={`flex items-center gap-3 p-4 rounded-2xl font-bold transition-all ${activeTab === 'profile' ? 'bg-amber-50 text-amber-800' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'}`}>
                 <User size={20} /> Personal Details
               </button>
-              <button onClick={() => setActiveTab('orders')} className={`flex items-center gap-3 p-4 rounded-2xl font-bold transition-all ${activeTab === 'orders' ? 'bg-amber-50 text-amber-800' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'}`}>
+              <button onClick={() => { setActiveTab('orders'); setOrderTab('active'); }} className={`flex items-center gap-3 p-4 rounded-2xl font-bold transition-all ${activeTab === 'orders' ? 'bg-amber-50 text-amber-800' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'}`}>
                 <Package size={20} /> Order History
               </button>
               <button onClick={() => setActiveTab('addresses')} className={`flex items-center gap-3 p-4 rounded-2xl font-bold transition-all ${activeTab === 'addresses' ? 'bg-amber-50 text-amber-800' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'}`}>
@@ -253,8 +266,32 @@ const MyAccount = () => {
             {/* --- ORDERS TAB --- */}
             {activeTab === 'orders' && (
               <div className="animate-in fade-in duration-300">
-                <h2 className="text-3xl font-black text-gray-800 mb-8 tracking-tighter ml-2">Recent Orders</h2>
+                <h2 className="text-3xl font-black text-gray-800 mb-6 tracking-tighter ml-2">Recent Orders</h2>
                 
+                {/* 🔥 THE NEW CATEGORY TABS 🔥 */}
+                {!loadingOrders && orders.length > 0 && (
+                  <div className="flex gap-2 p-1 bg-white border border-gray-200 rounded-xl overflow-x-auto shadow-sm mb-6">
+                    <button 
+                      onClick={() => setOrderTab('active')} 
+                      className={`flex-1 min-w-[100px] py-3 px-2 rounded-lg font-bold text-sm transition-all flex justify-center items-center gap-2 ${orderTab === 'active' ? 'bg-amber-50 text-amber-700 shadow-sm border border-amber-200' : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'}`}
+                    >
+                      <Clock size={16} /> Active <span className="bg-amber-100 text-amber-800 px-2 py-0.5 rounded-full text-xs">{activeOrders.length}</span>
+                    </button>
+                    <button 
+                      onClick={() => setOrderTab('completed')} 
+                      className={`flex-1 min-w-[120px] py-3 px-2 rounded-lg font-bold text-sm transition-all flex justify-center items-center gap-2 ${orderTab === 'completed' ? 'bg-green-50 text-green-700 shadow-sm border border-green-200' : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'}`}
+                    >
+                      <Truck size={16} /> Transit/Delivered <span className="bg-green-100 text-green-800 px-2 py-0.5 rounded-full text-xs">{completedOrders.length}</span>
+                    </button>
+                    <button 
+                      onClick={() => setOrderTab('cancelled')} 
+                      className={`flex-1 min-w-[100px] py-3 px-2 rounded-lg font-bold text-sm transition-all flex justify-center items-center gap-2 ${orderTab === 'cancelled' ? 'bg-red-50 text-red-700 shadow-sm border border-red-200' : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'}`}
+                    >
+                      <Ban size={16} /> Cancelled <span className="bg-red-100 text-red-800 px-2 py-0.5 rounded-full text-xs">{cancelledOrders.length}</span>
+                    </button>
+                  </div>
+                )}
+
                 {loadingOrders ? (
                   <div className="bg-white p-10 rounded-3xl shadow-sm border border-amber-100 text-center">
                     <p className="text-amber-600 font-bold animate-pulse">Loading your delicious history...</p>
@@ -266,26 +303,39 @@ const MyAccount = () => {
                     <p className="text-gray-500 mb-8">You haven't placed any orders with this account.</p>
                     <button onClick={() => navigate('/menu')} className="bg-amber-600 text-white font-black px-8 py-4 rounded-xl hover:bg-amber-700 transition-colors">Start Shopping</button>
                   </div>
+                ) : displayOrders.length === 0 ? (
+                  /* 🔥 EMPTY STATE HANDLER FOR TABS 🔥 */
+                  <div className="text-center py-16 bg-white rounded-3xl border border-amber-100 shadow-sm">
+                    <ShoppingBag size={48} className="mx-auto text-gray-300 mb-4" />
+                    <p className="text-gray-500 font-bold text-lg">No {orderTab} orders found.</p>
+                  </div>
                 ) : (
                   <div className="space-y-6">
-                    {orders.map((order) => (
+                    {displayOrders.map((order) => (
                       <div key={order.order_id} className="bg-white rounded-3xl p-6 md:p-8 border border-amber-100 shadow-md relative overflow-hidden transition hover:shadow-xl">
                         <PackageCheck className="absolute -right-8 -bottom-8 w-40 h-40 text-amber-500 opacity-5" />
                         
-                        <div className="flex justify-between items-start border-b border-gray-100 pb-4 mb-4">
+                        <div className="flex justify-between items-start border-b border-gray-100 pb-4 mb-4 relative z-10">
                           <div>
                             <p className="text-gray-400 font-bold text-xs uppercase tracking-widest">Order ID</p>
                             <p className="text-2xl font-black text-gray-900">#{order.order_id}</p>
                           </div>
                           <div className="text-right">
-                            <span className={`inline-block px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-widest shadow-sm ${order.status === 'Pending' ? 'bg-amber-100 text-amber-800' : order.status === 'Delivered' ? 'bg-green-100 text-green-800' : 'bg-blue-100 text-blue-800'}`}>
-                              {order.status}
+                            {/* 🔥 Upgraded Badge to match TrackOrder 🔥 */}
+                            <span className={`inline-block px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-widest shadow-sm 
+                                ${order.status === 'Pending' ? 'bg-amber-400 text-amber-950' : 
+                                  order.status === 'Delivered' ? 'bg-green-600 text-white' : 
+                                  order.status.includes('Cancel') ? 'bg-red-100 text-red-800' : 
+                                  'bg-blue-600 text-white'}`}>
+                                {order.status === 'Cancelled by User' ? 'Cancelled' : order.status}
                             </span>
-                            <p className="text-xs text-gray-500 font-bold mt-2">{new Date(order.created_at).toLocaleDateString()}</p>
+                            <p className="text-xs text-gray-500 font-bold mt-2">
+                              {new Date(order.created_at).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}
+                            </p>
                           </div>
                         </div>
 
-                        <div className="space-y-2 mb-6">
+                        <div className="space-y-2 mb-6 relative z-10">
                           {order.items && order.items.map((item, idx) => (
                             <div key={idx} className="flex justify-between items-center text-sm font-medium text-gray-700">
                               <span>{item.quantity}x {item.name}</span>
@@ -294,7 +344,7 @@ const MyAccount = () => {
                           ))}
                         </div>
                         
-                        <div className="flex justify-between items-center bg-gray-50 p-4 rounded-xl font-black text-lg text-red-800 border border-gray-100">
+                        <div className="flex justify-between items-center bg-gray-50 p-4 rounded-xl font-black text-lg text-red-800 border border-gray-100 relative z-10">
                           <span>Total Paid</span>
                           <span>₹{order.total_amount}</span>
                         </div>

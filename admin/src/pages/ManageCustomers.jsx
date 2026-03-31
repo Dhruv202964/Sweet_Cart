@@ -9,21 +9,34 @@ const ManageCustomers = () => {
     guestCount: 0,
     totalCustomers: 0
   });
-  const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState('registered'); // 'registered' or 'guest'
+  const [loading, setLoading] = useState(true); // Only true on the VERY first load
+  const [activeTab, setActiveTab] = useState('registered');
 
   useEffect(() => {
+    // 1. Initial fetch when component mounts
     fetchCustomerData();
+
+    // 2. 🚀 THE SILENT LIVE ENGINE (Polls every 10 seconds)
+    const intervalId = setInterval(() => {
+      fetchCustomerData(true); // Passing true means it's a "silent" background fetch
+    }, 10000);
+
+    // Clean up if admin leaves the page
+    return () => clearInterval(intervalId);
   }, []);
 
-  const fetchCustomerData = async () => {
+  const fetchCustomerData = async (isSilent = false) => {
     try {
-      // 🛡️ Grab the admin token to prove Khiloshiya Ji is authorized
+      if (!isSilent) setLoading(true);
+
       const token = localStorage.getItem('token'); 
       
-      const response = await fetch('http://localhost:5000/api/admin/customers', {
+      // 🔥 THE CACHE-BUSTING FIX: Adding a live timestamp so the browser never ignores the radar!
+      const timestamp = new Date().getTime();
+      const response = await fetch(`http://localhost:5000/api/admin/customers?t=${timestamp}`, {
         headers: {
-          'Authorization': `Bearer ${token}` // If your backend uses JWT middleware
+          'Authorization': `Bearer ${token}`,
+          'Cache-Control': 'no-cache, no-store, must-revalidate' // Forcing browser to fetch fresh
         }
       });
       
@@ -35,7 +48,7 @@ const ManageCustomers = () => {
     } catch (error) {
       console.error("Error fetching CRM data:", error);
     } finally {
-      setLoading(false);
+      if (!isSilent) setLoading(false);
     }
   };
 
@@ -47,7 +60,6 @@ const ManageCustomers = () => {
     );
   }
 
-  // Decide which list to map over based on the active tab
   const displayList = activeTab === 'registered' ? data.registeredList : data.guestList;
 
   return (
@@ -59,15 +71,20 @@ const ManageCustomers = () => {
             <Users className="text-amber-500" size={32} />
             Customer Analytics
           </h1>
-          <p className="text-gray-500 mt-1 font-medium">Track registered accounts and guest checkouts.</p>
+          <p className="text-gray-500 mt-1 font-medium">Track registered accounts and guest checkouts in real-time.</p>
         </div>
         
-        <div className="bg-amber-100 px-6 py-3 rounded-xl border border-amber-200 shadow-sm flex items-center gap-3">
-          <div className="bg-amber-500 text-white p-2 rounded-lg">
+        <div className="bg-amber-100 px-6 py-3 rounded-xl border border-amber-200 shadow-sm flex items-center gap-3 relative overflow-hidden group">
+          {/* Subtle pulse animation to show it's "Live" */}
+          <div className="absolute inset-0 bg-white/40 opacity-0 group-hover:opacity-100 transition-opacity animate-pulse"></div>
+          
+          <div className="bg-amber-500 text-white p-2 rounded-lg relative z-10">
             <Users size={20} />
           </div>
-          <div>
-            <p className="text-xs text-amber-800 font-bold uppercase tracking-wider">Total Reach</p>
+          <div className="relative z-10">
+            <p className="text-xs text-amber-800 font-bold uppercase tracking-wider flex items-center gap-1">
+              <span className="w-2 h-2 rounded-full bg-green-500 animate-ping"></span> Live Reach
+            </p>
             <p className="text-2xl font-black text-amber-900">{data.totalCustomers} <span className="text-sm font-medium text-amber-700">Customers</span></p>
           </div>
         </div>
@@ -81,7 +98,7 @@ const ManageCustomers = () => {
         >
           <UserCheck size={20} />
           Registered Users
-          <span className="bg-gray-100 text-gray-600 text-xs py-1 px-2 rounded-full ml-1">{data.registeredCount}</span>
+          <span className="bg-gray-100 text-gray-600 text-xs py-1 px-2 rounded-full ml-1 transition-all">{data.registeredCount}</span>
           {activeTab === 'registered' && <span className="absolute bottom-[-2px] left-0 w-full h-1 bg-amber-500 rounded-t-md"></span>}
         </button>
 
@@ -91,13 +108,13 @@ const ManageCustomers = () => {
         >
           <UserX size={20} />
           Guest Customers
-          <span className="bg-gray-100 text-gray-600 text-xs py-1 px-2 rounded-full ml-1">{data.guestCount}</span>
+          <span className="bg-gray-100 text-gray-600 text-xs py-1 px-2 rounded-full ml-1 transition-all">{data.guestCount}</span>
           {activeTab === 'guest' && <span className="absolute bottom-[-2px] left-0 w-full h-1 bg-amber-500 rounded-t-md"></span>}
         </button>
       </div>
 
       {/* 📋 Data Table */}
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden transition-all duration-500">
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
@@ -110,17 +127,17 @@ const ManageCustomers = () => {
             <tbody className="divide-y divide-gray-100">
               {displayList.length > 0 ? (
                 displayList.map((customer, index) => (
-                  <tr key={customer.id || index} className="hover:bg-amber-50/50 transition-colors">
+                  <tr key={customer.id || index} className="hover:bg-amber-50/50 transition-colors animate-in fade-in duration-300">
                     <td className="p-4">
                       <p className="font-bold text-gray-800">{customer.name}</p>
-                      {activeTab === 'guest' && <span className="text-[10px] bg-gray-100 text-gray-500 px-2 py-1 rounded border border-gray-200 mt-1 inline-block">GUEST CHECKOUT</span>}
+                      {activeTab === 'guest' && <span className="text-[10px] bg-gray-100 text-gray-500 px-2 py-1 rounded border border-gray-200 mt-1 inline-block font-bold">GUEST CHECKOUT</span>}
                     </td>
                     <td className="p-4 space-y-1">
-                      <div className="flex items-center gap-2 text-sm text-gray-600">
+                      <div className="flex items-center gap-2 text-sm text-gray-600 font-medium">
                         <Mail size={14} className="text-amber-500" />
                         {customer.email}
                       </div>
-                      <div className="flex items-center gap-2 text-sm text-gray-600">
+                      <div className="flex items-center gap-2 text-sm text-gray-600 font-medium">
                         <Phone size={14} className="text-amber-500" />
                         {customer.phone || 'N/A'}
                       </div>

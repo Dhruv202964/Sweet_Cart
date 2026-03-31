@@ -1,6 +1,6 @@
 -- ############################################################
 -- # SWEET_CART DATABASE SCHEMA - PRODUCTION NEON CLOUD
--- # Team: 4O4 ERROR | Updated: March 31, 2026 (Phase 8)
+-- # Team: 4O4 ERROR | Updated: April 1, 2026 (Phase 9)
 -- ############################################################
 
 -- 0. SYSTEM LOCALIZATION
@@ -15,6 +15,20 @@ CREATE TABLE users (
     password_hash VARCHAR(255) NOT NULL,
     role VARCHAR(20) CHECK (role IN ('customer', 'admin')) DEFAULT 'customer',
     phone VARCHAR(15),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- 1.5 USER ADDRESSES TABLE (NEW: For "Save this address" feature)
+CREATE TABLE user_addresses (
+    address_id SERIAL PRIMARY KEY,
+    user_id INT REFERENCES users(user_id) ON DELETE CASCADE,
+    flat_house VARCHAR(255) NOT NULL,
+    delivery_area VARCHAR(100) NOT NULL,
+    delivery_city VARCHAR(100) DEFAULT 'Surat',
+    delivery_state VARCHAR(100) DEFAULT 'Gujarat',
+    pincode VARCHAR(10) NOT NULL,
+    landmark VARCHAR(255),
+    is_default BOOLEAN DEFAULT FALSE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -48,7 +62,7 @@ CREATE TABLE orders (
     guest_email VARCHAR(255), 
     guest_phone VARCHAR(15),  
     total_amount DECIMAL(10, 2) NOT NULL,
-    status VARCHAR(50) DEFAULT 'Pending' CHECK (status IN ('Pending', 'Packed', 'Out for Delivery', 'Delivered', 'Cancelled')),
+    status VARCHAR(50) DEFAULT 'Pending' CHECK (status IN ('Pending', 'Packed', 'Out for Delivery', 'Delivered', 'Cancelled', 'Cancelled by User', 'Cancelled by Admin')),
     delivery_address TEXT NOT NULL,
     delivery_area VARCHAR(100), 
     delivery_city VARCHAR(100) DEFAULT 'Surat', 
