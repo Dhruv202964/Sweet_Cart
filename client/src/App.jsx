@@ -16,6 +16,7 @@ import Home from './pages/Home';
 import Dashboard from './pages/Dashboard'; // Admin Dashboard
 import Menu from './pages/Menu';
 import Checkout from './pages/Checkout';
+import Payment from './pages/Payment'; // 🌟 NEW IMPORT
 import ProductDetails from './pages/ProductDetails';
 import Login from './pages/Login';
 import Register from './pages/Register';
@@ -39,6 +40,7 @@ function App() {
               <Route path="/" element={<Home />} />
               <Route path="/menu" element={<Menu />} /> 
               <Route path="/checkout" element={<Checkout />} />
+              <Route path="/payment/:order_id" element={<Payment />} /> {/* 🌟 NEW PAYMENT ROUTE */}
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
               <Route path="/product/:id" element={<ProductDetails />} />

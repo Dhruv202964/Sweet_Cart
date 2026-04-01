@@ -8,13 +8,14 @@ exports.getAllOrders = async (req, res) => {
         o.order_id, 
         o.total_amount, 
         o.status, 
+        o.payment_status,
         o.created_at,
-        o.customer_name,   -- Fetches the direct order name!
-        o.phone,           -- Fetches the contact number!
-        o.flat_house,      -- Fetches House/Flat
-        o.landmark,        -- Fetches Landmark
-        o.state,           -- Fetches State
-        o.pincode,         -- Fetches Pincode
+        o.customer_name,   
+        o.phone,           
+        o.flat_house,      
+        o.landmark,        
+        o.state,           
+        o.pincode,         
         o.delivery_area, 
         o.delivery_city AS city, 
         o.delivery_address,
@@ -126,14 +127,14 @@ exports.getOrderItems = async (req, res) => {
   }
 };
  
-// 7. 🌟 SUPER-POWERED Track Order (Fetches Items + Address)
+// 7. SUPER-POWERED Track Order (Fetches Items + Address)
 exports.trackOrder = async (req, res) => {
   try {
     const { order_id, email } = req.query;
 
     let query = `
       SELECT 
-        o.order_id, o.status, o.created_at, o.customer_name, o.total_amount, 
+        o.order_id, o.status, o.payment_status, o.created_at, o.customer_name, o.total_amount, 
         o.delivery_address, o.flat_house, o.landmark, o.delivery_city, o.state, o.pincode, o.phone,
         (
           SELECT json_agg(json_build_object('name', p.name, 'quantity', oi.quantity, 'price', oi.price_at_time))
@@ -171,7 +172,7 @@ exports.trackOrder = async (req, res) => {
   }
 };
 
-// 8. UPGRADED Customer Checkout (Place New Order)
+// 8. Customer Checkout (Place New Order + Payment Status)
 exports.placeOrder = async (req, res) => {
   const client = await db.connect(); 
   try {
@@ -186,14 +187,13 @@ exports.placeOrder = async (req, res) => {
     const customer_name = `${firstName} ${lastName}`;
     const full_address = `${address}, ${landmark}`;
 
-    // Insert the main order with ALL the new details
     const orderResult = await client.query(`
       INSERT INTO orders (
         customer_id, customer_name, email, phone, 
         delivery_address, flat_house, landmark, delivery_area, delivery_city, state, pincode, 
-        total_amount, status
+        total_amount, status, payment_status
       ) 
-      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, 'Pending') 
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, 'Pending', 'Pending Payment') 
       RETURNING order_id
     `, [
       customer_id || null, customer_name, email, mobile, 
@@ -203,7 +203,6 @@ exports.placeOrder = async (req, res) => {
 
     const newOrderId = orderResult.rows[0].order_id;
 
-    // Insert the items and update live stock
     for (let item of cartItems) {
       await client.query(`
         INSERT INTO order_items (order_id, product_id, quantity, price_at_time) 
@@ -229,33 +228,98 @@ exports.placeOrder = async (req, res) => {
   }
 };
 
-// 9. 🗑️ DELETE ORDER (Safely removes items first to prevent DB constraints)
+// 9. DELETE ORDER
 exports.deleteOrder = async (req, res) => {
   const client = await db.connect();
   try {
     const { id } = req.params;
-    
     await client.query('BEGIN');
-
-    // 1. Delete all items attached to this order first
     await client.query('DELETE FROM order_items WHERE order_id = $1', [id]);
-    
-    // 2. Delete the actual order
     const result = await client.query('DELETE FROM orders WHERE order_id = $1 RETURNING *', [id]);
-
     if (result.rows.length === 0) {
       await client.query('ROLLBACK');
       return res.status(404).json({ error: "Order not found in database." });
     }
-
     await client.query('COMMIT');
     res.json({ msg: `Order #${id} completely deleted! 🗑️` });
-
   } catch (err) {
     await client.query('ROLLBACK');
     console.error("❌ DELETE ERROR:", err.message);
     res.status(500).json({ error: "Database constraint error. Could not delete." });
   } finally {
     client.release();
+  }
+};
+
+// 10. Check Payment Status
+exports.checkPaymentStatus = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const result = await db.query("SELECT payment_status, status FROM orders WHERE order_id = $1", [id]);
+    if (result.rows.length === 0) return res.status(404).json({ msg: "Order not found" });
+    res.json({ payment_status: result.rows[0].payment_status, status: result.rows[0].status });
+  } catch (err) {
+    console.error("❌ PAYMENT CHECK ERROR:", err.message);
+    res.status(500).json({ msg: "Server Error: Could not check payment status" });
+  }
+};
+
+// 11. 💰 ADMIN APPROVE PAYMENT
+exports.approvePayment = async (req, res) => {
+  try {
+    const { id } = req.params;
+    // 🔥 FIX: Changed status from 'Packed' to 'Pending' so the Admin knows it's fresh!
+    await db.query("UPDATE orders SET payment_status = 'Paid', status = 'Pending' WHERE order_id = $1", [id]);
+    res.json({ msg: "Payment officially approved by Admin!" });
+  } catch (err) {
+    console.error("❌ APPROVE PAYMENT ERROR:", err.message);
+    res.status(500).json({ msg: "Server Error: Could not approve payment" });
+  }
+};
+
+// 12. 💣 GHOST ORDER DELETION (Triggered by Timer or Page Refresh)
+exports.cancelUnpaidOrder = async (req, res) => {
+  const client = await db.connect();
+  try {
+    const { id } = req.params;
+    await client.query('BEGIN');
+    
+    // 🔥 FIX: If the timer runs out or they refresh, it completely WIPES the order from the database!
+    // It will never show up in the Admin Panel again!
+    await client.query("DELETE FROM order_items WHERE order_id = $1", [id]);
+    await client.query("DELETE FROM orders WHERE order_id = $1 AND payment_status = 'Pending Payment'", [id]);
+    
+    await client.query('COMMIT');
+    res.json({ msg: "Ghost order permanently deleted." });
+  } catch (err) {
+    await client.query('ROLLBACK');
+    console.error("❌ GHOST ORDER DELETE ERROR:", err.message);
+    res.status(500).json({ msg: "Server Error: Could not delete order" });
+  } finally {
+    client.release();
+  }
+};
+
+// 13. 📋 NEW: GET PENDING PAYMENT APPROVALS (For the new Admin Page!)
+exports.getPendingApprovals = async (req, res) => {
+  try {
+    const result = await db.query(`
+      SELECT 
+        o.order_id, o.customer_name, o.phone, o.total_amount, o.created_at,
+        (
+          SELECT json_agg(json_build_object('name', p.name, 'quantity', oi.quantity))
+          FROM order_items oi 
+          JOIN products p ON oi.product_id = p.product_id 
+          WHERE oi.order_id = o.order_id
+        ) as items
+      FROM orders o
+      WHERE o.payment_status = 'Pending Payment' 
+      AND o.status NOT IN ('Cancelled', 'Cancelled by User', 'Cancelled by Admin')
+      ORDER BY o.created_at ASC
+    `);
+    res.json(result.rows);
+  } catch (err) {
+    console.error("❌ PENDING APPROVALS ERROR:", err.message);
+    res.status(500).json({ msg: "Server Error: Could not fetch pending approvals" });
   }
 };

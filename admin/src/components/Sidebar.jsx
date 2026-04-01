@@ -4,8 +4,6 @@ import { Link, useLocation } from 'react-router-dom';
 const Sidebar = () => {
   const location = useLocation();
 
-  // No more role-checking logic needed! The admin gets access to everything.
-
   const isActive = (path) => location.pathname === path 
     ? "bg-red-800 text-white font-bold shadow-inner" 
     : "text-red-100 hover:bg-red-700 hover:text-white font-medium";
@@ -30,20 +28,19 @@ const Sidebar = () => {
           <span>📦</span> Orders
         </Link>
 
+        {/* 🔥 NEW PAYMENT APPROVALS TAB */}
+        <Link to="/approvals" className={`flex items-center gap-3 px-3 py-3 rounded-xl transition-all ${isActive('/approvals')}`}>
+          <span>💳</span> Approvals
+        </Link>
+
         <Link to="/products" className={`flex items-center gap-3 px-3 py-3 rounded-xl transition-all ${isActive('/products')}`}>
           <span>🍬</span> Inventory
         </Link>
-         {/* 🛵 PAUSED FOR RIDER PHASE
-         
-         <Link to="/riders" className={`flex items-center gap-3 px-3 py-3 rounded-xl transition-all ${isActive('/riders')}`}>
-          <span>🛵</span> Riders
-        </Link>*/}
 
         {/* ADMINISTRATION */}
         <div className="my-6 border-t border-red-800 mx-4"></div>
         <p className="text-xs font-bold text-red-200 uppercase px-3 mb-2 tracking-wider">Administration</p>
 
-        {/* 🔥 NEW CRM LINK ADDED HERE */}
         <Link to="/customers" className={`flex items-center gap-3 px-3 py-3 rounded-xl transition-all ${isActive('/customers')}`}>
           <span>👥</span> Customers
         </Link>

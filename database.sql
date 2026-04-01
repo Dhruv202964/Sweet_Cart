@@ -1,24 +1,23 @@
 -- ############################################################
 -- # SWEET_CART DATABASE SCHEMA - PRODUCTION NEON CLOUD
--- # Team: 4O4 ERROR | Updated: April 1, 2026 (Phase 9)
+-- # Team: 4O4 ERROR | Updated: April 2, 2026 (Final Phase)
 -- ############################################################
 
 -- 0. SYSTEM LOCALIZATION
 -- Enforces Indian Standard Time (IST) globally across the cloud server
 ALTER DATABASE "neondb" SET timezone TO 'Asia/Kolkata';
 
--- 1. USERS TABLE
+-- 1. USERS TABLE (RBAC Removed for streamlined access)
 CREATE TABLE users (
     user_id SERIAL PRIMARY KEY,
     full_name VARCHAR(100) NOT NULL,
     email VARCHAR(255) UNIQUE NOT NULL,
     password_hash VARCHAR(255) NOT NULL,
-    role VARCHAR(20) CHECK (role IN ('customer', 'admin')) DEFAULT 'customer',
     phone VARCHAR(15),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- 1.5 USER ADDRESSES TABLE (NEW: For "Save this address" feature)
+-- 1.5 USER ADDRESSES TABLE (For "Save this address" feature)
 CREATE TABLE user_addresses (
     address_id SERIAL PRIMARY KEY,
     user_id INT REFERENCES users(user_id) ON DELETE CASCADE,
@@ -52,21 +51,27 @@ CREATE TABLE products (
     image_url TEXT,
     gallery_images TEXT[], 
     is_available BOOLEAN DEFAULT TRUE,
+    is_bestseller BOOLEAN DEFAULT FALSE, -- ✨ Added for Homepage Bestsellers
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- 4. ORDERS TABLE 
+-- 4. ORDERS TABLE (Upgraded with full Checkout & Ghost Order support)
 CREATE TABLE orders (
     order_id SERIAL PRIMARY KEY,
     customer_id INT REFERENCES users(user_id) ON DELETE SET NULL,
-    guest_email VARCHAR(255), 
-    guest_phone VARCHAR(15),  
+    customer_name VARCHAR(255), -- ✨ Matched to React Checkout form
+    email VARCHAR(255),         -- ✨ Matched to React Checkout form
+    phone VARCHAR(20),          -- ✨ Matched to React Checkout form
     total_amount DECIMAL(10, 2) NOT NULL,
     status VARCHAR(50) DEFAULT 'Pending' CHECK (status IN ('Pending', 'Packed', 'Out for Delivery', 'Delivered', 'Cancelled', 'Cancelled by User', 'Cancelled by Admin')),
+    payment_status VARCHAR(50) DEFAULT 'Pending Payment', -- ✨ Added for Ghost Order system
     delivery_address TEXT NOT NULL,
+    flat_house TEXT,            -- ✨ Matched to React Checkout form
+    landmark TEXT,              -- ✨ Matched to React Checkout form
     delivery_area VARCHAR(100), 
     delivery_city VARCHAR(100) DEFAULT 'Surat', 
-    delivery_state VARCHAR(100) DEFAULT 'Gujarat', -- Added for National Expansion
+    state VARCHAR(100) DEFAULT 'Gujarat', -- ✨ Matched to React Checkout form
+    pincode VARCHAR(20),        -- ✨ Matched to React Checkout form
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -83,7 +88,7 @@ CREATE TABLE order_items (
 );
 
 -- 6. CONTACT MESSAGES TABLE (CRM)
--- Updated Day 20: Subject line support for professional Gmail integration
+-- Subject line support for professional Gmail integration
 CREATE TABLE contact_messages (
     id SERIAL PRIMARY KEY,
     customer_name VARCHAR(100),
@@ -99,9 +104,10 @@ CREATE TABLE contact_messages (
 
 INSERT INTO categories (name) VALUES ('Sweets'), ('Farsan'), ('Dairy');
 
-INSERT INTO users (full_name, email, password_hash, role, phone) VALUES 
-('Admin', 'admin@sweetcart.com', 'admin123', 'admin', '9876543210');
+-- Admin User Seeding
+INSERT INTO users (full_name, email, password_hash, phone) VALUES 
+('Admin', 'admin@sweetcart.com', 'admin123', '9876543210');
 
--- Example Product with Ingredients
-INSERT INTO products (category_id, name, price, stock_quantity, unit, ingredients, gallery_images) VALUES 
-(1, 'Premium Pista Ghari', 850.00, 50, 'kg', 'Pure Ghee, Pistachios, Sugar, Mawa', ARRAY['pista_1.jpg', 'pista_2.jpg']);
+-- Example Product with Ingredients and Bestseller flag enabled
+INSERT INTO products (category_id, name, price, stock_quantity, unit, ingredients, gallery_images, is_bestseller) VALUES 
+(1, 'Premium Pista Ghari', 850.00, 50, 'kg', 'Pure Ghee, Pistachios, Sugar, Mawa', ARRAY['pista_1.jpg', 'pista_2.jpg'], TRUE);

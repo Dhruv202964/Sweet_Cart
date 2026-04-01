@@ -1,5 +1,5 @@
 import React, { useState, useContext, useEffect } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { CartContext } from '../context/CartContext';
 import { AuthContext } from '../context/AuthContext'; 
 import { CheckCircle, Save } from 'lucide-react'; 
@@ -20,9 +20,8 @@ const Checkout = () => {
   const [selectedState, setSelectedState] = useState('');
   const [availableCities, setAvailableCities] = useState([]);
   const [submitting, setSubmitting] = useState(false);
-  const [orderSuccess, setOrderSuccess] = useState(false);
   
-  // 🌟 NEW: Checkbox state for saving the address!
+  // 🌟 Checkbox state for saving the address
   const [saveAddress, setSaveAddress] = useState(false);
 
   const [formData, setFormData] = useState({
@@ -65,10 +64,10 @@ const Checkout = () => {
         cartItems: cart,
         total_amount: cartTotal,
         customer_id: isAuthenticated && user?.user_id ? user.user_id : null,
-        save_address: saveAddress // We will use this flag in the backend later!
     };
 
     try {
+      // 1. PLACE THE ORDER
       const res = await fetch('http://localhost:5000/api/orders/checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -76,8 +75,34 @@ const Checkout = () => {
       });
 
       if (res.ok) {
+        const orderData = await res.json();
+        
+        // 🚀 2. THE MAGIC: SILENTLY SAVE THE ADDRESS IF CHECKED!
+        if (saveAddress && isAuthenticated && user?.user_id) {
+            try {
+                await fetch('http://localhost:5000/api/addresses/add', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        user_id: user.user_id,
+                        flat_house: formData.address,
+                        delivery_area: formData.area,
+                        delivery_city: formData.city,
+                        delivery_state: selectedState,
+                        pincode: formData.pincode,
+                        landmark: formData.landmark
+                    })
+                });
+            } catch (addrErr) {
+                console.error("Silent address save failed:", addrErr);
+            }
+        }
+
         clearCart();
-        setOrderSuccess(true); 
+        
+        // 🔥 JUMP STRAIGHT TO PAYMENT PAGE!
+        navigate(`/payment/${orderData.order_id}`);
+        
       } else {
         const errorData = await res.json();
         alert(`Oops! Something went wrong: ${errorData.msg}`);
@@ -89,57 +114,6 @@ const Checkout = () => {
       setSubmitting(false);
     }
   };
-
-  if (orderSuccess) {
-    return (
-      <div className="min-h-screen bg-[#FFFDF8] flex flex-col items-center justify-center p-6 font-sans py-12">
-        <div className="bg-white p-10 md:p-14 rounded-[40px] shadow-2xl border border-amber-100 max-w-xl w-full text-center">
-          <div className="flex justify-center mb-6">
-            <CheckCircle className="text-green-500 w-28 h-28 drop-shadow-md" />
-          </div>
-          <h2 className="text-4xl font-black text-gray-800 mb-4 tracking-tighter">Order Confirmed! 🎉</h2>
-          <p className="text-lg text-gray-600 mb-8 leading-relaxed">
-            Thank you for choosing SweetCart! Your authentic Surati sweets are being prepared with love and will be out for delivery shortly.
-          </p>
-          
-          <div className="bg-amber-50 rounded-3xl p-6 mb-8 border border-amber-100">
-            <p className="text-amber-900 font-bold mb-2 uppercase text-xs tracking-widest">A confirmation text will be sent to:</p>
-            <p className="text-amber-700 font-black text-2xl">{formData.mobile}</p>
-            
-            {formData.city === 'Surat' && (
-              <p className="mt-4 text-green-700 font-bold bg-green-100 p-3 rounded-xl border border-green-200">
-                🚀 Surat Special: Order will be delivered with-in 24 hours.
-              </p>
-            )}
-            {formData.city !== 'Surat' && (
-              <p className="mt-4 text-gray-600 font-medium">
-                Standard delivery: 1 to 3 business days.
-              </p>
-            )}
-          </div>
-
-          <div className="bg-gray-50 rounded-3xl p-6 mb-10 border border-gray-200 text-left">
-            <h4 className="font-black text-gray-800 mb-2 flex items-center gap-2">
-              <span className="bg-gray-200 p-1.5 rounded-lg">📍</span> How to track your order:
-            </h4>
-            <ol className="list-decimal list-inside text-sm text-gray-600 space-y-2 font-medium">
-              <li>Check your SMS/WhatsApp for your <strong>Order ID</strong>.</li>
-              <li>Click the 👤 <strong>User Icon</strong> at the top right.</li>
-              <li>Select <strong>Track Order</strong> from the menu.</li>
-              <li>Enter your Order ID or Email to see real-time updates!</li>
-            </ol>
-          </div>
-
-          <button 
-            onClick={() => navigate('/menu')}
-            className="w-full py-5 rounded-2xl font-black text-white text-xl bg-red-800 hover:bg-red-900 transition-all shadow-xl hover:-translate-y-1"
-          >
-            Continue Shopping 🛍️
-          </button>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-[#FFFDF8] font-sans py-12">
@@ -237,8 +211,13 @@ const Checkout = () => {
 
               {/* 🌟 NEW: SAVE ADDRESS PROMPT FOR LOGGED IN USERS */}
               {isAuthenticated && (
-                <div className="mt-8 bg-amber-50 p-5 rounded-2xl border border-amber-200 flex items-center gap-3 cursor-pointer hover:bg-amber-100 transition-colors" onClick={() => setSaveAddress(!saveAddress)}>
-                  <input type="checkbox" checked={saveAddress} readOnly className="w-5 h-5 accent-amber-600 cursor-pointer" />
+                <div 
+                  className="mt-8 bg-amber-50 p-5 rounded-2xl border border-amber-200 flex items-center gap-4 cursor-pointer hover:bg-amber-100 transition-all shadow-sm" 
+                  onClick={() => setSaveAddress(!saveAddress)}
+                >
+                  <div className={`w-6 h-6 rounded-md border-2 flex items-center justify-center transition-colors ${saveAddress ? 'bg-amber-600 border-amber-600' : 'bg-white border-amber-400'}`}>
+                    {saveAddress && <CheckCircle size={16} className="text-white" />}
+                  </div>
                   <div className="flex flex-col">
                     <span className="font-bold text-amber-900 flex items-center gap-2"><Save size={16}/> Save this address</span>
                     <span className="text-sm text-amber-700">Make checkout faster next time by saving this to your address book.</span>

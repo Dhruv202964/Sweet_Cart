@@ -19,23 +19,18 @@ const Orders = () => {
   const [selectedDate, setSelectedDate] = useState('');
   
   const [orderToDelete, setOrderToDelete] = useState(null);
-
-  // 🔥 THE RADAR MEMORY: Stores old orders to compare with new ones!
   const previousOrders = useRef([]);
 
-  // 🚀 THE LIVE POLLING ENGINE (10-Second Radar)
   useEffect(() => {
     const fetchOrders = async () => {
       try {
         const res = await fetch('http://localhost:5000/api/orders');
         const currentOrders = await res.json();
 
-        // 🧠 Detect changes in the last 10 seconds
         if (previousOrders.current.length > 0) {
           currentOrders.forEach(newOrder => {
             const oldOrder = previousOrders.current.find(o => o.order_id === newOrder.order_id);
 
-            // 1. Did the User just cancel an order?
             if (oldOrder && oldOrder.status !== 'Cancelled by User' && newOrder.status === 'Cancelled by User') {
               toast.error(
                 `🚨 ALERT: Order #${newOrder.order_id} CANCELLED BY USER!`, 
@@ -46,10 +41,9 @@ const Orders = () => {
                 }
               );
             }
-            // 2. Did a completely brand new order come in?
-            else if (!oldOrder) {
+            else if (oldOrder && oldOrder.payment_status === 'Pending Payment' && newOrder.payment_status === 'Paid') {
                toast.success(
-                 `🛎️ NEW ORDER RECEIVED: #${newOrder.order_id}`, 
+                 `🛎️ NEW ORDER PAID: #${newOrder.order_id} IS READY FOR PACKING!`, 
                  {
                    duration: 6000,
                    position: 'top-right',
@@ -60,7 +54,6 @@ const Orders = () => {
           });
         }
 
-        // Update the radar memory and UI
         previousOrders.current = currentOrders;
         setOrders(currentOrders);
       } catch (err) {
@@ -68,13 +61,8 @@ const Orders = () => {
       }
     };
 
-    // Fetch immediately on load
     fetchOrders();
-
-    // Turn on the 10-Second Radar
     const intervalId = setInterval(fetchOrders, 10000);
-
-    // Clean up if the Admin leaves the page
     return () => clearInterval(intervalId);
   }, []);
 
@@ -123,23 +111,24 @@ const Orders = () => {
     }
   };
 
-  // 🔥 THE BADGE ENGINE
+  // 🚀 FIX: THE NEW COLOR THEMES FOR BADGES!
   const getStatusBadge = (status) => {
     switch (status) {
-      case 'Delivered': return 'bg-green-100 text-green-700 border-green-200';
-      case 'Out for Delivery': return 'bg-blue-100 text-blue-700 border-blue-200';
-      case 'Packed': return 'bg-yellow-100 text-yellow-700 border-yellow-200';
-      case 'Cancelled by User': return 'bg-orange-100 text-orange-800 border-orange-300 font-black shadow-sm';
+      case 'Delivered': return 'bg-green-100 text-green-700 border-green-200 shadow-sm';
+      case 'Out for Delivery': return 'bg-blue-100 text-blue-700 border-blue-200 shadow-sm';
+      case 'Packed': return 'bg-purple-100 text-purple-700 border-purple-300 shadow-sm'; // ✨ NEW PURPLE!
+      case 'Pending': return 'bg-orange-100 text-orange-700 border-orange-300 shadow-sm'; // ✨ NEW ORANGE!
+      case 'Cancelled by User': return 'bg-red-50 text-red-800 border-red-300 font-black shadow-sm';
       case 'Cancelled': 
-      case 'Cancelled by Admin': return 'bg-red-100 text-red-800 border-red-300 font-black shadow-sm';
+      case 'Cancelled by Admin': return 'bg-red-100 text-red-900 border-red-400 font-black shadow-sm';
       default: return 'bg-gray-100 text-gray-700 border-gray-200';
     }
   };
 
-  // 🔥 FILTERING UPGRADE
   const filteredOrders = orders.filter(order => {
     const isCancelledStatus = ['Cancelled', 'Cancelled by User', 'Cancelled by Admin'].includes(order.status);
-    const isActiveTab = activeTab === 'Active' && !isCancelledStatus && order.status !== 'Delivered';
+    
+    const isActiveTab = activeTab === 'Active' && !isCancelledStatus && order.status !== 'Delivered' && order.payment_status === 'Paid';
     const isDeliveredTab = activeTab === 'Delivered' && order.status === 'Delivered';
     const isCancelledTab = activeTab === 'Cancelled' && isCancelledStatus;
     
@@ -173,7 +162,7 @@ const Orders = () => {
               <span className="text-3xl animate-bounce inline-block">🛎️</span>
             </div>
             <div className="ml-3 flex-1">
-              <p className="text-lg font-black text-gray-900 uppercase tracking-wide">New Order Received!</p>
+              <p className="text-lg font-black text-gray-900 uppercase tracking-wide">New Order Paid!</p>
               <p className="mt-1 text-sm text-gray-500 font-bold">Action Required: Prepare for Dispatch</p>
             </div>
           </div>
@@ -317,9 +306,11 @@ const Orders = () => {
                     </span>
                     <p className="text-[10px] text-gray-400 mt-1 font-bold uppercase">{Object.keys(locationData).find(key => locationData[key].includes(order.city || 'Surat'))}</p>
                   </td>
+                  
                   <td className="p-5 font-black text-gray-800">
                     ₹{order.total_amount}
                   </td>
+                  
                   <td className="p-5">
                     <div className="flex items-center gap-3">
                       {activeTab === 'Active' ? (
