@@ -7,4 +7,7 @@ router.post('/register', authController.registerCustomer);
 router.post('/login', authController.loginCustomer);
 router.put('/update', authController.updateProfile);
 
+// 🌟 NEW: The endpoint to permanently delete an account
+router.delete('/delete/:id', authController.deleteAccount);
+
 module.exports = router;

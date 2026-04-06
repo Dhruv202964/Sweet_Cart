@@ -552,7 +552,8 @@ Dashboard officially functions as a zero-latency "War Room" for live business op
 
 Admin ecosystem is 100% database-safe and localization-accurate for Indian Standard Time.
 
-Day 22: Universal UX Unification & UI Polish Date: 2026-04-01 | Status: Complete | Phase: Profile & Tracking Synchronization
+Day 22: Universal UX Unification & UI Polish
+Date: 2026-04-01 | Status: Complete | Phase: Profile & Tracking Synchronization
 
 🎯 Objective Eradicate backend connection crashes, expand data limits for international inputs, and unify the order tracking UX across guest and authenticated user states. Prepare the database for the Address Book ecosystem.
 
@@ -578,7 +579,7 @@ Account Dashboard UX now matches top-tier commercial platforms (Swiggy/Zomato st
 
 Database architecture is officially primed and localized for the upcoming Customer Address Book features.
 
-Day 23: Ghost Order Security & Premium Visual Architecture (FINAL EXAM PHASE)
+Day 23: Ghost Order Security & Premium Visual Architecture
 Date: 2026-04-02 | Status: Complete | Phase: The Master Polish
 
 🎯 Objective Implement an advanced session-based security system, overhaul homepage visual storytelling, and construct a dedicated fintech-style payment approval gateway.
@@ -600,3 +601,53 @@ Dynamic Logistics Tracking: Integrated local state checks to dynamically alter o
 ✅ Milestones
 
 Application architecture is 100% fortified, highly performant, and verified "A+ Ready" for the final BCA faculty presentation.
+
+Day 24: Enterprise Address Ecosystem & Destructive Operations
+Date: 2026-04-05 | Status: Complete | Phase: User Retention & Data Management
+
+🎯 Objective Construct a robust Address Book database schema, implement full CRUD functionality, and engineer secure permanent data deletion workflows.
+
+🛠️ Critical Fixes
+
+Database Mismatch: Resolved a persistent NOT NULL constraint violation on flat_house by deprecating the legacy user_addresses table and engineering a strictly typed, comprehensive saved_addresses schema tailored for granular Indian address inputs.
+
+⚙️ Technical Implementation
+
+Backend CRUD Architecture: Built addressController.js and addressRoutes.js handling precise SQL injections for creating, reading, updating, and deleting user-specific addresses.
+
+Danger Zone UI: Designed a highly secure, permanent account deletion workflow inside MyAccount.jsx featuring a "Type DELETE to confirm" fail-safe and dynamic Tailwind-animated warning modals.
+
+Cancel Order Engine: Deployed a dynamic "Cancel Order" logic gate that selectively appears exclusively for "Pending" orders, allowing users autonomous order modification directly communicating with the logistics API.
+
+✅ Milestones
+
+Database is officially locked in to handle complex address arrays seamlessly.
+
+Destructive operations are fully protected with enterprise-level UI confirmations.
+
+Day 25: Frictionless Checkout, Glassmorphism UX & Server Shields
+Date: 2026-04-06 | Status: Complete | Phase: The UI/UX Masterpiece
+
+🎯 Objective Synchronize the new Address Book with the Checkout engine, replace ugly browser alerts with premium toasts, and shield the app from silent API crashes.
+
+🛠️ Critical Fixes
+
+White Screen of Death: Vaporized a fatal React UI crash in Checkout.jsx by diagnosing and restoring missing Lucide-React imports (Package, Truck).
+
+The Silent API Crash: Engineered an "Ultimate JSON Shield" in server.js to intercept global 404/500 errors, forcing Express to send structured JSON instead of HTML to prevent React from silently crashing during broken fetch requests.
+
+⚙️ Technical Implementation
+
+Smart Backend Funnel: Updated addressController.js to handle divergent, fallback payloads between MyAccount.jsx and Checkout.jsx inputs, preventing PostgreSQL null constraints without altering React state structures.
+
+Quick-Select Checkout UI: Refactored Checkout.jsx to automatically fetch user profiles and render saved addresses as clickable, glassmorphism cards. Clicking automatically populates the complex flat/area/landmark form matrix instantly.
+
+Glassmorphism Toasts: Systematically stripped native browser alert() calls. Built a custom, Tailwind-animated slide-in Toast notification system with dynamic success/error color mapping and automatic 4-second unmounting.
+
+Categorized UI Architecture: Overhauled MyAccount.jsx with segmented layout logic, generating distinct visual groups for Home, Work, and Other addresses, utilizing "Dotted Add Cards" as visually appealing empty states.
+
+✅ Milestones
+
+Address ecosystem is 100% synchronized across the entire platform.
+
+The User Dashboard UX matches elite commercial standards, heavily inspired by "Khlioshiya Ji's Farsan aesthetic."

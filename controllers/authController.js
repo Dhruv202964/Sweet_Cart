@@ -103,3 +103,31 @@ exports.updateProfile = async (req, res) => {
     res.status(500).json({ msg: "Server Error: Could not update profile" });
   }
 };
+
+// 🌟 4. NEW: Delete User Account
+exports.deleteAccount = async (req, res) => {
+  try {
+    // Getting user_id from either the URL parameter or the request body
+    const user_id = req.params.id || req.body.user_id;
+
+    if (!user_id) {
+      return res.status(400).json({ msg: "User ID is required to delete account" });
+    }
+
+    // Delete the user from the database
+    // Because of ON DELETE CASCADE, this will also wipe their addresses, etc.
+    const result = await db.query(
+      "DELETE FROM users WHERE user_id = $1 RETURNING user_id", 
+      [user_id]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ msg: "User not found or already deleted" });
+    }
+
+    res.json({ msg: "Account permanently deleted" });
+  } catch (err) {
+    console.error("❌ DELETE ACCOUNT ERROR:", err.message);
+    res.status(500).json({ msg: "Server Error: Could not delete account" });
+  }
+};

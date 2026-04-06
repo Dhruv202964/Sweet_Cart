@@ -1,11 +1,12 @@
 -- ############################################################
--- # SWEET_CART DATABASE SCHEMA - PRODUCTION NEON CLOUD
--- # Team: 4O4 ERROR | Updated: April 2, 2026 (Final Phase)
+-- # SWEET_CART DATABASE SCHEMA - LOCAL POSTGRESQL ENVIRONMENT
+-- # Team: 404 ERROR | Updated: April 2026 (Final Address Ecosystem)
 -- ############################################################
 
 -- 0. SYSTEM LOCALIZATION
--- Enforces Indian Standard Time (IST) globally across the cloud server
-ALTER DATABASE "neondb" SET timezone TO 'Asia/Kolkata';
+-- Enforces Indian Standard Time (IST) on your local PostgreSQL server
+-- (Make sure your local database is actually named 'sweet_cart'!)
+ALTER DATABASE sweet_cart SET timezone TO 'Asia/Kolkata';
 
 -- 1. USERS TABLE (RBAC Removed for streamlined access)
 CREATE TABLE users (
@@ -17,17 +18,19 @@ CREATE TABLE users (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- 1.5 USER ADDRESSES TABLE (For "Save this address" feature)
-CREATE TABLE user_addresses (
-    address_id SERIAL PRIMARY KEY,
-    user_id INT REFERENCES users(user_id) ON DELETE CASCADE,
-    flat_house VARCHAR(255) NOT NULL,
-    delivery_area VARCHAR(100) NOT NULL,
-    delivery_city VARCHAR(100) DEFAULT 'Surat',
-    delivery_state VARCHAR(100) DEFAULT 'Gujarat',
+-- 1.5 SAVED ADDRESSES TABLE (The new, upgraded Address Book ecosystem)
+CREATE TABLE saved_addresses (
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER REFERENCES users(user_id) ON DELETE CASCADE,
+    address_type VARCHAR(10) CHECK (address_type IN ('Home', 'Work', 'Other')),
+    full_name VARCHAR(100) NOT NULL,
+    phone VARCHAR(15) NOT NULL,
+    flat_house TEXT NOT NULL,
+    area_street TEXT NOT NULL,
+    landmark TEXT,
+    city VARCHAR(50) NOT NULL,
+    state VARCHAR(50) NOT NULL,
     pincode VARCHAR(10) NOT NULL,
-    landmark VARCHAR(255),
-    is_default BOOLEAN DEFAULT FALSE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
