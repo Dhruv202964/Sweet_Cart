@@ -114,8 +114,10 @@ const Login = () => {
                 <input id="remember-me" name="remember-me" type="checkbox" className="h-4 w-4 text-amber-600 focus:ring-amber-500 border-gray-300 rounded" />
                 <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-900">Remember me</label>
               </div>
+              
+              {/* 🌟 THE MAGIC LINK IS HERE! */}
               <div className="text-sm">
-                <a href="#" className="font-bold text-amber-600 hover:text-amber-500">Forgot your password?</a>
+                <Link to="/forgot-password" className="font-bold text-amber-600 hover:text-amber-500">Forgot your password?</Link>
               </div>
             </div>
 

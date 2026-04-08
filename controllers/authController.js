@@ -1,6 +1,16 @@
 const db = require('../config/db');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const nodemailer = require('nodemailer'); // 🌟 NEW: Email Engine Import
+
+// 🌟 Configure the Email Sender
+const transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS
+  }
+});
 
 // 1. Customer Registration
 exports.registerCustomer = async (req, res) => {
@@ -129,5 +139,87 @@ exports.deleteAccount = async (req, res) => {
   } catch (err) {
     console.error("❌ DELETE ACCOUNT ERROR:", err.message);
     res.status(500).json({ msg: "Server Error: Could not delete account" });
+  }
+};
+
+// 🌟 5. Send OTP for Password Reset
+exports.forgotPassword = async (req, res) => {
+  try {
+      const { email } = req.body;
+      const userCheck = await db.query("SELECT * FROM users WHERE email = $1", [email]);
+
+      if (userCheck.rows.length === 0) {
+          return res.status(404).json({ msg: "If that email exists, an OTP has been sent." }); // Security best practice!
+      }
+
+      // Generate a 6-digit OTP
+      const otp = Math.floor(100000 + Math.random() * 900000).toString();
+      // Set expiry for 10 minutes from now
+      const expiry = new Date(Date.now() + 10 * 60000);
+
+      // Save OTP to database
+      await db.query(
+          "UPDATE users SET reset_otp = $1, reset_otp_expiry = $2 WHERE email = $3",
+          [otp, expiry, email]
+      );
+
+      // Send the email
+      const mailOptions = {
+          from: process.env.EMAIL_USER,
+          to: email,
+          subject: 'SweetCart - Password Reset OTP',
+          html: `
+              <div style="font-family: Arial, sans-serif; text-align: center; padding: 20px;">
+                  <h2 style="color: #d97706;">SweetCart Security</h2>
+                  <p>Your password reset code is:</p>
+                  <h1 style="font-size: 40px; letter-spacing: 5px; color: #111827;">${otp}</h1>
+                  <p style="color: #6b7280; font-size: 12px;">This code expires in 10 minutes. Do not share it with anyone.</p>
+              </div>
+          `
+      };
+
+      await transporter.sendMail(mailOptions);
+      res.json({ msg: "OTP sent successfully!" });
+
+  } catch (err) {
+      console.error("❌ FORGOT PASSWORD ERROR:", err.message);
+      res.status(500).json({ msg: "Server Error: Could not send OTP." });
+  }
+};
+
+// 🌟 6. Verify OTP & Reset Password
+exports.resetPassword = async (req, res) => {
+  try {
+      const { email, otp, newPassword } = req.body;
+
+      const userCheck = await db.query("SELECT * FROM users WHERE email = $1", [email]);
+      if (userCheck.rows.length === 0) return res.status(400).json({ msg: "Invalid request." });
+
+      const user = userCheck.rows[0];
+
+      // Check if OTP matches and is not expired
+      if (user.reset_otp !== otp) {
+          return res.status(400).json({ msg: "Invalid OTP code." });
+      }
+
+      if (new Date() > new Date(user.reset_otp_expiry)) {
+          return res.status(400).json({ msg: "OTP has expired. Please request a new one." });
+      }
+
+      // Hash the new password
+      const salt = await bcrypt.genSalt(10);
+      const hashedPassword = await bcrypt.hash(newPassword, salt);
+
+      // Update password and wipe the OTP data
+      await db.query(
+          "UPDATE users SET password_hash = $1, reset_otp = NULL, reset_otp_expiry = NULL WHERE email = $2",
+          [hashedPassword, email]
+      );
+
+      res.json({ msg: "Password successfully reset! You can now log in." });
+
+  } catch (err) {
+      console.error("❌ RESET PASSWORD ERROR:", err.message);
+      res.status(500).json({ msg: "Server Error: Could not reset password." });
   }
 };

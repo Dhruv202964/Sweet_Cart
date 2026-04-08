@@ -20,6 +20,7 @@ import Payment from './pages/Payment'; // 🌟 NEW IMPORT
 import ProductDetails from './pages/ProductDetails';
 import Login from './pages/Login';
 import Register from './pages/Register';
+import ForgotPassword from './pages/ForgotPassword'; // 🌟 NEW IMPORT
 import TrackOrder from './pages/TrackOrder';
 import MyAccount from './pages/MyAccount';
 import About from './pages/About';
@@ -43,6 +44,7 @@ function App() {
               <Route path="/payment/:order_id" element={<Payment />} /> {/* 🌟 NEW PAYMENT ROUTE */}
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
+              <Route path="/forgot-password" element={<ForgotPassword />} /> {/* 🌟 NEW OTP ROUTE */}
               <Route path="/product/:id" element={<ProductDetails />} />
               <Route path="/track-order" element={<TrackOrder />} />
               <Route path="/account" element={<MyAccount />} />
