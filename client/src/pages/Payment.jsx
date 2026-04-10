@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { CheckCircle, QrCode, Loader2, AlertTriangle, Zap, Timer, AlertOctagon, Utensils, Truck } from 'lucide-react';
+import { CheckCircle, QrCode, Loader2, AlertTriangle, Zap, Timer, AlertOctagon, Utensils, Truck, CreditCard, Banknote, ShieldCheck } from 'lucide-react';
 
 const Payment = () => {
   const { order_id } = useParams();
@@ -13,6 +13,9 @@ const Payment = () => {
   const [paymentSuccess, setPaymentSuccess] = useState(false);
   const [paymentFailed, setPaymentFailed] = useState(false); 
   const [timeLeft, setTimeLeft] = useState(300); // 💣 5 Minutes
+  
+  // 🌟 NEW: UI State for Payment Tabs
+  const [paymentMethod, setPaymentMethod] = useState('upi');
   
   const isPolling = useRef(false);
 
@@ -112,15 +115,12 @@ const Payment = () => {
     );
   }
 
-  // 🎉 THE GRAND SUCCESS SCREEN (UPGRADED UI!)
+  // 🎉 THE GRAND SUCCESS SCREEN
   if (paymentSuccess) {
-    
-    // 🧠 DYNAMIC DELIVERY LOGIC
     const isSuratLocal = order?.delivery_city?.toLowerCase() === 'surat';
 
     return (
       <div className="min-h-screen bg-[#FFFDF8] flex flex-col items-center justify-center p-6 py-12 relative overflow-hidden">
-        {/* Soft background glow */}
         <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-green-400/10 blur-[100px] rounded-full pointer-events-none"></div>
 
         <div className="bg-white p-10 md:p-14 rounded-[40px] shadow-[0_20px_60px_-15px_rgba(0,0,0,0.1)] border border-green-50 max-w-xl w-full text-center animate-in zoom-in-95 duration-500 relative z-10">
@@ -133,7 +133,6 @@ const Payment = () => {
             <p className="text-green-950 font-black text-5xl tracking-tighter">#{order?.order_id}</p>
           </div>
 
-          {/* 🚚 DYNAMIC DELIVERY INFO BOX */}
           <div className="bg-[#F8FAFC] border border-blue-100 rounded-2xl p-5 mb-8 flex items-center gap-4 text-left shadow-sm">
             <div className="bg-blue-100 p-3 rounded-full text-blue-600 shrink-0">
               <Truck size={24} />
@@ -148,19 +147,11 @@ const Payment = () => {
             </div>
           </div>
           
-          {/* 🔥 PRIMARY BUTTON: MENU */}
-          <button 
-            onClick={() => navigate('/menu')} 
-            className="w-full py-5 rounded-2xl font-black text-white text-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 transition-all shadow-xl shadow-amber-500/30 hover:-translate-y-1 flex items-center justify-center gap-3 mb-4"
-          >
+          <button onClick={() => navigate('/menu')} className="w-full py-5 rounded-2xl font-black text-white text-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 transition-all shadow-xl shadow-amber-500/30 hover:-translate-y-1 flex items-center justify-center gap-3 mb-4">
             <Utensils size={24} /> Still hungry? Grab some more!
           </button>
 
-          {/* 🚚 SECONDARY BUTTON: TRACK ORDER */}
-          <button 
-            onClick={() => navigate('/track-order')} 
-            className="w-full py-4 rounded-2xl font-black text-amber-950 bg-amber-50 hover:bg-amber-100 border border-amber-200 transition-all shadow-sm"
-          >
+          <button onClick={() => navigate('/track-order')} className="w-full py-4 rounded-2xl font-black text-amber-950 bg-amber-50 hover:bg-amber-100 border border-amber-200 transition-all shadow-sm">
             Track My Order 🚚
           </button>
         </div>
@@ -191,25 +182,63 @@ const Payment = () => {
           </span>
         </div>
         
-        <h2 className="text-3xl font-black text-[#1A1A1A] tracking-tight mb-2">Scan & Pay</h2>
-        <p className="text-gray-500 font-medium mb-8 text-sm px-2">
-          Open any UPI app to pay securely before the timer expires.
-        </p>
-
-        {/* 🚀 THE LASER SCANNER QR CODE BOX */}
-        <div className="relative inline-block mb-8">
-          <div className="relative border-[3px] border-gray-100 bg-white p-4 rounded-[30px] shadow-sm overflow-hidden group">
-            <div className="absolute left-0 right-0 h-1 bg-amber-500 shadow-[0_0_20px_5px_rgba(245,158,11,0.6)] animate-bounce z-20 pointer-events-none" style={{ animationDuration: '3s' }}></div>
-            <div className="bg-white rounded-2xl overflow-hidden flex justify-center items-center relative z-10">
-               <img 
-                  src="/payment-qr.jpg" 
-                  alt="Scan to Pay" 
-                  className="w-48 h-48 object-contain transition-transform duration-500 group-hover:scale-105"
-                  onError={(e) => { e.target.src = 'https://via.placeholder.com/200?text=Insert+QR+Here'; }}
-               />
-            </div>
-          </div>
+        {/* 🌟 NEW: Payment Method Tabs */}
+        <div className="flex gap-2 mb-6">
+            <button onClick={() => setPaymentMethod('upi')} className={`flex-1 py-3 px-2 rounded-xl font-bold flex items-center justify-center gap-2 transition-all ${paymentMethod === 'upi' ? 'bg-amber-100 text-amber-700 border border-amber-500' : 'bg-gray-50 text-gray-500 border border-transparent hover:bg-gray-100'}`}>
+                <QrCode size={18} /> UPI
+            </button>
+            <button onClick={() => setPaymentMethod('card')} className={`flex-1 py-3 px-2 rounded-xl font-bold flex items-center justify-center gap-2 transition-all ${paymentMethod === 'card' ? 'bg-amber-100 text-amber-700 border border-amber-500' : 'bg-gray-50 text-gray-500 border border-transparent hover:bg-gray-100'}`}>
+                <CreditCard size={18} /> Card
+            </button>
+            <button onClick={() => setPaymentMethod('cod')} className={`flex-1 py-3 px-2 rounded-xl font-bold flex items-center justify-center gap-2 transition-all ${paymentMethod === 'cod' ? 'bg-amber-100 text-amber-700 border border-amber-500' : 'bg-gray-50 text-gray-500 border border-transparent hover:bg-gray-100'}`}>
+                <Banknote size={18} /> COD
+            </button>
         </div>
+
+        {/* 📱 UPI QR UI */}
+        {paymentMethod === 'upi' && (
+            <div className="animate-in fade-in duration-300 mb-6">
+                <h2 className="text-2xl font-black text-[#1A1A1A] tracking-tight mb-2">Scan & Pay</h2>
+                <p className="text-gray-500 font-medium mb-6 text-sm px-2">Open any UPI app to pay securely.</p>
+                <div className="relative inline-block">
+                    <div className="relative border-[3px] border-gray-100 bg-white p-4 rounded-[30px] shadow-sm overflow-hidden group">
+                        <div className="absolute left-0 right-0 h-1 bg-amber-500 shadow-[0_0_20px_5px_rgba(245,158,11,0.6)] animate-bounce z-20 pointer-events-none" style={{ animationDuration: '3s' }}></div>
+                        <div className="bg-white rounded-2xl overflow-hidden flex justify-center items-center relative z-10">
+                            <img src="/payment-qr.jpg" alt="Scan to Pay" className="w-40 h-40 object-contain transition-transform duration-500 group-hover:scale-105" onError={(e) => { e.target.src = 'https://via.placeholder.com/150?text=Insert+QR+Here'; }}/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        )}
+
+        {/* 💳 CREDIT CARD UI */}
+        {paymentMethod === 'card' && (
+            <div className="animate-in fade-in duration-300 text-left space-y-4 mb-6">
+                <div>
+                    <label className="block text-xs font-black text-gray-500 uppercase tracking-widest mb-1 ml-1">Card Number</label>
+                    <input type="text" placeholder="0000 0000 0000 0000" maxLength="19" className="w-full px-4 py-3 bg-gray-50 border-2 border-gray-100 rounded-xl focus:bg-white focus:border-amber-500 font-bold text-gray-800 tracking-widest outline-none transition-all" />
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                    <div>
+                        <label className="block text-xs font-black text-gray-500 uppercase tracking-widest mb-1 ml-1">Expiry</label>
+                        <input type="text" placeholder="MM/YY" maxLength="5" className="w-full px-4 py-3 bg-gray-50 border-2 border-gray-100 rounded-xl focus:bg-white focus:border-amber-500 font-bold text-gray-800 outline-none transition-all" />
+                    </div>
+                    <div>
+                        <label className="block text-xs font-black text-gray-500 uppercase tracking-widest mb-1 ml-1">CVV</label>
+                        <input type="password" placeholder="•••" maxLength="3" className="w-full px-4 py-3 bg-gray-50 border-2 border-gray-100 rounded-xl focus:bg-white focus:border-amber-500 font-bold text-center text-gray-800 outline-none transition-all" />
+                    </div>
+                </div>
+            </div>
+        )}
+
+        {/* 💵 COD UI */}
+        {paymentMethod === 'cod' && (
+            <div className="animate-in fade-in duration-300 bg-orange-50 border-2 border-orange-100 rounded-2xl p-6 text-center mb-6">
+                <Banknote size={48} className="text-orange-500 mx-auto mb-3" />
+                <h3 className="font-black text-lg text-gray-800">Cash on Delivery</h3>
+                <p className="text-gray-600 font-medium text-sm mt-2">Please keep exact change ready at the time of delivery.</p>
+            </div>
+        )}
 
         {/* 💳 Dark Mode Amount Card */}
         <div className="bg-gradient-to-br from-[#2a1100] to-[#1a0a00] rounded-3xl p-6 shadow-2xl relative overflow-hidden mb-8">
@@ -221,7 +250,7 @@ const Payment = () => {
           </p>
         </div>
 
-        {/* 🚀 Active Listening Indicator */}
+        {/* 🚀 Active Listening Indicator (Always running!) */}
         <div className="bg-amber-50 border border-amber-200/50 p-4 rounded-2xl flex items-center justify-center gap-3">
            <div className="relative flex h-3 w-3">
              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-500 opacity-75"></span>

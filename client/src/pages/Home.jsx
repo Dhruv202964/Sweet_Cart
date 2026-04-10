@@ -8,6 +8,9 @@ import story1Img from '../assets/story1.png';
 import story2Img from '../assets/story2.png';
 import story3Img from '../assets/story3.png';
 
+// 🌟 IMPORTING THE NEW MASTERPIECE SLIDER
+import HeroSlider from '../components/HeroSlider'; 
+
 // 🌟 Magic Auto-Sliding Image Component
 const AutoSlidingImage = ({ mainImage, gallery, category }) => {
   const images = [mainImage, ...(gallery || [])].filter(Boolean);
@@ -117,23 +120,13 @@ const Home = () => {
   );
 
   return (
-    <div className="min-h-screen bg-[#FFFDF8] font-sans pb-20 overflow-hidden">
+    <div className="min-h-screen bg-[#FFFDF8] font-sans pb-20 overflow-hidden relative">
       
-      {/* 🌟 HERO BANNER */}
-      <div className="relative bg-gradient-to-br from-yellow-300 via-amber-400 to-orange-400 overflow-hidden">
-        <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/food.png')] opacity-15 mix-blend-overlay"></div>
-        <div className="absolute inset-0 bg-gradient-to-t from-[#FFFDF8] to-transparent top-3/4"></div>
-        
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 lg:py-28 relative z-10 flex flex-col items-center text-center">
-          <span className="text-amber-900 font-bold tracking-widest uppercase text-sm mb-4 bg-white/30 px-4 py-1 rounded-full backdrop-blur-sm shadow-sm">Premium Quality 100% Pure</span>
-          <h1 className="text-5xl md:text-6xl lg:text-7xl font-black tracking-tight text-amber-950 mb-6 drop-shadow-sm">Authentic Taste, <br className="hidden md:block" /> Delivered Fresh.</h1>
-          <p className="text-lg md:text-xl text-amber-900 max-w-2xl mb-10 font-medium leading-relaxed">From our signature Pista Ghari to crispy Nylon Khaman. Experience the true flavors of Surat.</p>
-          <button onClick={() => navigate('/menu')} className="bg-amber-950 text-white px-10 py-4 rounded-full font-bold text-lg hover:bg-gray-900 hover:shadow-xl transition-all hover:-translate-y-1">Explore Full Menu</button>
-        </div>
-      </div>
+      {/* 🌟 PREMIUM HERO CAROUSEL REPLACES OLD BANNER */}
+      <HeroSlider />
 
       {/* 🌟 LUXURY CATEGORY TABS */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-4 mb-10 pt-4">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-12 mb-10 relative z-10">
         <div className="flex justify-center overflow-x-auto hide-scrollbar gap-4 pb-4">
           {categories.map(category => (
             <button
@@ -152,7 +145,7 @@ const Home = () => {
       </div>
 
       {/* 🌟 CATEGORY PRODUCT GRID */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         {loading ? (
           <div className="text-center py-20"><Loader2 className="animate-spin text-amber-500 w-12 h-12 mx-auto" /></div>
         ) : displayedProducts.length === 0 ? (
@@ -174,7 +167,7 @@ const Home = () => {
 
       {/* 🏆 BESTSELLERS SECTION */}
       {!loading && products.length > 0 && (
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-24 mb-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-24 mb-16 relative z-10">
           <div className="flex items-center gap-3 mb-8">
             <Award className="text-amber-500" size={36} />
             <h2 className="text-3xl md:text-4xl font-black text-gray-900 tracking-tight">Our Bestsellers</h2>
@@ -189,7 +182,7 @@ const Home = () => {
       {/* 📖 THE INSPIRING STORY SECTIONS */}
       {/* ========================================== */}
       
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 overflow-hidden">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 overflow-hidden relative z-10">
         
         {/* STORY 1: ORIGIN (Image Right) */}
         <div className="flex flex-col md:flex-row items-center gap-12 lg:gap-20 mb-32">

@@ -1,7 +1,7 @@
 const db = require('../config/db');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const nodemailer = require('nodemailer'); // 🌟 NEW: Email Engine Import
+const nodemailer = require('nodemailer');
 
 // 🌟 Configure the Email Sender
 const transporter = nodemailer.createTransport({
@@ -25,7 +25,6 @@ exports.registerCustomer = async (req, res) => {
     const salt = await bcrypt.genSalt(10);
     const password_hash = await bcrypt.hash(password, salt);
 
-    // 🌟 ADDED 'phone' to the RETURNING clause so React gets it instantly!
     const newUser = await db.query(`
       INSERT INTO users (full_name, email, password_hash, role, phone) 
       VALUES ($1, $2, $3, 'customer', $4) 
@@ -81,7 +80,7 @@ exports.loginCustomer = async (req, res) => {
         full_name: user.full_name,
         email: user.email,
         role: user.role,
-        phone: user.phone // 🌟 ADDED 'phone' here so MyAccount.jsx can see it!
+        phone: user.phone 
       }
     });
 
@@ -91,12 +90,11 @@ exports.loginCustomer = async (req, res) => {
   }
 };
 
-// 🌟 3. NEW: Update User Profile
+// 3. Update User Profile
 exports.updateProfile = async (req, res) => {
   try {
     const { user_id, full_name, email, phone } = req.body;
     
-    // Update the user in the database
     const result = await db.query(
       "UPDATE users SET full_name = $1, email = $2, phone = $3 WHERE user_id = $4 RETURNING user_id, full_name, email, phone, role",
       [full_name, email, phone, user_id]
@@ -106,7 +104,6 @@ exports.updateProfile = async (req, res) => {
       return res.status(404).json({ msg: "User not found" });
     }
 
-    // Send back the updated user data so the React Context updates!
     res.json({ msg: "Profile updated successfully!", user: result.rows[0] });
   } catch (err) {
     console.error("❌ UPDATE PROFILE ERROR:", err.message);
@@ -114,18 +111,15 @@ exports.updateProfile = async (req, res) => {
   }
 };
 
-// 🌟 4. NEW: Delete User Account
+// 4. Delete User Account
 exports.deleteAccount = async (req, res) => {
   try {
-    // Getting user_id from either the URL parameter or the request body
     const user_id = req.params.id || req.body.user_id;
 
     if (!user_id) {
       return res.status(400).json({ msg: "User ID is required to delete account" });
     }
 
-    // Delete the user from the database
-    // Because of ON DELETE CASCADE, this will also wipe their addresses, etc.
     const result = await db.query(
       "DELETE FROM users WHERE user_id = $1 RETURNING user_id", 
       [user_id]
@@ -142,20 +136,21 @@ exports.deleteAccount = async (req, res) => {
   }
 };
 
-// 🌟 5. Send OTP for Password Reset
+// 🌟 5. Send OTP for Password Reset (UPDATED: 2 Mins + Premium Template)
 exports.forgotPassword = async (req, res) => {
   try {
       const { email } = req.body;
       const userCheck = await db.query("SELECT * FROM users WHERE email = $1", [email]);
 
       if (userCheck.rows.length === 0) {
-          return res.status(404).json({ msg: "If that email exists, an OTP has been sent." }); // Security best practice!
+          return res.status(404).json({ msg: "If that email exists, an OTP has been sent." }); 
       }
 
       // Generate a 6-digit OTP
       const otp = Math.floor(100000 + Math.random() * 900000).toString();
-      // Set expiry for 10 minutes from now
-      const expiry = new Date(Date.now() + 10 * 60000);
+      
+      // 🌟 UPDATED: Set expiry for EXACTLY 2 minutes from now
+      const expiry = new Date(Date.now() + 2 * 60000);
 
       // Save OTP to database
       await db.query(
@@ -163,18 +158,62 @@ exports.forgotPassword = async (req, res) => {
           [otp, expiry, email]
       );
 
-      // Send the email
+      // 🌟 UPDATED: Premium Dashboard Email Template
       const mailOptions = {
           from: process.env.EMAIL_USER,
           to: email,
-          subject: 'SweetCart - Password Reset OTP',
+          subject: 'SweetCart - Your Verification Code', 
           html: `
-              <div style="font-family: Arial, sans-serif; text-align: center; padding: 20px;">
-                  <h2 style="color: #d97706;">SweetCart Security</h2>
-                  <p>Your password reset code is:</p>
-                  <h1 style="font-size: 40px; letter-spacing: 5px; color: #111827;">${otp}</h1>
-                  <p style="color: #6b7280; font-size: 12px;">This code expires in 10 minutes. Do not share it with anyone.</p>
-              </div>
+              <!DOCTYPE html>
+              <html>
+              <head>
+                  <meta charset="UTF-8">
+                  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                  <title>SweetCart Verification</title>
+              </head>
+              <body style="margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f3f4f6;">
+                  <table border="0" cellpadding="0" cellspacing="0" width="100%" style="padding: 40px 0;">
+                      <tr>
+                          <td align="center">
+                              <table border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 500px; background-color: #ffffff; border-radius: 8px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+                                  <tr>
+                                      <td align="center" style="padding: 30px 0 20px 0; border-bottom: 2px solid #f3f4f6;">
+                                          <h1 style="margin: 0; color: #d97706; font-size: 28px; font-weight: 900; letter-spacing: 1px;">SweetCart</h1>
+                                      </td>
+                                  </tr>
+                                  <tr>
+                                      <td style="padding: 30px 40px; text-align: center;">
+                                          <h2 style="margin: 0 0 15px 0; color: #1f2937; font-size: 20px;">Password Reset Request</h2>
+                                          <p style="margin: 0 0 25px 0; color: #4b5563; font-size: 15px; line-height: 1.5;">
+                                              We received a request to reset your SweetCart password. Enter the following verification code to continue:
+                                          </p>
+                                          
+                                          <div style="background-color: #fffbeb; border: 2px dashed #f59e0b; border-radius: 8px; padding: 20px; margin-bottom: 25px;">
+                                              <h1 style="margin: 0; font-size: 42px; font-weight: 700; color: #d97706; letter-spacing: 10px;">${otp}</h1>
+                                          </div>
+                                          
+                                          <p style="margin: 0 0 20px 0; color: #ef4444; font-size: 14px; font-weight: 600;">
+                                              ⏱️ This code expires in exactly 2 minutes.
+                                          </p>
+                                          <p style="margin: 0; color: #6b7280; font-size: 13px; line-height: 1.5;">
+                                              If you didn't request this change, please ignore this email to keep your account secure.
+                                          </p>
+                                      </td>
+                                  </tr>
+                                  <tr>
+                                      <td align="center" style="padding: 20px 40px; background-color: #f9fafb; border-bottom-left-radius: 8px; border-bottom-right-radius: 8px;">
+                                          <p style="margin: 0; color: #9ca3af; font-size: 12px;">
+                                              &copy; 2026 Team 404 ERROR. All rights reserved.<br>
+                                              SweetCart Ecosystem
+                                          </p>
+                                      </td>
+                                  </tr>
+                              </table>
+                          </td>
+                      </tr>
+                  </table>
+              </body>
+              </html>
           `
       };
 
@@ -187,7 +226,7 @@ exports.forgotPassword = async (req, res) => {
   }
 };
 
-// 🌟 6. Verify OTP & Reset Password
+// 6. Verify OTP & Reset Password
 exports.resetPassword = async (req, res) => {
   try {
       const { email, otp, newPassword } = req.body;
