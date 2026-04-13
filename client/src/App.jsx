@@ -16,17 +16,18 @@ import Home from './pages/Home';
 import Dashboard from './pages/Dashboard'; // Admin Dashboard
 import Menu from './pages/Menu';
 import Checkout from './pages/Checkout';
-import Payment from './pages/Payment'; // 🌟 NEW IMPORT
+import Payment from './pages/Payment'; 
 import ProductDetails from './pages/ProductDetails';
 import Login from './pages/Login';
 import Register from './pages/Register';
-import ForgotPassword from './pages/ForgotPassword'; // 🌟 NEW IMPORT
+import ForgotPassword from './pages/ForgotPassword'; 
 import TrackOrder from './pages/TrackOrder';
 import MyAccount from './pages/MyAccount';
 import About from './pages/About';
 import Contact from './pages/Contact';
 import PrivacyPolicy from './pages/PrivacyPolicy';
 import Team from './pages/Team';
+import MakeYourOwnBox from './pages/MakeYourOwnBox'; // 🎁 🌟 NEW IMPORT
 
 function App() {
   return (
@@ -40,11 +41,12 @@ function App() {
               {/* 🟢 PUBLIC ROUTES */}
               <Route path="/" element={<Home />} />
               <Route path="/menu" element={<Menu />} /> 
+              <Route path="/make-your-own-box" element={<MakeYourOwnBox />} /> {/* 🎁 🌟 NEW VIP ROUTE ADDED HERE */}
               <Route path="/checkout" element={<Checkout />} />
-              <Route path="/payment/:order_id" element={<Payment />} /> {/* 🌟 NEW PAYMENT ROUTE */}
+              <Route path="/payment/:order_id" element={<Payment />} /> 
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
-              <Route path="/forgot-password" element={<ForgotPassword />} /> {/* 🌟 NEW OTP ROUTE */}
+              <Route path="/forgot-password" element={<ForgotPassword />} /> 
               <Route path="/product/:id" element={<ProductDetails />} />
               <Route path="/track-order" element={<TrackOrder />} />
               <Route path="/account" element={<MyAccount />} />

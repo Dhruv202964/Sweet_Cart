@@ -28,6 +28,11 @@ const Sidebar = () => {
           <span>📦</span> Orders
         </Link>
 
+        {/* 🎁 NEW VIP BOX PACKING TAB */}
+        <Link to="/custom-boxes" className={`flex items-center gap-3 px-3 py-3 rounded-xl transition-all ${isActive('/custom-boxes')}`}>
+          <span>🎁</span> VIP Boxes
+        </Link>
+
         {/* 🔥 NEW PAYMENT APPROVALS TAB */}
         <Link to="/approvals" className={`flex items-center gap-3 px-3 py-3 rounded-xl transition-all ${isActive('/approvals')}`}>
           <span>💳</span> Approvals

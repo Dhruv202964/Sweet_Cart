@@ -1,14 +1,102 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { Star, Plus } from 'lucide-react';
-import { Link } from 'react-router-dom'; // 🌟 NEW: We need this to make things clickable!
+import { Link } from 'react-router-dom'; 
 import { CartContext } from '../context/CartContext';
+
+// 🚀 EXTRACTED CARD COMPONENT SO EACH ITEM HAS ITS OWN DROPDOWN STATE
+const MenuProductCard = ({ product, category }) => {
+  const { cart, addToCart, decreaseQuantity } = useContext(CartContext);
+  const [selectedWeight, setSelectedWeight] = useState('1KG');
+
+  // 🚀 THE PRICING MATH LOGIC
+  const isKg = product.unit?.toLowerCase() === 'kg';
+  const weightMultiplier = selectedWeight === '250G' ? 0.25 : selectedWeight === '500G' ? 0.5 : 1;
+  const displayPrice = isKg ? (parseFloat(product.price) * weightMultiplier) : parseFloat(product.price);
+
+  // 🚀 CART SYNC LOGIC
+  const uniqueCartId = isKg ? `${product.product_id}_${selectedWeight}` : `${product.product_id}_default`;
+  
+  // Find item by unique ID (or fallback for older items)
+  const cartItem = cart.find(c => c.cartItemId ? c.cartItemId === uniqueCartId : c.product_id === product.product_id);
+
+  const handleAddToCart = () => {
+    addToCart({
+      ...product,
+      price: displayPrice,
+      weight_selected: isKg ? selectedWeight : (product.unit || 'pcs'),
+      cartItemId: uniqueCartId
+    });
+  };
+
+  const handleDecrease = () => {
+    decreaseQuantity(cartItem.cartItemId || product.product_id);
+  };
+
+  return (
+    <div className="bg-white rounded-3xl shadow-sm hover:shadow-2xl hover:shadow-amber-500/10 transition-all duration-500 overflow-hidden border border-amber-100 group flex flex-col">
+      <Link to={`/product/${product.product_id}`} className="block h-56 bg-amber-50 relative overflow-hidden flex items-center justify-center p-4 cursor-pointer">
+        {product.image_url ? (
+          <img src={product.image_url} alt={product.name} className="w-full h-full object-cover rounded-2xl group-hover:scale-110 transition duration-700" />
+        ) : (
+          <span className="text-7xl group-hover:scale-110 group-hover:rotate-3 transition duration-500">{category === 'Sweets' ? '🍬' : category === 'Dairy' ? '🥛' : '🥟'}</span>
+        )}
+      </Link>
+      
+      <div className="p-6 flex flex-col flex-grow">
+        <div className="flex justify-between items-start mb-2 gap-2">
+          <Link to={`/product/${product.product_id}`} className="cursor-pointer hover:underline decoration-amber-500 decoration-2">
+            <h3 className="text-lg font-bold text-gray-900 leading-tight group-hover:text-amber-600 transition-colors">{product.name}</h3>
+          </Link>
+          <div className="flex items-center bg-amber-100 px-2 py-1 rounded text-amber-700 text-xs font-bold shrink-0"><Star size={12} className="mr-1 fill-amber-500 text-amber-500" /> 4.8</div>
+        </div>
+        <p className="text-sm text-gray-500 mb-6 line-clamp-2">{product.description || "Fresh and authentic quality, made with premium ingredients."}</p>
+        
+        <div className="flex items-end justify-between mt-auto pt-4 border-t border-amber-50">
+          <div className="flex flex-col">
+            <span className="text-[10px] text-gray-400 uppercase tracking-wider font-bold mb-0.5">Price</span>
+            <div className="flex items-baseline">
+              <span className="text-2xl font-black text-gray-900">₹{displayPrice.toFixed(2)}</span>
+              
+              {/* 🚀 DYNAMIC DROPDOWN */}
+              {isKg ? (
+                <select 
+                  value={selectedWeight} 
+                  onChange={(e) => setSelectedWeight(e.target.value)}
+                  className="ml-1 bg-amber-50 border border-amber-200 text-amber-900 text-xs font-bold rounded focus:ring-amber-500 focus:border-amber-500 py-0.5 px-1 cursor-pointer outline-none"
+                >
+                  <option value="250G">250G</option>
+                  <option value="500G">500G</option>
+                  <option value="1KG">1KG</option>
+                </select>
+              ) : (
+                <span className="text-xs text-amber-600 font-bold ml-1 uppercase">/ {product.unit || 'pcs'}</span>
+              )}
+            </div>
+          </div>
+
+          {cartItem ? (
+            <div className="flex items-center bg-amber-100 rounded-2xl border border-amber-200 overflow-hidden shadow-sm">
+              <button onClick={handleDecrease} className="px-4 py-2.5 text-amber-700 hover:bg-amber-200 hover:text-red-700 transition-colors font-black text-xl leading-none">-</button>
+              <span className="px-2 py-2.5 text-amber-900 font-bold min-w-[28px] text-center text-base">{cartItem.quantity}</span>
+              <button onClick={handleAddToCart} className="px-4 py-2.5 text-amber-700 hover:bg-amber-200 hover:text-green-700 transition-colors font-black text-xl leading-none">+</button>
+            </div>
+          ) : (
+            <button onClick={handleAddToCart} className="bg-amber-100 hover:bg-amber-500 text-amber-700 hover:text-white p-3 rounded-2xl transition-all group-hover:shadow-md">
+              <Plus size={20} strokeWidth={3} />
+            </button>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
 
 const Menu = () => {
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   
-  const { cart, addToCart, decreaseQuantity, searchQuery } = useContext(CartContext);
+  const { searchQuery } = useContext(CartContext);
 
   useEffect(() => {
     fetch('http://localhost:5000/api/products')
@@ -67,53 +155,7 @@ const Menu = () => {
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
                     {categoryProducts.map(product => (
-                      <div key={product.product_id} className="bg-white rounded-3xl shadow-sm hover:shadow-2xl hover:shadow-amber-500/10 transition-all duration-500 overflow-hidden border border-amber-100 group flex flex-col">
-                        
-                        {/* 🌟 NEW: The Image is now wrapped in a Link! */}
-                        <Link to={`/product/${product.product_id}`} className="block h-56 bg-amber-50 relative overflow-hidden flex items-center justify-center p-4 cursor-pointer">
-                          {product.image_url ? (
-                            <img src={product.image_url} alt={product.name} className="w-full h-full object-cover rounded-2xl group-hover:scale-110 transition duration-700" />
-                          ) : (
-                            <span className="text-7xl group-hover:scale-110 group-hover:rotate-3 transition duration-500">{category === 'Sweets' ? '🍬' : category === 'Dairy' ? '🥛' : '🥟'}</span>
-                          )}
-                        </Link>
-                        
-                        <div className="p-6 flex flex-col flex-grow">
-                          <div className="flex justify-between items-start mb-2 gap-2">
-                            {/* 🌟 NEW: The Title is now wrapped in a Link! */}
-                            <Link to={`/product/${product.product_id}`} className="cursor-pointer hover:underline decoration-amber-500 decoration-2">
-                              <h3 className="text-lg font-bold text-gray-900 leading-tight group-hover:text-amber-600 transition-colors">{product.name}</h3>
-                            </Link>
-                            <div className="flex items-center bg-amber-100 px-2 py-1 rounded text-amber-700 text-xs font-bold shrink-0"><Star size={12} className="mr-1 fill-amber-500 text-amber-500" /> 4.8</div>
-                          </div>
-                          <p className="text-sm text-gray-500 mb-6 line-clamp-2">{product.description || "Fresh and authentic quality, made with premium ingredients."}</p>
-                          <div className="flex items-center justify-between mt-auto pt-4 border-t border-amber-50">
-                            <div>
-                              <span className="text-2xl font-black text-gray-900">₹{parseFloat(product.price || 0).toFixed(2)}</span>
-                              <span className="text-xs text-amber-600 font-bold ml-1 uppercase">/ {product.unit || 'kg'}</span>
-                            </div>
-
-                            {(() => {
-                              const cartItem = cart.find(c => c.product_id === product.product_id);
-                              if (cartItem) {
-                                return (
-                                  <div className="flex items-center bg-amber-100 rounded-2xl border border-amber-200 overflow-hidden shadow-sm">
-                                    <button onClick={() => decreaseQuantity(product.product_id)} className="px-4 py-2.5 text-amber-700 hover:bg-amber-200 hover:text-red-700 transition-colors font-black text-xl leading-none">-</button>
-                                    <span className="px-2 py-2.5 text-amber-900 font-bold min-w-[28px] text-center text-base">{cartItem.quantity}</span>
-                                    <button onClick={() => addToCart(product)} className="px-4 py-2.5 text-amber-700 hover:bg-amber-200 hover:text-green-700 transition-colors font-black text-xl leading-none">+</button>
-                                  </div>
-                                );
-                              }
-                              return (
-                                <button onClick={() => addToCart(product)} className="bg-amber-100 hover:bg-amber-500 text-amber-700 hover:text-white p-3 rounded-2xl transition-all group-hover:shadow-md">
-                                  <Plus size={20} strokeWidth={3} />
-                                </button>
-                              );
-                            })()}
-
-                          </div>
-                        </div>
-                      </div>
+                      <MenuProductCard key={product.product_id} product={product} category={category} />
                     ))}
                   </div>
                 </div>

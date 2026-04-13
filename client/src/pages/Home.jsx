@@ -8,8 +8,8 @@ import story1Img from '../assets/story1.png';
 import story2Img from '../assets/story2.png';
 import story3Img from '../assets/story3.png';
 
-// 🌟 IMPORTING THE NEW MASTERPIECE SLIDER
-import HeroSlider from '../components/HeroSlider'; 
+// 🌟 THE SLIDER IS COMMENTED OUT FOR SCREENSHOTS
+// import HeroSlider from '../components/HeroSlider'; 
 
 // 🌟 Magic Auto-Sliding Image Component
 const AutoSlidingImage = ({ mainImage, gallery, category }) => {
@@ -64,66 +64,112 @@ const Home = () => {
     .filter(product => product.category_name === activeCategory)
     .slice(0, 4);
 
-  // 🏆 BESTSELLER LOGIC
   const bestsellers = products.filter(p => p.is_bestseller);
   const displayBestsellers = bestsellers.length > 0 ? bestsellers.slice(0, 4) : products.slice(0, 4);
 
-  // Reusable Product Card Component
-  const ProductCard = ({ product, isBestsellerBadge }) => (
-    <div className="bg-white rounded-3xl shadow-sm hover:shadow-2xl hover:shadow-amber-500/10 transition-all duration-500 overflow-hidden border border-amber-100 group flex flex-col relative">
-      
-      {/* 🏆 Bestseller Badge */}
-      {isBestsellerBadge && (
-        <div className="absolute top-3 left-3 z-10 bg-gradient-to-r from-red-600 to-amber-500 text-white text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full shadow-lg flex items-center gap-1 animate-in zoom-in duration-300">
-          <Sparkles size={12} /> Bestseller
-        </div>
-      )}
+  // 🚀 REUSABLE PRODUCT CARD WITH DYNAMIC WEIGHT LOGIC
+  const ProductCard = ({ product, isBestsellerBadge }) => {
+    const [selectedWeight, setSelectedWeight] = useState('1KG');
 
-      <Link to={`/product/${product.product_id}`} className="block h-52 bg-amber-50 relative overflow-hidden flex items-center justify-center p-4 cursor-pointer">
-        <AutoSlidingImage mainImage={product.image_url} gallery={product.gallery_images} category={product.category_name} />
-      </Link>
+    const isKg = product.unit?.toLowerCase() === 'kg';
+    const weightMultiplier = selectedWeight === '250G' ? 0.25 : selectedWeight === '500G' ? 0.5 : 1;
+    const displayPrice = isKg ? (parseFloat(product.price) * weightMultiplier) : parseFloat(product.price);
 
-      <div className="p-5 flex flex-col flex-grow">
-        <div className="flex justify-between items-start mb-2 gap-2">
-          <Link to={`/product/${product.product_id}`} className="cursor-pointer hover:underline decoration-amber-500 decoration-2">
-            <h3 className="text-md font-bold text-gray-900 group-hover:text-amber-600 transition-colors">{product.name}</h3>
-          </Link>
-          <div className="flex items-center bg-amber-100 px-2 py-0.5 rounded text-amber-700 text-xs font-bold"><Star size={10} className="mr-1 fill-amber-500 text-amber-500" /> 4.8</div>
-        </div>
-        <p className="text-xs text-gray-500 mb-4 line-clamp-2">{product.description}</p>
-        <div className="flex items-center justify-between mt-auto pt-3 border-t border-amber-50">
-          <div>
-            <span className="text-xl font-black text-gray-900">₹{parseFloat(product.price).toFixed(2)}</span>
-            <span className="text-[10px] text-amber-600 font-bold ml-1 uppercase">/ {product.unit || 'kg'}</span>
+    const uniqueCartId = isKg ? `${product.product_id}_${selectedWeight}` : `${product.product_id}_default`;
+    
+    const cartItem = cart.find(c => c.cartItemId ? c.cartItemId === uniqueCartId : c.product_id === product.product_id);
+
+    const handleAddToCart = () => {
+      addToCart({
+        ...product,
+        price: displayPrice,
+        weight_selected: isKg ? selectedWeight : (product.unit || 'pcs'),
+        cartItemId: uniqueCartId
+      });
+    };
+
+    const handleDecrease = () => {
+      decreaseQuantity(cartItem.cartItemId || product.product_id);
+    };
+
+    return (
+      <div className="bg-white rounded-3xl shadow-sm hover:shadow-2xl hover:shadow-amber-500/10 transition-all duration-500 overflow-hidden border border-amber-100 group flex flex-col relative">
+        
+        {isBestsellerBadge && (
+          <div className="absolute top-3 left-3 z-10 bg-gradient-to-r from-red-600 to-amber-500 text-white text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full shadow-lg flex items-center gap-1 animate-in zoom-in duration-300">
+            <Sparkles size={12} /> Bestseller
           </div>
+        )}
+
+        <Link to={`/product/${product.product_id}`} className="block h-52 bg-amber-50 relative overflow-hidden flex items-center justify-center p-4 cursor-pointer">
+          <AutoSlidingImage mainImage={product.image_url} gallery={product.gallery_images} category={product.category_name} />
+        </Link>
+
+        <div className="p-5 flex flex-col flex-grow">
+          <div className="flex justify-between items-start mb-2 gap-2">
+            <Link to={`/product/${product.product_id}`} className="cursor-pointer hover:underline decoration-amber-500 decoration-2">
+              <h3 className="text-md font-bold text-gray-900 group-hover:text-amber-600 transition-colors">{product.name}</h3>
+            </Link>
+            <div className="flex items-center bg-amber-100 px-2 py-0.5 rounded text-amber-700 text-xs font-bold"><Star size={10} className="mr-1 fill-amber-500 text-amber-500" /> 4.8</div>
+          </div>
+          <p className="text-xs text-gray-500 mb-4 line-clamp-2">{product.description}</p>
           
-          {(() => {
-            const cartItem = cart.find(c => c.product_id === product.product_id);
-            if (cartItem) {
-              return (
-                <div className="flex items-center bg-amber-100 rounded-xl border border-amber-200 overflow-hidden shadow-sm">
-                  <button onClick={() => decreaseQuantity(product.product_id)} className="px-3 py-2 text-amber-700 hover:bg-amber-200 hover:text-red-700 transition-colors font-black text-lg leading-none">-</button>
-                  <span className="px-1 py-2 text-amber-900 font-bold min-w-[24px] text-center text-sm">{cartItem.quantity}</span>
-                  <button onClick={() => addToCart(product)} className="px-3 py-2 text-amber-700 hover:bg-amber-200 hover:text-green-700 transition-colors font-black text-lg leading-none">+</button>
-                </div>
-              );
-            }
-            return (
-              <button onClick={() => addToCart(product)} className="bg-amber-100 hover:bg-amber-500 text-amber-700 hover:text-white p-2.5 rounded-xl transition-all group-hover:shadow-md">
+          <div className="flex items-end justify-between mt-auto pt-3 border-t border-amber-50">
+            <div className="flex flex-col">
+              <span className="text-[10px] text-gray-400 uppercase tracking-wider font-bold mb-0.5">Price</span>
+              <div className="flex items-baseline">
+                <span className="text-xl font-black text-gray-900">₹{displayPrice.toFixed(2)}</span>
+                
+                {/* 🚀 DYNAMIC DROPDOWN */}
+                {isKg ? (
+                  <select 
+                    value={selectedWeight} 
+                    onChange={(e) => setSelectedWeight(e.target.value)}
+                    className="ml-1 bg-amber-50 border border-amber-200 text-amber-900 text-xs font-bold rounded focus:ring-amber-500 focus:border-amber-500 py-0.5 px-1 cursor-pointer outline-none"
+                  >
+                    <option value="250G">250G</option>
+                    <option value="500G">500G</option>
+                    <option value="1KG">1KG</option>
+                  </select>
+                ) : (
+                  <span className="text-[10px] text-amber-600 font-bold ml-1 uppercase">/ {product.unit || 'kg'}</span>
+                )}
+              </div>
+            </div>
+            
+            {cartItem ? (
+              <div className="flex items-center bg-amber-100 rounded-xl border border-amber-200 overflow-hidden shadow-sm">
+                <button onClick={handleDecrease} className="px-3 py-2 text-amber-700 hover:bg-amber-200 hover:text-red-700 transition-colors font-black text-lg leading-none">-</button>
+                <span className="px-1 py-2 text-amber-900 font-bold min-w-[24px] text-center text-sm">{cartItem.quantity}</span>
+                <button onClick={handleAddToCart} className="px-3 py-2 text-amber-700 hover:bg-amber-200 hover:text-green-700 transition-colors font-black text-lg leading-none">+</button>
+              </div>
+            ) : (
+              <button onClick={handleAddToCart} className="bg-amber-100 hover:bg-amber-500 text-amber-700 hover:text-white p-2.5 rounded-xl transition-all group-hover:shadow-md">
                 <Plus size={18} strokeWidth={3} />
               </button>
-            );
-          })()}
+            )}
+          </div>
         </div>
       </div>
-    </div>
-  );
+    );
+  };
 
   return (
     <div className="min-h-screen bg-[#FFFDF8] font-sans pb-20 overflow-hidden relative">
       
-      {/* 🌟 PREMIUM HERO CAROUSEL REPLACES OLD BANNER */}
-      <HeroSlider />
+      {/* 🌟 OLD YELLOW BANNER RESTORED FOR SCREENSHOTS */}
+      {/* I added pt-24 here to account for your new fixed glass navbar! */}
+      <div className="relative bg-gradient-to-br from-yellow-300 via-amber-400 to-orange-400 overflow-hidden pt-24">
+        <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/food.png')] opacity-15 mix-blend-overlay"></div>
+        <div className="absolute inset-0 bg-gradient-to-t from-[#FFFDF8] to-transparent top-3/4"></div>
+        
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 lg:py-28 relative z-10 flex flex-col items-center text-center">
+          <span className="text-amber-900 font-bold tracking-widest uppercase text-sm mb-4 bg-white/30 px-4 py-1 rounded-full backdrop-blur-sm shadow-sm">Premium Quality 100% Pure</span>
+          <h1 className="text-5xl md:text-6xl lg:text-7xl font-black tracking-tight text-amber-950 mb-6 drop-shadow-sm">Authentic Taste, <br className="hidden md:block" /> Delivered Fresh.</h1>
+          <p className="text-lg md:text-xl text-amber-900 max-w-2xl mb-10 font-medium leading-relaxed">From our signature Pista Ghari to crispy Nylon Khaman. Experience the true flavors of Surat.</p>
+          <button onClick={() => navigate('/menu')} className="bg-amber-950 text-white px-10 py-4 rounded-full font-bold text-lg hover:bg-gray-900 hover:shadow-xl transition-all hover:-translate-y-1">Explore Full Menu</button>
+        </div>
+      </div>
 
       {/* 🌟 LUXURY CATEGORY TABS */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-12 mb-10 relative z-10">

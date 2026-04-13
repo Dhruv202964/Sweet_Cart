@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { CheckCircle, QrCode, Loader2, AlertTriangle, Zap, Timer, AlertOctagon, Utensils, Truck, CreditCard, Banknote, ShieldCheck } from 'lucide-react';
+import { CheckCircle, QrCode, Loader2, AlertTriangle, Zap, Timer, AlertOctagon, Utensils, Truck, CreditCard, Banknote, ShieldCheck, Ban } from 'lucide-react';
 
 const Payment = () => {
   const { order_id } = useParams();
@@ -11,10 +11,10 @@ const Payment = () => {
   const [error, setError] = useState('');
   
   const [paymentSuccess, setPaymentSuccess] = useState(false);
-  const [paymentFailed, setPaymentFailed] = useState(false); 
+  const [paymentFailed, setPaymentFailed] = useState(false); // For Timeouts & Refreshes
+  const [adminRejected, setAdminRejected] = useState(false); // 🚀 For Admin Cancellations
   const [timeLeft, setTimeLeft] = useState(300); // 💣 5 Minutes
   
-  // 🌟 NEW: UI State for Payment Tabs
   const [paymentMethod, setPaymentMethod] = useState('upi');
   
   const isPolling = useRef(false);
@@ -26,7 +26,11 @@ const Payment = () => {
         const data = await res.json();
         if (res.ok && data.length > 0) {
           setOrder(data[0]);
-          if (data[0].payment_status === 'Paid') setPaymentSuccess(true);
+          if (data[0].payment_status === 'Paid') {
+             setPaymentSuccess(true);
+          } else if (data[0].status && data[0].status.includes('Cancelled')) {
+             setAdminRejected(true);
+          }
         } else {
           setError("Order not found or has been removed.");
         }
@@ -36,51 +40,53 @@ const Payment = () => {
     fetchOrder();
   }, [order_id]);
 
-  // 💣 TIMER ENGINE
   useEffect(() => {
-    if (paymentSuccess || paymentFailed || !order) return;
+    if (paymentSuccess || paymentFailed || adminRejected || !order) return;
     if (timeLeft <= 0) {
       handleAutoCancel(); 
       return;
     }
     const timerId = setInterval(() => setTimeLeft(prev => prev - 1), 1000);
     return () => clearInterval(timerId);
-  }, [timeLeft, paymentSuccess, paymentFailed, order]);
+  }, [timeLeft, paymentSuccess, paymentFailed, adminRejected, order]);
 
-  // 💣 PAGE REFRESH INTERCEPTOR
   useEffect(() => {
     const handleBeforeUnload = (e) => {
-      if (!paymentSuccess && !paymentFailed && order) {
+      if (!paymentSuccess && !paymentFailed && !adminRejected && order) {
         navigator.sendBeacon(`http://localhost:5000/api/orders/${order_id}/cancel-unpaid`);
       }
     };
     window.addEventListener('beforeunload', handleBeforeUnload);
     return () => window.removeEventListener('beforeunload', handleBeforeUnload);
-  }, [paymentSuccess, paymentFailed, order, order_id]);
+  }, [paymentSuccess, paymentFailed, adminRejected, order, order_id]);
 
-  // 🚀 SAFE POLLING
   useEffect(() => {
     let pollInterval;
-    if (order && !paymentSuccess && !paymentFailed) {
+    if (order && !paymentSuccess && !paymentFailed && !adminRejected) {
       pollInterval = setInterval(async () => {
         if (isPolling.current) return; 
         isPolling.current = true;
         try {
-          const res = await fetch(`http://localhost:5000/api/orders/${order_id}/payment-status`);
+          const res = await fetch(`http://localhost:5000/api/orders/track?order_id=${order_id}`);
           const data = await res.json();
-          if (res.ok && data.payment_status === 'Paid') {
-            setPaymentSuccess(true);
+          
+          if (res.ok && data.length > 0) {
+            const currentOrder = data[0];
+            if (currentOrder.payment_status === 'Paid') {
+              setPaymentSuccess(true);
+            } else if (currentOrder.status && currentOrder.status.includes('Cancelled')) {
+              setAdminRejected(true); 
+            }
           } else if (res.status === 404) {
-             setPaymentFailed(true);
+             setPaymentFailed(true); 
           }
         } catch (err) { console.error(err); } 
         finally { isPolling.current = false; }
       }, 5000); 
     }
     return () => clearInterval(pollInterval); 
-  }, [order, paymentSuccess, paymentFailed, order_id]);
+  }, [order, paymentSuccess, paymentFailed, adminRejected, order_id]);
 
-  // 💣 DELETE FUNCTION
   const handleAutoCancel = async () => {
     setPaymentFailed(true);
     try {
@@ -97,17 +103,43 @@ const Payment = () => {
   if (loading) return <div className="min-h-screen bg-[#FFFDF8] flex justify-center items-center"><Loader2 size={64} className="text-amber-500 animate-spin" /></div>;
   if (error) return <div className="min-h-screen bg-[#FFFDF8] flex justify-center items-center text-red-600 font-black text-2xl flex-col gap-4"><AlertTriangle size={64} className="animate-bounce" />{error}</div>;
 
-  // 🚨 THE CANCELLED SCREEN
-  if (paymentFailed) {
+  // 🚨 1. THE ADMIN REJECTED SCREEN (EXPLICIT MESSAGING)
+  if (adminRejected) {
     return (
       <div className="min-h-screen bg-[#FFFDF8] flex flex-col items-center justify-center p-6 py-12">
-        <div className="bg-white p-10 rounded-[40px] shadow-2xl border border-red-100 max-w-md w-full text-center animate-in zoom-in duration-300">
-          <AlertOctagon className="text-red-500 w-24 h-24 mx-auto mb-6" />
-          <h2 className="text-3xl font-black text-gray-900 mb-2">Order Removed</h2>
-          <p className="text-gray-500 font-medium mb-8">
-            Your session expired or was interrupted. Your ghost order has been safely removed from our system!
+        <div className="bg-white p-10 rounded-[40px] shadow-2xl border-t-8 border-red-500 max-w-md w-full text-center animate-in zoom-in duration-300">
+          <div className="bg-red-50 w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-6">
+            <Ban className="text-red-500 w-12 h-12" />
+          </div>
+          <h2 className="text-3xl font-black text-gray-900 mb-2 tracking-tight">Declined by Store</h2>
+          <p className="text-gray-500 font-medium mb-8 text-sm leading-relaxed">
+            We're sorry, but your order or payment could not be verified and was <b className="text-red-600">cancelled by the administrator</b>.
+            <br/><br/>
+            If your account was charged, the full amount will be automatically refunded to your original payment method within 3-5 business days.
           </p>
-          <button onClick={() => navigate('/menu')} className="w-full py-4 rounded-xl font-black text-white bg-gray-900 hover:bg-black transition-all">
+          <button onClick={() => navigate('/menu', { replace: true })} className="w-full py-4 rounded-xl font-black text-white bg-red-600 hover:bg-red-700 transition-all shadow-md">
+            Return to Menu
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // 🚨 2. THE TIMEOUT / REFRESH SCREEN (EXPLICIT MESSAGING)
+  if (paymentFailed && !adminRejected) {
+    return (
+      <div className="min-h-screen bg-[#FFFDF8] flex flex-col items-center justify-center p-6 py-12">
+        <div className="bg-white p-10 rounded-[40px] shadow-2xl border-t-8 border-gray-400 max-w-md w-full text-center animate-in zoom-in duration-300">
+          <div className="bg-gray-100 w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-6">
+            <Timer className="text-gray-500 w-12 h-12" />
+          </div>
+          <h2 className="text-3xl font-black text-gray-900 mb-2 tracking-tight">Session Timeout</h2>
+          <p className="text-gray-500 font-medium mb-8 text-sm leading-relaxed">
+            Your secure payment window has <b className="text-gray-800">expired</b> due to inactivity or a page refresh.
+            <br/><br/>
+            For your security, this checkout attempt was closed. Please start a new order.
+          </p>
+          <button onClick={() => navigate('/menu', { replace: true })} className="w-full py-4 rounded-xl font-black text-white bg-amber-500 hover:bg-amber-600 transition-all shadow-md">
             Start New Order
           </button>
         </div>
@@ -115,7 +147,7 @@ const Payment = () => {
     );
   }
 
-  // 🎉 THE GRAND SUCCESS SCREEN
+  // 🎉 3. THE GRAND SUCCESS SCREEN
   if (paymentSuccess) {
     const isSuratLocal = order?.delivery_city?.toLowerCase() === 'surat';
 
@@ -147,11 +179,11 @@ const Payment = () => {
             </div>
           </div>
           
-          <button onClick={() => navigate('/menu')} className="w-full py-5 rounded-2xl font-black text-white text-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 transition-all shadow-xl shadow-amber-500/30 hover:-translate-y-1 flex items-center justify-center gap-3 mb-4">
+          <button onClick={() => navigate('/menu', { replace: true })} className="w-full py-5 rounded-2xl font-black text-white text-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 transition-all shadow-xl shadow-amber-500/30 hover:-translate-y-1 flex items-center justify-center gap-3 mb-4">
             <Utensils size={24} /> Still hungry? Grab some more!
           </button>
 
-          <button onClick={() => navigate('/track-order')} className="w-full py-4 rounded-2xl font-black text-amber-950 bg-amber-50 hover:bg-amber-100 border border-amber-200 transition-all shadow-sm">
+          <button onClick={() => navigate('/track-order', { replace: true })} className="w-full py-4 rounded-2xl font-black text-amber-950 bg-amber-50 hover:bg-amber-100 border border-amber-200 transition-all shadow-sm">
             Track My Order 🚚
           </button>
         </div>
@@ -159,7 +191,7 @@ const Payment = () => {
     );
   }
 
-  // 💳 THE FINTECH PAYMENT GATEWAY UI
+  // 💳 4. THE FINTECH PAYMENT GATEWAY UI
   return (
     <div className="min-h-screen bg-[#FFFDF8] font-sans flex flex-col items-center justify-center p-6 py-8 relative overflow-hidden">
       
@@ -182,7 +214,7 @@ const Payment = () => {
           </span>
         </div>
         
-        {/* 🌟 NEW: Payment Method Tabs */}
+        {/* Payment Method Tabs */}
         <div className="flex gap-2 mb-6">
             <button onClick={() => setPaymentMethod('upi')} className={`flex-1 py-3 px-2 rounded-xl font-bold flex items-center justify-center gap-2 transition-all ${paymentMethod === 'upi' ? 'bg-amber-100 text-amber-700 border border-amber-500' : 'bg-gray-50 text-gray-500 border border-transparent hover:bg-gray-100'}`}>
                 <QrCode size={18} /> UPI
@@ -250,7 +282,7 @@ const Payment = () => {
           </p>
         </div>
 
-        {/* 🚀 Active Listening Indicator (Always running!) */}
+        {/* 🚀 Active Listening Indicator */}
         <div className="bg-amber-50 border border-amber-200/50 p-4 rounded-2xl flex items-center justify-center gap-3">
            <div className="relative flex h-3 w-3">
              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-500 opacity-75"></span>

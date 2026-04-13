@@ -1,28 +1,19 @@
 const db = require('../config/db');
 
-// 1. Get All Orders
+// 1. Get All Orders (🚀 UPGRADED: Now EXCLUDES Custom VIP Boxes from the regular list)
 exports.getAllOrders = async (req, res) => {
   try {
     const result = await db.query(`
       SELECT 
-        o.order_id, 
-        o.total_amount, 
-        o.status, 
-        o.payment_status,
-        o.created_at,
-        o.customer_name,   
-        o.phone,           
-        o.flat_house,      
-        o.landmark,        
-        o.state,           
-        o.pincode,         
-        o.delivery_area, 
-        o.delivery_city AS city, 
-        o.delivery_address,
-        u.email,
+        o.order_id, o.total_amount, o.status, o.payment_status, o.created_at,
+        o.customer_name, o.phone, o.flat_house, o.landmark, o.state, o.pincode, 
+        o.delivery_area, o.delivery_city AS city, o.delivery_address, u.email,
         (SELECT COALESCE(SUM(quantity), 0) FROM order_items WHERE order_id = o.order_id) AS item_count
       FROM orders o
       LEFT JOIN users u ON o.customer_id = u.user_id
+      WHERE NOT EXISTS (
+        SELECT 1 FROM order_items oi WHERE oi.order_id = o.order_id AND oi.is_custom_box = true
+      )
       ORDER BY o.order_id DESC
     `);
     res.json(result.rows);
@@ -110,14 +101,22 @@ exports.updateOrderStatus = async (req, res) => {
   }
 };
 
-// 6. Get Specific Order Items
+// 6. Get Specific Order Items (🚀 UPGRADED FOR VIP BOX & DYNAMIC WEIGHT)
 exports.getOrderItems = async (req, res) => {
   try {
     const { id } = req.params;
     const result = await db.query(`
-      SELECT oi.quantity, oi.price_at_time, p.name AS product_name, p.image_url, p.unit
+      SELECT 
+        oi.quantity, 
+        oi.price_at_time, 
+        oi.weight_selected, 
+        oi.is_custom_box, 
+        oi.custom_box_selections,
+        COALESCE(p.name, 'Premium Custom Box') AS product_name, 
+        p.image_url, 
+        COALESCE(p.unit, 'box') AS unit
       FROM order_items oi
-      JOIN products p ON oi.product_id = p.product_id
+      LEFT JOIN products p ON oi.product_id = p.product_id
       WHERE oi.order_id = $1
     `, [id]); 
     res.json(result.rows);
@@ -127,7 +126,7 @@ exports.getOrderItems = async (req, res) => {
   }
 };
  
-// 7. SUPER-POWERED Track Order (Fetches Items + Address)
+// 7. SUPER-POWERED Track Order (🚀 UPGRADED WITH JSON_AGG FALLBACKS)
 exports.trackOrder = async (req, res) => {
   try {
     const { order_id, email } = req.query;
@@ -137,9 +136,16 @@ exports.trackOrder = async (req, res) => {
         o.order_id, o.status, o.payment_status, o.created_at, o.customer_name, o.total_amount, 
         o.delivery_address, o.flat_house, o.landmark, o.delivery_city, o.state, o.pincode, o.phone,
         (
-          SELECT json_agg(json_build_object('name', p.name, 'quantity', oi.quantity, 'price', oi.price_at_time))
+          SELECT json_agg(json_build_object(
+            'name', COALESCE(p.name, 'Premium Custom Box'), 
+            'quantity', oi.quantity, 
+            'price', oi.price_at_time,
+            'weight_selected', oi.weight_selected,
+            'is_custom_box', oi.is_custom_box,
+            'custom_box_selections', oi.custom_box_selections
+          ))
           FROM order_items oi 
-          JOIN products p ON oi.product_id = p.product_id 
+          LEFT JOIN products p ON oi.product_id = p.product_id 
           WHERE oi.order_id = o.order_id
         ) as items
       FROM orders o
@@ -172,7 +178,7 @@ exports.trackOrder = async (req, res) => {
   }
 };
 
-// 8. Customer Checkout (Place New Order + Payment Status)
+// 8. Customer Checkout (🚀 UPGRADED FOR VIP BOX & STOCK SAFETY)
 exports.placeOrder = async (req, res) => {
   const client = await db.connect(); 
   try {
@@ -204,16 +210,33 @@ exports.placeOrder = async (req, res) => {
     const newOrderId = orderResult.rows[0].order_id;
 
     for (let item of cartItems) {
+      // 🚀 The 300 IQ Move: If it's a custom box (99999), save null so we don't break the database FK!
+      const p_id = item.product_id === 99999 ? null : item.product_id;
+
       await client.query(`
-        INSERT INTO order_items (order_id, product_id, quantity, price_at_time) 
-        VALUES ($1, $2, $3, $4)
-      `, [newOrderId, item.product_id, item.quantity, item.price]);
+        INSERT INTO order_items (
+          order_id, product_id, quantity, price_at_time, 
+          weight_selected, is_custom_box, custom_box_selections
+        ) 
+        VALUES ($1, $2, $3, $4, $5, $6, $7)
+      `, [
+        newOrderId, 
+        p_id, 
+        item.quantity, 
+        item.price,
+        item.weight_selected || '1KG',
+        item.is_custom_box || false,
+        item.custom_box_selections || null
+      ]);
       
-      await client.query(`
-        UPDATE products 
-        SET stock_quantity = stock_quantity - $1 
-        WHERE product_id = $2
-      `, [item.quantity, item.product_id]);
+      // Only reduce stock if it's a real product
+      if (p_id !== null) {
+        await client.query(`
+          UPDATE products 
+          SET stock_quantity = stock_quantity - $1 
+          WHERE product_id = $2
+        `, [item.quantity, p_id]);
+      }
     }
 
     await client.query('COMMIT');
@@ -268,7 +291,6 @@ exports.checkPaymentStatus = async (req, res) => {
 exports.approvePayment = async (req, res) => {
   try {
     const { id } = req.params;
-    // 🔥 FIX: Changed status from 'Packed' to 'Pending' so the Admin knows it's fresh!
     await db.query("UPDATE orders SET payment_status = 'Paid', status = 'Pending' WHERE order_id = $1", [id]);
     res.json({ msg: "Payment officially approved by Admin!" });
   } catch (err) {
@@ -284,8 +306,6 @@ exports.cancelUnpaidOrder = async (req, res) => {
     const { id } = req.params;
     await client.query('BEGIN');
     
-    // 🔥 FIX: If the timer runs out or they refresh, it completely WIPES the order from the database!
-    // It will never show up in the Admin Panel again!
     await client.query("DELETE FROM order_items WHERE order_id = $1", [id]);
     await client.query("DELETE FROM orders WHERE order_id = $1 AND payment_status = 'Pending Payment'", [id]);
     
@@ -300,16 +320,21 @@ exports.cancelUnpaidOrder = async (req, res) => {
   }
 };
 
-// 13. 📋 NEW: GET PENDING PAYMENT APPROVALS (For the new Admin Page!)
+// 13. 📋 GET PENDING PAYMENT APPROVALS (🚀 UPGRADED WITH JSON_AGG FALLBACKS)
 exports.getPendingApprovals = async (req, res) => {
   try {
     const result = await db.query(`
       SELECT 
         o.order_id, o.customer_name, o.phone, o.total_amount, o.created_at,
         (
-          SELECT json_agg(json_build_object('name', p.name, 'quantity', oi.quantity))
+          SELECT json_agg(json_build_object(
+            'name', COALESCE(p.name, 'Premium Custom Box'), 
+            'quantity', oi.quantity,
+            'weight_selected', oi.weight_selected,
+            'is_custom_box', oi.is_custom_box
+          ))
           FROM order_items oi 
-          JOIN products p ON oi.product_id = p.product_id 
+          LEFT JOIN products p ON oi.product_id = p.product_id 
           WHERE oi.order_id = o.order_id
         ) as items
       FROM orders o
@@ -321,5 +346,25 @@ exports.getPendingApprovals = async (req, res) => {
   } catch (err) {
     console.error("❌ PENDING APPROVALS ERROR:", err.message);
     res.status(500).json({ msg: "Server Error: Could not fetch pending approvals" });
+  }
+};
+
+// 14. 🎁 ADMIN: GET CUSTOM BOX PACKING QUEUE (🚀 FIXED: Hides Unpaid Orders!)
+exports.getCustomBoxOrders = async (req, res) => {
+  try {
+    const result = await db.query(`
+      SELECT 
+        o.order_id, o.customer_name, o.phone, o.delivery_address, o.status, o.created_at,
+        oi.weight_selected AS box_size, oi.custom_box_selections AS packing_list
+      FROM orders o
+      JOIN order_items oi ON o.order_id = oi.order_id
+      WHERE oi.is_custom_box = true
+      AND o.payment_status != 'Pending Payment' 
+      ORDER BY o.created_at DESC
+    `);
+    res.json(result.rows);
+  } catch (err) {
+    console.error("❌ CUSTOM BOX QUEUE ERROR:", err.message);
+    res.status(500).json({ msg: "Server Error: Could not fetch custom boxes" });
   }
 };

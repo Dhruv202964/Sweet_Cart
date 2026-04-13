@@ -30,32 +30,37 @@ export const CartProvider = ({ children }) => {
     localStorage.setItem(storageKey, JSON.stringify(cart));
   }, [cart, user, isAuthenticated]);
 
+  // 🚀 UPGRADED: Now separates items by weight using cartItemId!
   const addToCart = (product) => {
     setCart((prevCart) => {
-      const existingItem = prevCart.find((item) => item.product_id === product.product_id);
+      const matchId = product.cartItemId || product.product_id;
+      const existingItem = prevCart.find((item) => (item.cartItemId || item.product_id) === matchId);
+      
       if (existingItem) {
         return prevCart.map((item) =>
-          item.product_id === product.product_id ? { ...item, quantity: item.quantity + 1 } : item
+          (item.cartItemId || item.product_id) === matchId ? { ...item, quantity: item.quantity + 1 } : item
         );
       }
       return [...prevCart, { ...product, quantity: 1 }];
     });
   };
 
-  const decreaseQuantity = (productId) => {
+  // 🚀 UPGRADED: Decreases specific weights
+  const decreaseQuantity = (id) => {
     setCart((prevCart) => {
-      const existingItem = prevCart.find((item) => item.product_id === productId);
+      const existingItem = prevCart.find((item) => (item.cartItemId || item.product_id) === id);
       if (existingItem?.quantity === 1) {
-        return prevCart.filter((item) => item.product_id !== productId);
+        return prevCart.filter((item) => (item.cartItemId || item.product_id) !== id);
       }
       return prevCart.map((item) =>
-        item.product_id === productId ? { ...item, quantity: item.quantity - 1 } : item
+        (item.cartItemId || item.product_id) === id ? { ...item, quantity: item.quantity - 1 } : item
       );
     });
   };
 
-  const removeFromCart = (productId) => {
-    setCart((prevCart) => prevCart.filter((item) => item.product_id !== productId));
+  // 🚀 UPGRADED: Removes specific weights
+  const removeFromCart = (id) => {
+    setCart((prevCart) => prevCart.filter((item) => (item.cartItemId || item.product_id) !== id));
   };
 
   const getCartTotal = () => {

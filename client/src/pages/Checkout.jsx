@@ -1,14 +1,33 @@
-import React, { useState, useContext, useEffect } from 'react';
+import React, { useState, useContext, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { CartContext } from '../context/CartContext';
 import { AuthContext } from '../context/AuthContext'; 
-import { CheckCircle, Save, Home as HomeIcon, Briefcase, MapPin, User, Mail, Phone, Map, Navigation, ShieldCheck, Package, Truck } from 'lucide-react';
+import { CheckCircle, Save, Home as HomeIcon, Briefcase, MapPin, User, Mail, Phone, Map, Navigation, ShieldCheck, Package, Truck, Loader2 } from 'lucide-react';
+
 const locationData = {
   "Gujarat": ["Surat", "Ahmedabad", "Vadodara", "Rajkot", "Gandhinagar"],
   "Maharashtra": ["Mumbai", "Pune", "Nagpur", "Nashik"],
   "Rajasthan": ["Jaipur", "Udaipur", "Jodhpur"],
   "Delhi": ["New Delhi", "Dwarka"]
 };
+
+const SleekInput = ({ icon: Icon, label, value, ...props }) => (
+  <div className="w-full">
+    <label className="block text-xs font-black text-gray-500 uppercase tracking-widest mb-2 ml-1">
+      {label} {props.required && <span className="text-red-500">*</span>}
+    </label>
+    <div className="relative group">
+      <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400 group-focus-within:text-amber-500 transition-colors">
+        <Icon size={18} />
+      </div>
+      <input 
+        {...props} 
+        value={value || ''} 
+        className="w-full pl-11 pr-4 py-4 bg-gray-50 border-2 border-gray-100 rounded-2xl focus:bg-white focus:outline-none focus:border-amber-500 transition-all font-bold text-gray-800 shadow-sm" 
+      />
+    </div>
+  </div>
+);
 
 const Checkout = () => {
   const navigate = useNavigate();
@@ -24,10 +43,23 @@ const Checkout = () => {
   const [selectedSavedAddressId, setSelectedSavedAddressId] = useState(null);
   const [saveAddress, setSaveAddress] = useState(false);
 
+  // 🚀 THE FIX: A flag to tell the shield we are intentionally emptying the cart to go to payment!
+  const isOrderPlaced = useRef(false);
+
   const [formData, setFormData] = useState({
     firstName: '', lastName: '', email: '', mobile: '',
     address: '', area: '', landmark: '', city: '', pincode: ''
   });
+
+  const cartTotal = cart.reduce((total, item) => total + (item.price * item.quantity), 0);
+
+  // 🛡️ THE ZERO-DOLLAR EXPLOIT SHIELD (Fixed!)
+  useEffect(() => {
+    // Only kick them to the menu if the cart is empty AND they didn't just place an order
+    if (cart.length === 0 && !isOrderPlaced.current) {
+      navigate('/menu', { replace: true }); 
+    }
+  }, [cart, navigate]);
 
   useEffect(() => {
     if (isAuthenticated && user?.user_id) {
@@ -55,55 +87,70 @@ const Checkout = () => {
     }
   }, [isAuthenticated, user]);
 
-  const cartTotal = cart.reduce((total, item) => total + (item.price * item.quantity), 0);
-
   const handleStateChange = (e) => {
     const state = e.target.value;
     setSelectedState(state);
     setAvailableCities(locationData[state] || []);
-    setFormData({ ...formData, city: '' }); 
+    setFormData(prev => ({ ...prev, city: '' })); 
   };
 
   const handleInputChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  // 🌟 Auto-fill logic perfectly matched to our new DB!
   const handleSelectSavedAddress = (addr) => {
     setSelectedSavedAddressId(addr.id);
-    setSaveAddress(false); // Already saved!
+    setSaveAddress(false); 
     
     setSelectedState(addr.state);
     setAvailableCities(locationData[addr.state] || []);
     const nameParts = addr.full_name.split(' ');
 
-    setFormData({
-      ...formData,
+    setFormData(prev => ({
+      ...prev,
       firstName: nameParts[0] || '',
       lastName: nameParts.slice(1).join(' ') || '',
       mobile: addr.phone || '',
       address: addr.flat_house || '',
       area: addr.area_street || '',
       landmark: addr.landmark || '',
-      city: addr.city,
-      pincode: addr.pincode
-    });
+      city: addr.city || '',
+      pincode: addr.pincode || ''
+    }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (cart.length === 0 || cartTotal <= 0) return;
+    
     setSubmitting(true);
 
     const orderPayload = {
-        ...formData,
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        email: formData.email,
+        mobile: formData.mobile, 
+        address: formData.address, 
+        area: formData.area, 
+        landmark: formData.landmark,
+        city: formData.city, 
         state: selectedState,
-        cartItems: cart,
+        pincode: formData.pincode,
         total_amount: cartTotal,
         customer_id: isAuthenticated && user?.user_id ? user.user_id : null,
+        cartItems: cart.map(item => ({
+          product_id: item.product_id,
+          name: item.name,
+          quantity: item.quantity,
+          price: item.price,
+          weight_selected: item.weight_selected || '1KG', 
+          is_custom_box: item.is_custom_box || false,
+          custom_box_selections: item.custom_box_selections || null
+        }))
     };
 
     try {
-      // 1. PLACE THE ORDER
       const res = await fetch('http://localhost:5000/api/orders/checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -113,7 +160,6 @@ const Checkout = () => {
       if (res.ok) {
         const orderData = await res.json();
         
-        // 🚀 2. SILENT ADDRESS SAVE (Perfectly matched to new columns!)
         if (saveAddress && isAuthenticated && user?.user_id) {
             try {
                 await fetch('http://localhost:5000/api/addresses/add', {
@@ -137,8 +183,10 @@ const Checkout = () => {
             }
         }
 
-        clearCart();
-        navigate(`/payment/${orderData.order_id}`);
+        // 🚀 THE FIX IN ACTION
+        isOrderPlaced.current = true; // Turn OFF the shield temporarily
+        clearCart(); // Empty the cart
+        navigate(`/payment/${orderData.order_id}`, { replace: true }); // Redirect to payment page!
         
       } else {
         const errorData = await res.json();
@@ -152,27 +200,10 @@ const Checkout = () => {
     }
   };
 
-  // Reusable sleek input component
-  const SleekInput = ({ icon: Icon, label, ...props }) => (
-    <div className="w-full">
-      <label className="block text-xs font-black text-gray-500 uppercase tracking-widest mb-2 ml-1">{label} {props.required && <span className="text-red-500">*</span>}</label>
-      <div className="relative group">
-        <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400 group-focus-within:text-amber-500 transition-colors">
-          <Icon size={18} />
-        </div>
-        <input 
-          {...props} 
-          className="w-full pl-11 pr-4 py-4 bg-gray-50 border-2 border-gray-100 rounded-2xl focus:bg-white focus:outline-none focus:border-amber-500 transition-all font-bold text-gray-800 shadow-sm" 
-        />
-      </div>
-    </div>
-  );
-
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#FFFDF8] to-orange-50/20 font-sans py-12">
+    <div className="min-h-screen bg-gradient-to-br from-[#FFFDF8] to-orange-50/20 font-sans py-12 pt-24">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         
-        {/* Header Section */}
         <div className="mb-10 text-center animate-in slide-in-from-top-4 duration-500">
             <h1 className="text-4xl md:text-5xl font-black text-gray-900 tracking-tighter mb-2">Secure Checkout</h1>
             <p className="text-gray-500 font-bold tracking-widest uppercase text-sm">Complete your SweetCart order</p>
@@ -231,7 +262,6 @@ const Checkout = () => {
 
             <form onSubmit={handleSubmit} className="space-y-8">
               
-              {/* CONTACT DETAILS CARD */}
               <div className="bg-white p-8 md:p-10 rounded-[40px] shadow-2xl shadow-gray-200/30 border border-white">
                 <h2 className="text-2xl font-black text-gray-800 mb-6 flex items-center gap-3"><User className="text-amber-500"/> Contact Details</h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -242,7 +272,6 @@ const Checkout = () => {
                 </div>
               </div>
 
-              {/* DELIVERY DETAILS CARD */}
               <div className="bg-white p-8 md:p-10 rounded-[40px] shadow-2xl shadow-gray-200/30 border border-white">
                 <h2 className="text-2xl font-black text-gray-800 mb-6 flex items-center gap-3"><Map className="text-amber-500"/> Delivery Location</h2>
                 
@@ -275,7 +304,6 @@ const Checkout = () => {
                   </div>
                 </div>
 
-                {/* 🌟 SAVE ADDRESS CHECKBOX */}
                 {isAuthenticated && selectedSavedAddressId === null && (
                   <div className="mt-8 bg-amber-50/50 p-6 rounded-[24px] border border-amber-200/60 flex items-center gap-5 cursor-pointer hover:bg-amber-50 transition-all group" onClick={() => setSaveAddress(!saveAddress)}>
                     <div className={`w-8 h-8 rounded-xl border-2 flex items-center justify-center transition-all duration-300 ${saveAddress ? 'bg-amber-500 border-amber-500 shadow-lg shadow-amber-500/30' : 'bg-white border-amber-300 group-hover:border-amber-500'}`}>
@@ -283,16 +311,14 @@ const Checkout = () => {
                     </div>
                     <div className="flex flex-col">
                       <span className="font-black text-amber-900 text-lg">Save this address</span>
-                      <span className="text-sm font-bold text-amber-700/70">Add to your Address Book for 1-click checkout next time.</span>
+                      <span className="text-sm font-bold text-amber-700/70">Add to Address Book for next time.</span>
                     </div>
                   </div>
                 )}
               </div>
 
-              {/* 🌟 MASSIVE CTA BUTTON */}
-              <button type="submit" disabled={submitting} className="w-full py-6 mt-4 rounded-[24px] font-black text-white text-2xl bg-gradient-to-r from-amber-500 to-orange-500 hover:from-orange-500 hover:to-amber-500 transition-all duration-300 shadow-2xl shadow-orange-500/30 hover:-translate-y-2 disabled:opacity-70 disabled:hover:translate-y-0 group relative overflow-hidden">
-                <div className="absolute inset-0 bg-white/20 w-full translate-x-[-100%] skew-x-[-15deg] group-hover:animate-[shine_1s_ease-in-out]"></div>
-                { submitting ? 'Processing Order...' : `Pay ₹${cartTotal.toFixed(2)} Securely 🚀` }
+              <button type="submit" disabled={submitting || cart.length === 0 || cartTotal <= 0} className="w-full py-6 mt-4 rounded-[24px] font-black text-white text-2xl bg-gradient-to-r from-amber-500 to-orange-500 hover:from-orange-500 hover:to-amber-500 transition-all duration-300 shadow-2xl shadow-orange-500/30 hover:-translate-y-2 disabled:opacity-70 disabled:hover:translate-y-0 flex items-center justify-center gap-3">
+                { submitting ? <><Loader2 className="animate-spin"/> Processing...</> : `Pay ₹${cartTotal.toFixed(2)} Securely 🚀` }
               </button>
 
             </form>
@@ -300,7 +326,7 @@ const Checkout = () => {
 
           {/* RIGHT SIDEBAR: SLEEK RECEIPT */}
           <div className="lg:w-1/3">
-            <div className="bg-white p-8 md:p-10 rounded-[40px] shadow-2xl shadow-gray-200/40 border border-white sticky top-24 relative overflow-hidden">
+            <div className="bg-white p-8 md:p-10 rounded-[40px] shadow-2xl shadow-gray-200/40 border border-white sticky top-28 relative overflow-hidden">
               <div className="absolute top-0 left-0 w-full h-3 bg-gradient-to-r from-amber-400 to-orange-400"></div>
               
               <h3 className="text-2xl font-black text-gray-900 mb-8 border-b-2 border-dashed border-gray-100 pb-6">Order Summary</h3>
@@ -313,10 +339,13 @@ const Checkout = () => {
               ) : (
                 <div className="space-y-5 mb-8">
                   {cart.map(item => (
-                    <div key={item.product_id} className="flex justify-between items-start gap-4">
+                    <div key={item.cartItemId || item.product_id} className="flex justify-between items-start gap-4">
                       <div>
-                        <span className="font-black text-gray-800 text-sm">{item.name}</span>
-                        <p className="text-xs font-bold text-gray-400 mt-1">Qty: {item.quantity}</p>
+                        <span className="font-black text-gray-800 text-sm line-clamp-2">{item.name}</span>
+                        <div className="flex items-center gap-2 mt-1">
+                          <span className="text-xs font-bold text-gray-500 bg-gray-100 px-2 py-0.5 rounded">Qty: {item.quantity}</span>
+                          <span className="text-xs font-bold text-amber-600 bg-amber-50 border border-amber-100 px-2 py-0.5 rounded">{item.weight_selected}</span>
+                        </div>
                       </div>
                       <span className="text-gray-900 font-black">₹{(item.price * item.quantity).toFixed(2)}</span>
                     </div>

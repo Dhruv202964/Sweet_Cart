@@ -10,6 +10,9 @@ router.get('/stats', orderController.getDashboardStats);
 router.get('/analytics', orderController.getSalesByArea);
 router.get('/track', orderController.trackOrder); 
 
+// 🎁 NEW: VIP CUSTOM BOX QUEUE (Safely above /:id)
+router.get('/custom-boxes', orderController.getCustomBoxOrders);
+
 // 🌟 NEW: Placed safely ABOVE the /:id routes!
 router.get('/pending-approvals', orderController.getPendingApprovals); 
 

@@ -1,14 +1,15 @@
 -- ############################################################
 -- # SWEET_CART DATABASE SCHEMA - LOCAL POSTGRESQL ENVIRONMENT
--- # Team: 404 ERROR | Updated: April 2026 (Final Address, OTP & Custom Box Ecosystem)
+-- # Team: 404 ERROR 
+-- # Updated: April 2026 (Day 27: VIP Custom Box Engine & Security Fortification)
 -- ############################################################
 
 -- 0. SYSTEM LOCALIZATION
 -- Enforces Indian Standard Time (IST) on your local PostgreSQL server
--- (Make sure your local database is actually named 'sweet_cart'!)
+-- Note: Ensure your local pg pool in db.js uses your 'admin123' database password!
 ALTER DATABASE sweet_cart SET timezone TO 'Asia/Kolkata';
 
--- 1. USERS TABLE (Upgraded with OTP Email Engine & Role safety)
+-- 1. USERS TABLE (Upgraded with OTP Email Engine & Role Security)
 CREATE TABLE users (
     user_id SERIAL PRIMARY KEY,
     full_name VARCHAR(100) NOT NULL,
@@ -21,7 +22,7 @@ CREATE TABLE users (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- 1.5 SAVED ADDRESSES TABLE (The new, upgraded Address Book ecosystem)
+-- 1.5 SAVED ADDRESSES TABLE (The Enterprise Address Book Ecosystem)
 CREATE TABLE saved_addresses (
     id SERIAL PRIMARY KEY,
     user_id INTEGER REFERENCES users(user_id) ON DELETE CASCADE,
@@ -44,7 +45,7 @@ CREATE TABLE categories (
     description TEXT
 );
 
--- 3. PRODUCTS TABLE
+-- 3. PRODUCTS TABLE (Upgraded for Multi-Image Galleries & Rich Ingredients)
 CREATE TABLE products (
     product_id SERIAL PRIMARY KEY,
     category_id INT REFERENCES categories(category_id) ON DELETE SET NULL,
@@ -61,7 +62,7 @@ CREATE TABLE products (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- 4. ORDERS TABLE (Upgraded with full Checkout & Ghost Order support)
+-- 4. ORDERS TABLE (Upgraded with full Checkout Validation & Ghost Order Protection)
 CREATE TABLE orders (
     order_id SERIAL PRIMARY KEY,
     customer_id INT REFERENCES users(user_id) ON DELETE SET NULL,
@@ -81,10 +82,10 @@ CREATE TABLE orders (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Reset Order ID Sequence for Enterprise Invoicing
+-- Reset Order ID Sequence for Enterprise-Grade Invoicing (Starts at #10000)
 ALTER SEQUENCE orders_order_id_seq RESTART WITH 10000;
 
--- 5. ORDER ITEMS TABLE (🚀 UPGRADED FOR 250G/500G & CUSTOM BOXES)
+-- 5. ORDER ITEMS TABLE (🚀 UPGRADED FOR 250G/500G & VIP CUSTOM BOXES)
 CREATE TABLE order_items (
     order_item_id SERIAL PRIMARY KEY,
     order_id INT REFERENCES orders(order_id) ON DELETE CASCADE,
@@ -92,12 +93,11 @@ CREATE TABLE order_items (
     quantity INT NOT NULL,
     price_at_time DECIMAL(10, 2) NOT NULL,
     weight_selected VARCHAR(20) DEFAULT '1KG',     -- ✨ NEW: Captures 250G/500G/1KG selection
-    is_custom_box BOOLEAN DEFAULT FALSE,           -- ✨ NEW: Flags if this item is a custom gift box
-    custom_box_selections TEXT                     -- ✨ NEW: Stores the JSON/String of sweets inside the box
+    is_custom_box BOOLEAN DEFAULT FALSE,           -- ✨ NEW: Flags if this item is a VIP custom gift box
+    custom_box_selections TEXT                     -- ✨ NEW: Stores the exact packing list for the kitchen
 );
 
--- 6. CONTACT MESSAGES TABLE (CRM)
--- Subject line support for professional Gmail integration
+-- 6. CONTACT MESSAGES TABLE (CRM Inbox Integration)
 CREATE TABLE contact_messages (
     id SERIAL PRIMARY KEY,
     customer_name VARCHAR(100),
@@ -108,16 +108,16 @@ CREATE TABLE contact_messages (
 );
 
 -- ############################################################
--- # DATA SEEDING (Sweets, Farsan, Dairy)
+-- # SYSTEM SEEDING DATA (Core Dependencies)
 -- ############################################################
 
+-- Initial Categories
 INSERT INTO categories (name) VALUES ('Sweets'), ('Farsan'), ('Dairy');
 
--- Admin User Seeding (Password: admin123)
+-- Default Admin Account (Password is hashed 'admin123')
 INSERT INTO users (full_name, email, password_hash, phone, role) VALUES 
 ('Admin', 'admin@sweetcart.com', '$2a$10$X...', '9876543210', 'admin'); 
--- NOTE: Make sure your actual bcrypt hash for 'admin123' goes here if you are hardcoding it!
 
--- Example Product with Ingredients and Bestseller flag enabled
+-- Sample Bestseller Product
 INSERT INTO products (category_id, name, price, stock_quantity, unit, ingredients, gallery_images, is_bestseller) VALUES 
 (1, 'Premium Pista Ghari', 850.00, 50, 'kg', 'Pure Ghee, Pistachios, Sugar, Mawa', ARRAY['pista_1.jpg', 'pista_2.jpg'], TRUE);

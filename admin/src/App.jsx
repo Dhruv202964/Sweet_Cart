@@ -10,7 +10,8 @@ import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import Products from './pages/Products';
 import Orders from './pages/Orders';
-import PaymentApprovals from './pages/PaymentApprovals'; // 🌟 NEW IMPORT
+import PaymentApprovals from './pages/PaymentApprovals'; 
+import CustomBoxes from './pages/CustomBoxes'; // 🎁 🌟 NEW IMPORT FOR VIP BOXES
 import Messages from './pages/Messages';
 import ManageCustomers from './pages/ManageCustomers';
 
@@ -60,7 +61,8 @@ function App() {
                     <Route path="/dashboard" element={<Dashboard />} />
                     <Route path="/products" element={<Products />} />
                     <Route path="/orders" element={<Orders />} />
-                    <Route path="/approvals" element={<PaymentApprovals />} /> {/* 🌟 NEW ROUTE ADDED HERE */}
+                    <Route path="/approvals" element={<PaymentApprovals />} /> 
+                    <Route path="/custom-boxes" element={<CustomBoxes />} /> {/* 🎁 🌟 NEW ROUTE ADDED HERE */}
                     <Route path="/riders" element={<Riders />} />
                     <Route path="/customers" element={<ManageCustomers />} />
                     <Route path="/messages" element={<Messages />} />
