@@ -1,7 +1,7 @@
 -- ############################################################
 -- # SWEET_CART DATABASE SCHEMA - LOCAL POSTGRESQL ENVIRONMENT
 -- # Team: 404 ERROR 
--- # Updated: April 2026 (Day 27: VIP Custom Box Engine & Security Fortification)
+-- # Updated: April 2026 (Day 28: Dynamic CMS Architecture)
 -- ############################################################
 
 -- 0. SYSTEM LOCALIZATION
@@ -107,6 +107,18 @@ CREATE TABLE contact_messages (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+-- 7. HERO SLIDERS TABLE (🖼️ NEW: Dynamic Storefront CMS)
+CREATE TABLE hero_sliders (
+    id SERIAL PRIMARY KEY,
+    title VARCHAR(255),
+    subtitle VARCHAR(255),
+    image_url TEXT NOT NULL,
+    cta_text VARCHAR(100) DEFAULT 'Shop Now',
+    cta_link VARCHAR(255) DEFAULT '/menu',
+    is_active BOOLEAN DEFAULT TRUE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
 -- ############################################################
 -- # SYSTEM SEEDING DATA (Core Dependencies)
 -- ############################################################
@@ -121,3 +133,7 @@ INSERT INTO users (full_name, email, password_hash, phone, role) VALUES
 -- Sample Bestseller Product
 INSERT INTO products (category_id, name, price, stock_quantity, unit, ingredients, gallery_images, is_bestseller) VALUES 
 (1, 'Premium Pista Ghari', 850.00, 50, 'kg', 'Pure Ghee, Pistachios, Sugar, Mawa', ARRAY['pista_1.jpg', 'pista_2.jpg'], TRUE);
+
+-- Initial Fallback Hero Slider
+INSERT INTO hero_sliders (title, subtitle, image_url, cta_text, cta_link, is_active) VALUES 
+('Royal Surat Sweets', 'PREMIUM QUALITY 100% PURE', 'https://images.unsplash.com/photo-1633933358116-a27b902fad35?q=80&w=1920&auto=format&fit=crop', 'Explore Collection', '/menu', TRUE);

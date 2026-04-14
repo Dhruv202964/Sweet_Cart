@@ -1,6 +1,6 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { Toaster } from 'react-hot-toast'; // 🔥 1. IMPORT TOASTER
+import { Toaster } from 'react-hot-toast'; 
 
 // Import Layout Components
 import Sidebar from './components/Sidebar';
@@ -11,7 +11,8 @@ import Dashboard from './pages/Dashboard';
 import Products from './pages/Products';
 import Orders from './pages/Orders';
 import PaymentApprovals from './pages/PaymentApprovals'; 
-import CustomBoxes from './pages/CustomBoxes'; // 🎁 🌟 NEW IMPORT FOR VIP BOXES
+import CustomBoxes from './pages/CustomBoxes'; 
+import ManageSliders from './pages/ManageSliders'; // 🖼️ NEW IMPORT FOR SLIDERS
 import Messages from './pages/Messages';
 import ManageCustomers from './pages/ManageCustomers';
 
@@ -33,14 +34,13 @@ const ProtectedRoute = ({ children }) => {
 function App() {
   return (
     <Router>
-      {/* 🔥 2. INJECT THE TOASTER ENGINE HERE */}
       <Toaster 
         position="top-center" 
         toastOptions={{
           style: {
-            background: '#1f2937', // Dark mode premium background
+            background: '#1f2937', 
             color: '#fff',
-            border: '2px solid #ef4444', // Brand red border
+            border: '2px solid #ef4444', 
             fontWeight: 'bold',
             borderRadius: '12px',
           },
@@ -62,7 +62,8 @@ function App() {
                     <Route path="/products" element={<Products />} />
                     <Route path="/orders" element={<Orders />} />
                     <Route path="/approvals" element={<PaymentApprovals />} /> 
-                    <Route path="/custom-boxes" element={<CustomBoxes />} /> {/* 🎁 🌟 NEW ROUTE ADDED HERE */}
+                    <Route path="/custom-boxes" element={<CustomBoxes />} /> 
+                    <Route path="/sliders" element={<ManageSliders />} /> {/* 🖼️ NEW ROUTE ADDED HERE */}
                     <Route path="/riders" element={<Riders />} />
                     <Route path="/customers" element={<ManageCustomers />} />
                     <Route path="/messages" element={<Messages />} />

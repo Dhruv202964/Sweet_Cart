@@ -1,25 +1,25 @@
 import React, { useState } from 'react';
 import { Store, Heart, ShieldCheck, MapPin, ChefHat, Clock, Phone } from 'lucide-react';
+import { useTranslation } from 'react-i18next'; // 🌍 NEW TRANSLATION HOOK
 
 const About = () => {
-  // 🌟 NEW: React State to toggle between the two branches!
+  const { t } = useTranslation(); // 🌍 INIT
   const [activeBranch, setActiveBranch] = useState('main');
 
-  // 🌟 The Real Shop Data from your Google Maps Links!
   const branches = {
     main: {
       id: 'main',
-      title: 'Rustampura Main Hub',
-      name: 'Shreenathji Farsan Sarasiya Khaja & Sweets',
-      address: 'Navsari Bazar Rd, Rustampura, Surat, Gujarat 395002',
+      title: t('branch_main_title', 'Rustampura Main Hub'),
+      name: t('branch_main_name', 'Shreenathji Farsan Sarasiya Khaja & Sweets'),
+      address: 'Navsari Bazar Rd, Rustampura, Surat, Gujarat 395002', // Address logic can stay as is if universal
       phone: '+91 98251 53531',
       hours: 'Mon - Sun: 7:00 AM - 9:00 PM',
       iframe: 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3720.105652720149!2d72.8269672!3d21.1879615!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3be04e68084f56d9%3A0xadb43948aea625bd!2sShreenathji%20Farsan%20Sarasiya%20Khaja%20%26%20Sweets!5e0!3m2!1sen!2sin!4v1773151857780!5m2!1sen!2sin'
     },
     adajan: {
       id: 'adajan',
-      title: 'Adajan Branch',
-      name: 'Shree Nathji Farsan',
+      title: t('branch_adajan_title', 'Adajan Branch'),
+      name: t('branch_adajan_name', 'Shree Nathji Farsan'),
       address: 'Shop No.3, Green Plaza, Subhash Chandra Bose Marg, Adajan, Surat 395009',
       phone: '+91 88667 98147',
       hours: 'Mon - Sun: 7:00 AM - 9:00 PM',
@@ -36,25 +36,25 @@ const About = () => {
         {/* Hero Section */}
         <div className="text-center mb-20">
           <h1 className="text-5xl md:text-7xl font-black text-gray-900 tracking-tighter mb-6">
-            Our <span className="text-amber-600">Heritage</span>
+            {t('about_title_1', 'Our')} <span className="text-amber-600">{t('about_title_2', 'Heritage')}</span>
           </h1>
           <p className="text-xl md:text-2xl text-gray-600 max-w-4xl mx-auto leading-relaxed font-medium">
-            Bringing the authentic, generations-old flavors of Surat's finest sweets and farsan directly to your family's table.
+            {t('about_subtitle', "Bringing the authentic, generations-old flavors of Surat's finest sweets and farsan directly to your family's table.")}
           </p>
         </div>
 
         {/* The Story Split Section */}
         <div className="flex flex-col lg:flex-row gap-16 items-center mb-24">
           <div className="lg:w-1/2 space-y-6">
-            <h2 className="text-4xl font-black text-gray-900 tracking-tight border-b-4 border-amber-500 pb-4 inline-block">The SweetCart Story</h2>
+            <h2 className="text-4xl font-black text-gray-900 tracking-tight border-b-4 border-amber-500 pb-4 inline-block">{t('story_heading', 'The SweetCart Story')}</h2>
             <p className="text-lg text-gray-600 leading-relaxed font-medium">
-              It started with a simple vision: to preserve the authentic, rich taste of traditional Surati delicacies. In a world of mass-produced snacks, we wanted to create a haven where every bite feels like home.
+              {t('about_story_p1', 'It started with a simple vision...')}
             </p>
             <p className="text-lg text-gray-600 leading-relaxed font-medium">
-              We source only the highest quality ingredients—premium besan, pure desi ghee, and hand-picked spices. Our master chefs bring decades of experience to the kitchen, ensuring that whether it's our famous Sarasiya Khaja or our crispy nylon khaman, the standard remains flawlessly consistent.
+              {t('about_story_p2', 'We source only the highest quality ingredients...')}
             </p>
             <p className="text-lg text-gray-600 leading-relaxed font-medium">
-              Today, SweetCart has grown from our original Rustampura hub to a brand new location in Adajan. Our core philosophy hasn't changed: we don't just sell food; we deliver happiness, celebrations, and memories.
+              {t('about_story_p3', 'Today, SweetCart has grown...')}
             </p>
           </div>
           <div className="lg:w-1/2 grid grid-cols-2 gap-6">
@@ -73,22 +73,22 @@ const About = () => {
             <div className="bg-amber-100 w-24 h-24 mx-auto rounded-full flex items-center justify-center text-amber-600 mb-6">
               <Store size={40} />
             </div>
-            <h3 className="text-2xl font-black text-gray-800 mb-4">Authentic Taste</h3>
-            <p className="text-gray-600 font-medium leading-relaxed">Prepared using generations-old recipes, ensuring every bite takes you back to the vibrant streets of Surat.</p>
+            <h3 className="text-2xl font-black text-gray-800 mb-4">{t('val1_title', 'Authentic Taste')}</h3>
+            <p className="text-gray-600 font-medium leading-relaxed">{t('val1_desc', 'Prepared using generations-old recipes...')}</p>
           </div>
           <div className="bg-white p-10 rounded-[35px] shadow-xl border border-amber-100 text-center hover:-translate-y-2 transition-transform">
             <div className="bg-red-100 w-24 h-24 mx-auto rounded-full flex items-center justify-center text-red-600 mb-6">
               <Heart size={40} />
             </div>
-            <h3 className="text-2xl font-black text-gray-800 mb-4">Made with Love</h3>
-            <p className="text-gray-600 font-medium leading-relaxed">Premium quality ingredients and 100% pure ghee go into every single batch we make daily.</p>
+            <h3 className="text-2xl font-black text-gray-800 mb-4">{t('val2_title', 'Made with Love')}</h3>
+            <p className="text-gray-600 font-medium leading-relaxed">{t('val2_desc', 'Premium quality ingredients...')}</p>
           </div>
           <div className="bg-white p-10 rounded-[35px] shadow-xl border border-amber-100 text-center hover:-translate-y-2 transition-transform">
             <div className="bg-green-100 w-24 h-24 mx-auto rounded-full flex items-center justify-center text-green-600 mb-6">
               <ShieldCheck size={40} />
             </div>
-            <h3 className="text-2xl font-black text-gray-800 mb-4">100% Hygienic</h3>
-            <p className="text-gray-600 font-medium leading-relaxed">Strict quality controls and enterprise-grade packaging keep your food safe, fresh, and perfectly intact.</p>
+            <h3 className="text-2xl font-black text-gray-800 mb-4">{t('val3_title', '100% Hygienic')}</h3>
+            <p className="text-gray-600 font-medium leading-relaxed">{t('val3_desc', 'Strict quality controls...')}</p>
           </div>
         </div>
 
@@ -98,9 +98,9 @@ const About = () => {
             <div className="bg-white/10 p-5 rounded-full backdrop-blur-sm mb-6">
               <MapPin size={48} className="text-amber-500" />
             </div>
-            <h2 className="text-4xl font-black text-white mb-4 tracking-tighter">Visit Our Kitchens</h2>
+            <h2 className="text-4xl font-black text-white mb-4 tracking-tighter">{t('visit_title', 'Visit Our Kitchens')}</h2>
             <p className="text-lg text-gray-300 max-w-2xl mx-auto font-medium leading-relaxed mb-10">
-              We love seeing our customers! Drop by our main hub in Rustampura or our newly opened Adajan branch to experience the aroma of fresh sweets and farsan being prepared live.
+              {t('visit_desc', 'We love seeing our customers!...')}
             </p>
 
             {/* 🌟 The Branch Switcher Buttons */}

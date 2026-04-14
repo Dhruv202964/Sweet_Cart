@@ -711,3 +711,55 @@ Admin Packing Hub: Upgraded `CustomBoxes.jsx` utilizing a bulletproof 12-column 
 VIP Custom Box feature is 100% operational from client selection to admin packing.
 
 Checkout flow is fortified against history manipulation and zero-dollar exploits, securing the application's transactional integrity.
+
+Day 28: Dynamic CMS Architecture & Fintech Payment Desk
+Date: 2026-04-14 | Status: Complete | Phase: Global Admin Overhaul
+
+🎯 Objective Replace static hardcoded storefront banners with a fully dynamic, database-driven Content Management System (CMS) and elevate the Payment Approvals dashboard into a high-end fintech transaction desk.
+
+🛠️ Critical Fixes
+
+The CSS Grid Overlap Glitch: Resolved a critical UX bug in the Admin Slider CMS where a sticky flexbox layout caused gallery cards to violently overlap the upload form on smaller screens. Engineered a bulletproof 12-column CSS Grid (grid-cols-12) to permanently isolate the left and right columns.
+
+PostgreSQL Column Sync: Executed emergency ALTER TABLE commands to inject cta_text and cta_link columns into the hero_sliders table, preventing fatal backend crashes when the new dynamic button feature attempted to save data.
+
+⚙️ Technical Implementation
+
+Dynamic Hero Slider CMS: Engineered ManageSliders.jsx and sliderController.js to provide full C-R-U-D capabilities. The admin can now upload images via multer, set headlines, and dynamically route CTA buttons (e.g., to the VIP Box or Contact pages) directly from the dashboard.
+
+Frontend CMS Integration: Ripped out the hardcoded HeroSlider.jsx data and connected it to the live GET /api/sliders endpoint. Programmed a "Smart Icon Logic" system that automatically renders the correct Lucide-React icon (Info, Mail, ShoppingCart) based on the URL the admin selected.
+
+Fintech Payment Approvals UI: Overhauled PaymentApprovals.jsx to mimic a Silicon Valley transaction desk. Replaced generic tables with floating glassmorphism cards, pulsating "Live" indicators, strict 5-minute countdown timers, and clear Approve / Decline action buttons for pending UPI verifications.
+
+Frontend Pagination Engine: Injected a localized React pagination state (currentPage, itemsPerPage) into the Admin Slider CMS to prevent infinite scrolling, slicing the gallery array to display exactly 4 banners per mini-page.
+
+✅ Milestones
+
+The storefront homepage is officially 100% dynamic and controllable by the Admin.
+
+Payment approval flow is visually pristine, highly responsive, and dummy-proof.
+
+Day 29: Global i18n Translation & Enterprise Localization
+Date: 2026-04-14 | Status: Complete | Phase: Multi-Language Storefront
+
+🎯 Objective Scale the existing react-i18next translation engine beyond the Navbar and Footer, achieving 100% localization for all static UI elements across the entire customer storefront (English, Hindi, Gujarati).
+
+🛠️ Critical Fixes
+
+Translation Fallback Missing Key Error: Diagnosed and fixed a bug where newly translated components (like the "Our Full Menu" header) failed to switch languages and defaulted to English. Resolved by expanding the i18n.js dictionary with the exact matching t() keys for all three languages.
+
+Dynamic vs. Static Text Isolation: Established a strict architectural rule to only apply translation hooks to static UI elements (buttons, labels, fallback text). Explicitly bypassed dynamic database values (like PostgreSQL product names and prices) to prevent half-translated UI anomalies.
+
+⚙️ Technical Implementation
+
+Global Dictionary Expansion: Meticulously translated and injected massive JSON blocks into i18n.js, covering the entire Brand Story (About Us), Contact Form placeholders, Menu UI elements, and Product Detail page labels into authentic Hindi and Gujarati.
+
+Surgical Hook Injection: Deployed the useTranslation hook across Home.jsx, Menu.jsx, ProductDetails.jsx, AboutUs.jsx, and ContactUs.jsx. Wrapped all hardcoded English strings in t('key', 'Fallback') functions to ensure instant, seamless switching.
+
+Premium Language Dropdown: Deprecated the outdated, native HTML <select> tag in the Navbar. Engineered a custom, floating, glassmorphism dropdown UI utilizing Tailwind animate-in utilities, lucide-react Globe icons, and an useRef outside-click detector for a flawless mobile and desktop experience.
+
+✅ Milestones
+
+The SweetCart storefront is officially a globally scalable, tri-lingual e-commerce platform.
+
+The entire customer UI instantly translates without requiring a page reload.

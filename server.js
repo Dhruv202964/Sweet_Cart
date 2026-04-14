@@ -14,11 +14,9 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 // 📈 ANALYTICS ENGINE (Auto-Track Visitors)
 // ==========================================
 app.use(async (req, res, next) => {
-    // 🔥 THE FIX: Tell the analytics to IGNORE the 10-second background radar!
     const isPollingOrders = req.path === '/api/orders' && req.method === 'GET';
     const isPollingCustomers = req.path.startsWith('/api/admin/customers') && req.method === 'GET';
 
-    // Only track if it's a real API request AND it's not our silent radar
     if (req.path.startsWith('/api') && !isPollingOrders && !isPollingCustomers) {
         try {
             await db.query(`
@@ -28,7 +26,6 @@ app.use(async (req, res, next) => {
                 DO UPDATE SET total_visitors = daily_stats.total_visitors + 1
             `);
         } catch (err) {
-            // This will now stay quiet because it's not being spammed every 10 seconds!
             console.log("Analytics error ignored");
         }
     }
@@ -42,7 +39,8 @@ app.use('/api/auth', require('./routes/authRoutes'));
 app.use('/api/products', require('./routes/productRoutes')); 
 app.use('/api/orders', require('./routes/orderRoutes'));
 app.use('/api/admin', require('./routes/adminRoutes'));
-app.use('/api/addresses', require('./routes/addressRoutes')); // 👈 This is perfect!
+app.use('/api/addresses', require('./routes/addressRoutes')); 
+app.use('/api/sliders', require('./routes/sliderRoutes')); // 🌟 NEW: HERO SLIDER API
 
 // ==========================================
 // 3. DIRECT ROUTES (Messages)
@@ -54,12 +52,10 @@ app.delete('/api/messages/:id', messageController.deleteMessage);
 // ==========================================
 // 🛡️ THE ULTIMATE SHIELD: JSON Error Catchers
 // ==========================================
-// 1. Catch 404s (Missing Routes) and force JSON instead of HTML
 app.use((req, res, next) => {
   res.status(404).json({ msg: `Backend route not found: ${req.originalUrl}` });
 });
 
-// 2. Catch 500 Server Crashes and force JSON instead of HTML
 app.use((err, req, res, next) => {
   console.error("❌ CRITICAL SERVER CRASH:", err.stack);
   res.status(500).json({ msg: "Internal Server Error! Check backend terminal." });

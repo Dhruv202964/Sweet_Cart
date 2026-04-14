@@ -2,11 +2,14 @@ import React, { useState, useEffect, useContext } from 'react';
 import { Star, Plus } from 'lucide-react';
 import { Link } from 'react-router-dom'; 
 import { CartContext } from '../context/CartContext';
+// 🌍 NEW: IMPORTING TRANSLATION ENGINE
+import { useTranslation } from 'react-i18next';
 
-// 🚀 EXTRACTED CARD COMPONENT SO EACH ITEM HAS ITS OWN DROPDOWN STATE
+// 🚀 EXTRACTED CARD COMPONENT
 const MenuProductCard = ({ product, category }) => {
   const { cart, addToCart, decreaseQuantity } = useContext(CartContext);
   const [selectedWeight, setSelectedWeight] = useState('1KG');
+  const { t } = useTranslation(); // 🌍 INIT TRANSLATION FOR CARD
 
   // 🚀 THE PRICING MATH LOGIC
   const isKg = product.unit?.toLowerCase() === 'kg';
@@ -15,8 +18,6 @@ const MenuProductCard = ({ product, category }) => {
 
   // 🚀 CART SYNC LOGIC
   const uniqueCartId = isKg ? `${product.product_id}_${selectedWeight}` : `${product.product_id}_default`;
-  
-  // Find item by unique ID (or fallback for older items)
   const cartItem = cart.find(c => c.cartItemId ? c.cartItemId === uniqueCartId : c.product_id === product.product_id);
 
   const handleAddToCart = () => {
@@ -49,11 +50,12 @@ const MenuProductCard = ({ product, category }) => {
           </Link>
           <div className="flex items-center bg-amber-100 px-2 py-1 rounded text-amber-700 text-xs font-bold shrink-0"><Star size={12} className="mr-1 fill-amber-500 text-amber-500" /> 4.8</div>
         </div>
-        <p className="text-sm text-gray-500 mb-6 line-clamp-2">{product.description || "Fresh and authentic quality, made with premium ingredients."}</p>
+        {/* Dynamic description stays as is, fallback gets translated */}
+        <p className="text-sm text-gray-500 mb-6 line-clamp-2">{product.description || t('default_product_desc', 'Fresh and authentic quality, made with premium ingredients.')}</p>
         
         <div className="flex items-end justify-between mt-auto pt-4 border-t border-amber-50">
           <div className="flex flex-col">
-            <span className="text-[10px] text-gray-400 uppercase tracking-wider font-bold mb-0.5">Price</span>
+            <span className="text-[10px] text-gray-400 uppercase tracking-wider font-bold mb-0.5">{t('price_label', 'Price')}</span>
             <div className="flex items-baseline">
               <span className="text-2xl font-black text-gray-900">₹{displayPrice.toFixed(2)}</span>
               
@@ -97,6 +99,7 @@ const Menu = () => {
   const [loading, setLoading] = useState(true);
   
   const { searchQuery } = useContext(CartContext);
+  const { t } = useTranslation(); // 🌍 INIT TRANSLATION FOR MENU
 
   useEffect(() => {
     fetch('http://localhost:5000/api/products')
@@ -129,14 +132,14 @@ const Menu = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         <div className="mb-10 text-center">
-          <h1 className="text-4xl md:text-5xl font-black text-amber-950 tracking-tight mb-4">Our Full Menu</h1>
-          <p className="text-amber-800 text-lg">Discover the authentic taste of Surat, made fresh daily.</p>
+          <h1 className="text-4xl md:text-5xl font-black text-amber-950 tracking-tight mb-4">{t('full_menu_title', 'Our Full Menu')}</h1>
+          <p className="text-amber-800 text-lg">{t('menu_subtitle', 'Discover the authentic taste of Surat, made fresh daily.')}</p>
         </div>
 
         {loading ? (
           <div className="text-center py-20"><div className="animate-spin rounded-full h-12 w-12 border-b-4 border-amber-500 mx-auto mb-4"></div></div>
         ) : filteredProducts.length === 0 ? (
-          <div className="text-center py-20 bg-white rounded-3xl shadow-sm border border-amber-100"><span className="text-6xl mb-4 block">🥺</span><h3 className="text-xl font-bold text-gray-800">No items found</h3></div>
+          <div className="text-center py-20 bg-white rounded-3xl shadow-sm border border-amber-100"><span className="text-6xl mb-4 block">🥺</span><h3 className="text-xl font-bold text-gray-800">{t('no_items_found', 'No items found')}</h3></div>
         ) : (
           <div className="space-y-16">
             {categories.map(category => {

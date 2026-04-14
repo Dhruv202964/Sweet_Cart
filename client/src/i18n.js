@@ -5,7 +5,7 @@ import LanguageDetector from 'i18next-browser-languagedetector';
 const resources = {
   eng: {
     translation: {
-      // --- NAVBAR ---
+      // --- NAVBAR & FOOTER ---
       "home": "Home",
       "full_menu": "Full Menu",
       "search_placeholder": "Search for premium sweets, farsan...",
@@ -16,8 +16,6 @@ const resources = {
       "admin_dash": "Admin Dashboard",
       "logout": "Logout",
       "login_register": "Login / Register",
-      
-      // --- FOOTER ---
       "brand_desc": "Born in the heart of Surat, we have been crafting the finest, 100% pure vegetarian sweets and farsan. Originally Shreenathji Farsan, our journey started with a single pan of premium ghee, and today we deliver smiles across the city.",
       "quick_links": "Quick Links",
       "about_us": "About Us",
@@ -40,12 +38,95 @@ const resources = {
       "all_rights_reserved": "All rights reserved.",
       "privacy_policy": "Privacy Policy",
       "made_with": "Made with",
-      "by": "by"
+      "by": "by",
+
+      // --- HERO SLIDER & HOME ---
+      "hero_desc": "Experience pure indulgence with our signature traditional sweets. Crafted with premium desi ghee and generations of love.",
+      "fallback_title": "Royal Surat Sweets",
+      "fallback_sub": "PREMIUM QUALITY 100% PURE",
+      "explore_collection": "Explore Collection",
+      "bestseller_badge": "Bestseller",
+      "price_label": "Price",
+      "no_items_found": "No items found",
+      "see_full_menu": "See Full Menu",
+      "our_bestsellers": "Our Bestsellers",
+      "story1_subtitle": "The Legacy Begins",
+      "story1_title": "From Shreenath Farsan to SweetCart.",
+      "story1_p1": "It all started with a simple passion: bringing the most authentic, mouth-watering Surati snacks and sweets to our local community. For years, Shreenath Farsan has been a household name, known for our secret family recipes and unmatched taste.",
+      "story1_p2": "Now, with SweetCart, we are taking that same love and tradition online. We believe that distance shouldn't stop you from enjoying the flavors you grew up with. Our digital storefront brings the heart of our kitchen directly to your doorstep.",
+      "story2_subtitle": "Uncompromised Quality",
+      "story2_title": "Pure Ingredients. Perfect Packaging.",
+      "story2_p1": "We never cut corners. Every single sweet and snack is prepared in a state-of-the-art, hyper-hygienic kitchen using only 100% pure desi ghee, premium nuts, and locally sourced spices.",
+      "story2_p2": "But great food needs great care. Our custom-designed packaging ensures that whether you order Kaju Katli or crispy Farsan, it arrives at your home looking and tasting exactly as fresh as the moment it left our kitchen. Zero spills, maximum freshness.",
+      "story3_subtitle": "The SweetCart Advantage",
+      "story3_title": "Why Our Customers Love Shopping Here.",
+      "story3_p1": "We didn't just build a website; we built an experience. SweetCart is designed to be blazingly fast and incredibly easy to use. No confusing menus, no hidden fees.",
+      "story3_li1": "Real-time Order Tracking",
+      "story3_li2": "100% Secure UPI & Wallet Payments",
+      "story3_li3": "Express 24-Hour Delivery in Surat",
+      "story3_p2": "We combined the old-school charm of traditional sweets with cutting-edge technology to give you the ultimate dessert shopping experience.",
+
+      // --- STOREFRONT UI ---
+      "full_menu_title": "Our Full Menu",
+      "menu_subtitle": "Discover the authentic taste of Surat, made fresh daily.",
+      "add_to_cart": "Add to Cart",
+      "out_of_stock": "Out of Stock",
+      "all_categories": "All Categories",
+      "filter_by": "Filter by:",
+      "search_results": "Search Results",
+      "product_details": "Product Details",
+      "description": "Description",
+      "select_weight": "Select Weight",
+
+      // --- ABOUT US ---
+      "about_title_1": "Our",
+      "about_title_2": "Heritage",
+      "about_subtitle": "Bringing the authentic, generations-old flavors of Surat's finest sweets and farsan directly to your family's table.",
+      "story_heading": "The SweetCart Story",
+      "about_story_p1": "It started with a simple vision: to preserve the authentic, rich taste of traditional Surati delicacies. In a world of mass-produced snacks, we wanted to create a haven where every bite feels like home.",
+      "about_story_p2": "We source only the highest quality ingredients—premium besan, pure desi ghee, and hand-picked spices. Our master chefs bring decades of experience to the kitchen, ensuring that whether it's our famous Sarasiya Khaja or our crispy nylon khaman, the standard remains flawlessly consistent.",
+      "about_story_p3": "Today, SweetCart has grown from our original Rustampura hub to a brand new location in Adajan. Our core philosophy hasn't changed: we don't just sell food; we deliver happiness, celebrations, and memories.",
+      "val1_title": "Authentic Taste",
+      "val1_desc": "Prepared using generations-old recipes, ensuring every bite takes you back to the vibrant streets of Surat.",
+      "val2_title": "Made with Love",
+      "val2_desc": "Premium quality ingredients and 100% pure ghee go into every single batch we make daily.",
+      "val3_title": "100% Hygienic",
+      "val3_desc": "Strict quality controls and enterprise-grade packaging keep your food safe, fresh, and perfectly intact.",
+      "visit_title": "Visit Our Kitchens",
+      "visit_desc": "We love seeing our customers! Drop by our main hub in Rustampura or our newly opened Adajan branch to experience the aroma of fresh sweets and farsan being prepared live.",
+      "branch_main_title": "Rustampura Main Hub",
+      "branch_main_name": "Shreenathji Farsan Sarasiya Khaja & Sweets",
+      "branch_adajan_title": "Adajan Branch",
+      "branch_adajan_name": "Shree Nathji Farsan",
+
+      // --- CONTACT US ---
+      "contact_title": "Contact Support",
+      "contact_subtitle": "Have a question about your order or need help? Send us a message!",
+      "location_title": "Our Location",
+      "loc_l1": "123 Premium Sweet Hub,",
+      "loc_l2": "Adajan, Surat, Gujarat 395009",
+      "phone_title": "Phone Support",
+      "phone_l1": "+91 98765 43210",
+      "phone_l2": "Mon-Sat: 9AM to 8PM",
+      "email_title": "Email Us",
+      "email_l1": "support@sweetcart.com",
+      "email_l2": "We reply within 24 hours.",
+      "inquiry_sent_title": "Inquiry Sent!",
+      "inquiry_sent_desc": "Thank you for reaching out. Our support team will review your message and reply shortly.",
+      "form_name": "Your Name",
+      "form_email": "Email Address",
+      "form_subject": "Subject",
+      "form_message": "Your Message",
+      "ph_name": "John Doe",
+      "ph_subject": "e.g. Order #10005 Delivery Issue",
+      "ph_message": "How can we help you today?",
+      "btn_sending": "Sending...",
+      "btn_send": "Send Inquiry"
     }
   },
   hin: {
     translation: {
-      // --- NAVBAR ---
+      // --- NAVBAR & FOOTER ---
       "home": "होम",
       "full_menu": "पूरा मेनू",
       "search_placeholder": "प्रीमियम मिठाइयाँ, फरसाण खोजें...",
@@ -56,8 +137,6 @@ const resources = {
       "admin_dash": "एडमिन डैशबोर्ड",
       "logout": "लॉग आउट",
       "login_register": "लॉगिन / रजिस्टर",
-      
-      // --- FOOTER ---
       "brand_desc": "सूरत के दिल में जन्मे, हम बेहतरीन और 100% शुद्ध शाकाहारी मिठाइयाँ और फरसाण बना रहे हैं। मूल रूप से श्रीनाथजी फरसाण, हमारी यात्रा प्रीमियम घी की एक कड़ाही से शुरू हुई थी, और आज हम पूरे शहर में मुस्कान बांटते हैं।",
       "quick_links": "त्वरित लिंक",
       "about_us": "हमारे बारे में",
@@ -80,12 +159,95 @@ const resources = {
       "all_rights_reserved": "सभी अधिकार सुरक्षित।",
       "privacy_policy": "गोपनीयता नीति",
       "made_with": "के साथ",
-      "by": "बनाया गया"
+      "by": "बनाया गया",
+
+      // --- HERO SLIDER & HOME ---
+      "hero_desc": "हमारी सिग्नेचर पारंपरिक मिठाइयों के साथ शुद्ध आनंद का अनुभव करें। प्रीमियम देसी घी और पीढ़ियों के प्यार से तैयार।",
+      "fallback_title": "रॉयल सूरत स्वीट्स",
+      "fallback_sub": "प्रीमियम गुणवत्ता 100% शुद्ध",
+      "explore_collection": "कलेक्शन देखें",
+      "bestseller_badge": "बेस्टसेलर",
+      "price_label": "कीमत",
+      "no_items_found": "कोई आइटम नहीं मिला",
+      "see_full_menu": "पूरा मेनू देखें",
+      "our_bestsellers": "हमारे बेस्टसेलर्स",
+      "story1_subtitle": "विरासत की शुरुआत",
+      "story1_title": "श्रीनाथ फरसाण से स्वीटकार्ट तक।",
+      "story1_p1": "यह सब एक साधारण जुनून के साथ शुरू हुआ: हमारे स्थानीय समुदाय के लिए सबसे प्रामाणिक, स्वादिष्ट सुरती स्नैक्स और मिठाइयाँ लाना। वर्षों से, श्रीनाथ फरसाण एक घरेलू नाम रहा है, जो हमारे गुप्त पारिवारिक व्यंजनों और बेजोड़ स्वाद के लिए जाना जाता है।",
+      "story1_p2": "अब, स्वीटकार्ट के साथ, हम उसी प्यार और परंपरा को ऑनलाइन ले जा रहे हैं। हमारा मानना है कि दूरी आपको उन स्वादों का आनंद लेने से नहीं रोकनी चाहिए जिनके साथ आप बड़े हुए हैं।",
+      "story2_subtitle": "असमझौता गुणवत्ता",
+      "story2_title": "शुद्ध सामग्री। उत्तम पैकेजिंग।",
+      "story2_p1": "हम कभी भी गुणवत्ता से समझौता नहीं करते हैं। हर एक मिठाई और स्नैक केवल 100% शुद्ध देसी घी, प्रीमियम नट्स और स्थानीय मसालों का उपयोग करके तैयार किया जाता है।",
+      "story2_p2": "हमारे कस्टम-डिज़ाइन किए गए पैकेजिंग से यह सुनिश्चित होता है कि चाहे आप काजू कतली ऑर्डर करें या क्रिस्पी फरसाण, यह आपके घर पर बिल्कुल ताज़ा और सुरक्षित पहुँचता है।",
+      "story3_subtitle": "स्वीटकार्ट का फायदा",
+      "story3_title": "हमारे ग्राहक यहां खरीदारी करना क्यों पसंद करते हैं।",
+      "story3_p1": "हमने सिर्फ एक वेबसाइट नहीं बनाई; हमने एक अनुभव बनाया है। स्वीटकार्ट को बहुत तेज़ और उपयोग में अविश्वसनीय रूप से आसान बनाने के लिए डिज़ाइन किया गया है। कोई छिपी हुई फीस नहीं।",
+      "story3_li1": "रीयल-टाइम ऑर्डर ट्रैकिंग",
+      "story3_li2": "100% सुरक्षित UPI और वॉलेट भुगतान",
+      "story3_li3": "सूरत में 24 घंटे की एक्सप्रेस डिलीवरी",
+      "story3_p2": "हमने आपको बेहतरीन मिठाई खरीदारी का अनुभव देने के लिए पारंपरिक मिठाइयों के आकर्षण को आधुनिक तकनीक के साथ जोड़ा है।",
+
+      // --- STOREFRONT UI ---
+      "full_menu_title": "हमारा पूरा मेनू",
+      "menu_subtitle": "सूरत के प्रामाणिक स्वाद की खोज करें, रोज़ाना ताज़ा बनाया जाता है।",
+      "add_to_cart": "कार्ट में डालें",
+      "out_of_stock": "स्टॉक से बाहर",
+      "all_categories": "सभी श्रेणियां",
+      "filter_by": "फ़िल्टर करें:",
+      "search_results": "खोज परिणाम",
+      "product_details": "उत्पाद विवरण",
+      "description": "विवरण",
+      "select_weight": "वजन चुनें",
+
+      // --- ABOUT US ---
+      "about_title_1": "हमारी",
+      "about_title_2": "विरासत",
+      "about_subtitle": "सूरत की बेहतरीन मिठाइयों और फरसाण के प्रामाणिक, पीढ़ियों पुराने स्वाद को सीधे आपके परिवार की मेज़ तक लाना।",
+      "story_heading": "स्वीटकार्ट की कहानी",
+      "about_story_p1": "यह एक साधारण दृष्टि के साथ शुरू हुआ: पारंपरिक सुरती व्यंजनों के प्रामाणिक, समृद्ध स्वाद को संरक्षित करना। बड़े पैमाने पर उत्पादित स्नैक्स की दुनिया में, हम एक ऐसा आश्रय बनाना चाहते थे जहां हर निवाला घर जैसा लगे।",
+      "about_story_p2": "हम केवल उच्चतम गुणवत्ता वाली सामग्री—प्रीमियम बेसन, शुद्ध देसी घी, और हाथ से चुने गए मसाले लाते हैं। हमारे मास्टर शेफ रसोई में दशकों का अनुभव लाते हैं, यह सुनिश्चित करते हुए कि चाहे वह हमारा प्रसिद्ध सरसिया खाजा हो या हमारा क्रिस्पी नायलॉन खमन, मानक हमेशा एक समान रहता है।",
+      "about_story_p3": "आज, स्वीटकार्ट हमारे मूल रुस्तमपुरा हब से अडाजण में एक नए स्थान तक बढ़ गया है। हमारा मूल दर्शन नहीं बदला है: हम सिर्फ खाना नहीं बेचते; हम खुशी, उत्सव और यादें प्रदान करते हैं।",
+      "val1_title": "प्रामाणिक स्वाद",
+      "val1_desc": "पीढ़ियों पुरानी रेसिपी का उपयोग करके तैयार किया गया, यह सुनिश्चित करते हुए कि हर निवाला आपको वापस सूरत की जीवंत सड़कों पर ले जाए।",
+      "val2_title": "प्यार से बनाया गया",
+      "val2_desc": "प्रीमियम गुणवत्ता वाली सामग्री और 100% शुद्ध घी हमारे द्वारा रोज़ाना बनाए जाने वाले हर एक बैच में जाता है।",
+      "val3_title": "100% स्वच्छ",
+      "val3_desc": "सख्त गुणवत्ता नियंत्रण और एंटरप्राइज़-ग्रेड पैकेजिंग आपके भोजन को सुरक्षित, ताज़ा और पूरी तरह से बरकरार रखती है।",
+      "visit_title": "हमारी रसोई में आएं",
+      "visit_desc": "हम अपने ग्राहकों से मिलना पसंद करते हैं! रुस्तमपुरा में हमारे मुख्य हब या हमारे नए खुले अडाजण शाखा में लाइव तैयार की जा रही ताज़ी मिठाइयों और फरसाण की सुगंध का अनुभव करने के लिए आएं।",
+      "branch_main_title": "रुस्तमपुरा मुख्य हब",
+      "branch_main_name": "श्रीनाथजी फरसाण सरसिया खाजा और स्वीट्स",
+      "branch_adajan_title": "अडाजण शाखा",
+      "branch_adajan_name": "श्री नाथजी फरसाण",
+
+      // --- CONTACT US ---
+      "contact_title": "संपर्क समर्थन",
+      "contact_subtitle": "क्या आपके आदेश के बारे में कोई प्रश्न है या मदद चाहिए? हमें एक संदेश भेजें!",
+      "location_title": "हमारा स्थान",
+      "loc_l1": "123 प्रीमियम स्वीट हब,",
+      "loc_l2": "अडाजण, सूरत, गुजरात 395009",
+      "phone_title": "फ़ोन समर्थन",
+      "phone_l1": "+91 98765 43210",
+      "phone_l2": "सोम-शनि: सुबह 9 बजे से रात 8 बजे तक",
+      "email_title": "हमें ईमेल करें",
+      "email_l1": "support@sweetcart.com",
+      "email_l2": "हम 24 घंटे के भीतर जवाब देते हैं।",
+      "inquiry_sent_title": "पूछताछ भेजी गई!",
+      "inquiry_sent_desc": "संपर्क करने के लिए धन्यवाद। हमारी सहायता टीम आपके संदेश की समीक्षा करेगी और जल्द ही जवाब देगी।",
+      "form_name": "आपका नाम",
+      "form_email": "ईमेल पता",
+      "form_subject": "विषय",
+      "form_message": "आपका संदेश",
+      "ph_name": "जॉन डो",
+      "ph_subject": "उदा. ऑर्डर #10005 डिलीवरी की समस्या",
+      "ph_message": "आज हम आपकी कैसे मदद कर सकते हैं?",
+      "btn_sending": "भेज रहा है...",
+      "btn_send": "पूछताछ भेजें"
     }
   },
   guj: {
     translation: {
-      // --- NAVBAR ---
+      // --- NAVBAR & FOOTER ---
       "home": "હોમ",
       "full_menu": "સંપૂર્ણ મેનૂ",
       "search_placeholder": "પ્રીમિયમ મીઠાઈઓ, ફરસાણ શોધો...",
@@ -96,8 +258,6 @@ const resources = {
       "admin_dash": "એડમિન ડેશબોર્ડ",
       "logout": "લૉગ આઉટ",
       "login_register": "લૉગિન / રજિસ્ટર",
-      
-      // --- FOOTER ---
       "brand_desc": "સુરતના હૃદયમાં જન્મેલા, અમે શ્રેષ્ઠ અને 100% શુદ્ધ શાકાહારી મીઠાઈઓ અને ફરસાણ બનાવી રહ્યા છીએ. મૂળ રૂપે શ્રીનાથજી ફરસાણ, અમારી યાત્રા પ્રીમિયમ ઘી ની એક કડાઈથી શરૂ થઈ હતી, અને આજે અમે આખા શહેરમાં ખુશીઓ વહેંચીએ છીએ.",
       "quick_links": "ઝડપી લિંક્સ",
       "about_us": "અમારા વિશે",
@@ -120,7 +280,90 @@ const resources = {
       "all_rights_reserved": "તમામ હકો સુરક્ષિત.",
       "privacy_policy": "ગોપનીયતા નીતિ",
       "made_with": "સાથે",
-      "by": "બનાવેલ"
+      "by": "બનાવેલ",
+
+      // --- HERO SLIDER & HOME ---
+      "hero_desc": "અમારી સિગ્નેચર પરંપરાગત મીઠાઈઓ સાથે શુદ્ધ આનંદનો અનુભવ કરો. પ્રીમિયમ દેશી ઘી અને પેઢીઓના પ્રેમથી તૈયાર.",
+      "fallback_title": "રોયલ સુરત સ્વીટ્સ",
+      "fallback_sub": "પ્રીમિયમ ગુણવત્તા 100% શુદ્ધ",
+      "explore_collection": "કલેક્શન જુઓ",
+      "bestseller_badge": "બેસ્ટસેલર",
+      "price_label": "કિંમત",
+      "no_items_found": "કોઈ આઇટમ મળી નથી",
+      "see_full_menu": "સંપૂર્ણ મેનૂ જુઓ",
+      "our_bestsellers": "અમારા બેસ્ટસેલર્સ",
+      "story1_subtitle": "વારસાની શરૂઆત",
+      "story1_title": "શ્રીનાથ ફરસાણ થી સ્વીટકારટ સુધી.",
+      "story1_p1": "તે બધું એક સાધારણ જુસ્સા સાથે શરૂ થયું: અમારા સ્થાનિક સમુદાય માટે સૌથી અધિકૃત, સ્વાદિષ્ટ સુરતી નાસ્તા અને મીઠાઈઓ લાવવા. વર્ષોથી, શ્રીનાથ ફરસાણ અમારા ગુપ્ત પારિવારિક વાનગીઓ અને અજોડ સ્વાદ માટે જાણીતું છે.",
+      "story1_p2": "હવે, સ્વીટકારટ સાથે, અમે તે જ પ્રેમ અને પરંપરાને ઓનલાઇન લઈ જઈ રહ્યા છીએ. અમારું માનવું છે કે અંતર તમને તે સ્વાદોનો આનંદ માણવાથી ન રોકવું જોઈએ જેની સાથે તમે મોટા થયા છો.",
+      "story2_subtitle": "કોઈ બાંધછોડ નહીં",
+      "story2_title": "શુદ્ધ સામગ્રી. પરફેક્ટ પેકેજિંગ.",
+      "story2_p1": "અમે ક્યારેય ગુણવત્તા સાથે બાંધછોડ કરતા નથી. દરેક મીઠાઈ અને નાસ્તો ફક્ત 100% શુદ્ધ દેશી ઘી, પ્રીમિયમ ડ્રાયફ્રૂટ્સ અને સ્થાનિક મસાલાઓનો ઉપયોગ કરીને તૈયાર કરવામાં આવે છે.",
+      "story2_p2": "અમારું કસ્ટમ-ડિઝાઇન કરેલ પેકેજિંગ એ સુનિશ્ચિત કરે છે કે ભલે તમે કાજુ કતલી ઓર્ડર કરો કે ક્રિસ્પી ફરસાણ, તે તમારા ઘરે બિલકુલ તાજું અને સુરક્ષિત પહોંચે.",
+      "story3_subtitle": "સ્વીટકારટ નો ફાયદો",
+      "story3_title": "અમારા ગ્રાહકો અહીં ખરીદી કરવાનું શા માટે પસંદ કરે છે.",
+      "story3_p1": "અમે માત્ર એક વેબસાઈટ નથી બનાવી; અમે એક અનુભવ બનાવ્યો છે. સ્વીટકારટ ને ખૂબ જ ઝડપી અને ઉપયોગમાં સરળ બનાવવા માટે ડિઝાઇન કરવામાં આવ્યું છે. કોઈ છુપી ફી નથી.",
+      "story3_li1": "રીઅલ-ટાઇમ ઓર્ડર ટ્રેકિંગ",
+      "story3_li2": "100% સુરક્ષિત UPI અને વૉલેટ પેમેન્ટ્સ",
+      "story3_li3": "સુરતમાં 24 કલાકમાં એક્સપ્રેસ ડિલિવરી",
+      "story3_p2": "અમે તમને શ્રેષ્ઠ મીઠાઈ ખરીદીનો અનુભવ આપવા માટે પરંપરાગત મીઠાઈઓના આકર્ષણને આધુનિક ટેકનોલોજી સાથે જોડ્યું છે.",
+
+      // --- STOREFRONT UI ---
+      "full_menu_title": "અમારું સંપૂર્ણ મેનૂ",
+      "menu_subtitle": "દરરોજ તાજા બનેલા સુરતના અધિકૃત સ્વાદનો અનુભવ કરો.",
+      "add_to_cart": "કાર્ટમાં ઉમેરો",
+      "out_of_stock": "સ્ટોક બહાર",
+      "all_categories": "તમામ શ્રેણીઓ",
+      "filter_by": "ફિલ્ટર કરો:",
+      "search_results": "શોધ પરિણામો",
+      "product_details": "ઉત્પાદન વિગતો",
+      "description": "વર્ણન",
+      "select_weight": "વજન પસંદ કરો",
+
+      // --- ABOUT US ---
+      "about_title_1": "અમારો",
+      "about_title_2": "વારસો",
+      "about_subtitle": "સુરતની શ્રેષ્ઠ મીઠાઈઓ અને ફરસાણનો અધિકૃત, પેઢીઓ જૂનો સ્વાદ સીધો તમારા પરિવારના ટેબલ પર લાવી રહ્યા છીએ.",
+      "story_heading": "સ્વીટકારટ ની વાર્તા",
+      "about_story_p1": "તે એક સાધારણ દ્રષ્ટિથી શરૂ થયું: પરંપરાગત સુરતી વાનગીઓના અધિકૃત, સમૃદ્ધ સ્વાદને જાળવી રાખવા. મોટા પાયે ઉત્પાદિત નાસ્તાની દુનિયામાં, અમે એક એવું આશ્રયસ્થાન બનાવવા માંગતા હતા જ્યાં દરેક કોળિયો ઘર જેવો લાગે.",
+      "about_story_p2": "અમે માત્ર ઉચ્ચતમ ગુણવત્તાવાળી સામગ્રી—પ્રીમિયમ બેસન, શુદ્ધ દેશી ઘી, અને હાથથી પસંદ કરેલા મસાલાઓનો ઉપયોગ કરીએ છીએ. અમારા માસ્ટર શેફ દાયકાઓનો અનુભવ રસોડામાં લાવે છે, એ સુનિશ્ચિત કરીને કે પછી તે અમારું પ્રખ્યાત સરસિયા ખાજા હોય કે અમારું ક્રિસ્પી નાયલોન ખમણ, ગુણવત્તા હંમેશા ઉત્તમ રહે છે.",
+      "about_story_p3": "આજે, સ્વીટકારટ અમારા મૂળ રુસ્તમપુરા હબથી અડાજણમાં એક નવા સ્થાન સુધી વિકસ્યું છે. અમારું મૂળ ફિલસૂફી બદલાયું નથી: અમે માત્ર ખોરાક નથી વેચતા; અમે ખુશી, ઉજવણી અને યાદો પ્રદાન કરીએ છીએ.",
+      "val1_title": "અધિકૃત સ્વાદ",
+      "val1_desc": "પેઢીઓ જૂની વાનગીઓનો ઉપયોગ કરીને તૈયાર કરવામાં આવે છે, જે ખાતરી કરે છે કે દરેક કોળિયો તમને સુરતની જીવંત શેરીઓમાં પાછા લઈ જશે.",
+      "val2_title": "પ્રેમથી બનાવેલ",
+      "val2_desc": "અમે રોજિંદા ધોરણે જે પણ બનાવીએ છીએ તેમાં પ્રીમિયમ ગુણવત્તાની સામગ્રી અને 100% શુદ્ધ ઘી વપરાય છે.",
+      "val3_title": "100% હાઇજેનિક",
+      "val3_desc": "કડક ગુણવત્તા નિયંત્રણ અને એન્ટરપ્રાઇઝ-ગ્રેડ પેકેજિંગ તમારા ખોરાકને સુરક્ષિત, તાજો અને સંપૂર્ણપણે અકબંધ રાખે છે.",
+      "visit_title": "અમારા રસોડાની મુલાકાત લો",
+      "visit_desc": "અમને અમારા ગ્રાહકોને જોવાનું ગમે છે! લાઇવ તૈયાર થઈ રહેલી તાજી મીઠાઈઓ અને ફરસાણની સુગંધનો અનુભવ કરવા માટે અમારા રુસ્તમપુરા મેઇન હબ અથવા અમારી નવી અડાજણ શાખાની મુલાકાત લો.",
+      "branch_main_title": "રુસ્તમપુરા મેઇન હબ",
+      "branch_main_name": "શ્રીનાથજી ફરસાણ સરસિયા ખાજા અને સ્વીટ્સ",
+      "branch_adajan_title": "અડાજણ શાખા",
+      "branch_adajan_name": "શ્રી નાથજી ફરસાણ",
+
+      // --- CONTACT US ---
+      "contact_title": "સંપર્ક સપોર્ટ",
+      "contact_subtitle": "શું તમને તમારા ઑર્ડર વિશે કોઈ પ્રશ્ન છે અથવા મદદની જરૂર છે? અમને મેસેજ મોકલો!",
+      "location_title": "અમારું સ્થાન",
+      "loc_l1": "123 પ્રીમિયમ સ્વીટ હબ,",
+      "loc_l2": "અડાજણ, સુરત, ગુજરાત 395009",
+      "phone_title": "ફોન સપોર્ટ",
+      "phone_l1": "+91 98765 43210",
+      "phone_l2": "સોમ-શનિ: સવારે 9 થી રાત્રે 8",
+      "email_title": "અમને ઇમેઇલ કરો",
+      "email_l1": "support@sweetcart.com",
+      "email_l2": "અમે 24 કલાકમાં જવાબ આપીએ છીએ.",
+      "inquiry_sent_title": "પૂછપરછ મોકલી દેવાઇ છે!",
+      "inquiry_sent_desc": "સંપર્ક કરવા બદલ આભાર. અમારી સપોર્ટ ટીમ તમારા સંદેશની સમીક્ષા કરશે અને ટૂંક સમયમાં જવાબ આપશે.",
+      "form_name": "તમારું નામ",
+      "form_email": "ઇમેઇલ સરનામું",
+      "form_subject": "વિષય",
+      "form_message": "તમારો સંદેશ",
+      "ph_name": "જોન ડો",
+      "ph_subject": "ઉદા. ઓર્ડર #10005 ડિલિવરી સમસ્યા",
+      "ph_message": "આજે અમે તમારી કેવી રીતે મદદ કરી શકીએ?",
+      "btn_sending": "મોકલી રહ્યું છે...",
+      "btn_send": "પૂછપરછ મોકલો"
     }
   }
 };
@@ -130,7 +373,7 @@ i18n
   .use(initReactI18next)
   .init({
     resources,
-    fallbackLng: 'eng', // Changed fallback to 3 letters
+    fallbackLng: 'eng', 
     interpolation: {
       escapeValue: false 
     }
