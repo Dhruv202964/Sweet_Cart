@@ -132,7 +132,12 @@ const Home = () => {
   return (
     <div className="min-h-screen bg-[#FFFDF8] font-sans pb-20 overflow-hidden relative">
       
-      <HeroSlider />
+      {/* 🚀 THE FADE FIX: Wrapper around HeroSlider */}
+      <div className="relative">
+        <HeroSlider />
+        {/* Seamless bottom fade overlay */}
+        <div className="absolute bottom-0 left-0 w-full h-32 bg-gradient-to-t from-[#FFFDF8] to-transparent pointer-events-none z-10"></div>
+      </div>
 
       {/* 🌟 LUXURY CATEGORY TABS */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-12 mb-10 relative z-10">

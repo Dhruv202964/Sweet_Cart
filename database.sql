@@ -1,7 +1,7 @@
 -- ############################################################
 -- # SWEET_CART DATABASE SCHEMA - LOCAL POSTGRESQL ENVIRONMENT
 -- # Team: 404 ERROR 
--- # Updated: April 2026 (Day 28: Dynamic CMS Architecture)
+-- # Updated: April 2026 (Day 30: Final System Connections & Analytics)
 -- ############################################################
 
 -- 0. SYSTEM LOCALIZATION
@@ -117,6 +117,13 @@ CREATE TABLE hero_sliders (
     cta_link VARCHAR(255) DEFAULT '/menu',
     is_active BOOLEAN DEFAULT TRUE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- 8. DAILY STATS TABLE (📈 NEW: The Analytics Engine)
+-- Captures daily unique visitors to populate the Admin Dashboard
+CREATE TABLE daily_stats (
+    stat_date DATE PRIMARY KEY,
+    total_visitors INT DEFAULT 0
 );
 
 -- ############################################################

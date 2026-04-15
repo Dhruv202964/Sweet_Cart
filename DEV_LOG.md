@@ -763,3 +763,32 @@ Premium Language Dropdown: Deprecated the outdated, native HTML <select> tag in 
 The SweetCart storefront is officially a globally scalable, tri-lingual e-commerce platform.
 
 The entire customer UI instantly translates without requiring a page reload.
+
+Day 30: API Re-Wiring, Multi-Line Chart Analytics & Session Security
+Date: 2026-04-15 | Status: Complete | Phase: Final System Connections & UX Polish
+
+🎯 Objective Reconnect the Contact Us form to the database, resolve visual Chart.js anomalies in the Admin panel, and enforce session-bound logic for global language states.
+
+🛠️ Critical Fixes
+
+API Disconnect: Discovered and patched a frontend UI blindspot where the `Contact.jsx` component was using a fake `setTimeout` function. Rewired the `fetch` call to successfully hit the real `POST /api/messages` endpoint, ensuring customer inquiries properly save to the PostgreSQL `contact_messages` table and appear in the Admin Inbox.
+
+Admin Chart Rendering: Bypassed aggressive Chart.js canvas caching and overlapping text bugs. Engineered a multi-line array splitting function in `SalesChart.jsx` that elegantly stacks long area names (e.g., "SINGANPOR ROAD, KATARGAM") vertically along the X-axis while preserving the full string for hover tooltips.
+
+⚙️ Technical Implementation
+
+Gradient UX Masking: Injected a CSS `bg-gradient-to-t` overlay onto the homepage `<HeroSlider />` component in `Home.jsx`, creating a seamless, premium melt effect from the slider imagery into the primary `#FFFDF8` background color.
+
+Session-Bound i18n Translation: Overhauled the `i18next` initialization in `i18n.js` to strictly enforce `sessionStorage` detection. The platform now intelligently auto-resets the site language to English whenever the browser tab is closed.
+
+Authentication Language Wiping: Upgraded the `logout` function within `AuthContext.jsx` to forcefully trigger `i18n.changeLanguage('eng')`, preventing subsequent users on the same device from inheriting the previous user's language settings.
+
+Legal Localization Expansion: Surgically injected `useTranslation` hooks into `PrivacyPolicy.jsx` and injected comprehensive legal translations (English, Hindi, Gujarati) into the global dictionary.
+
+✅ Milestones
+
+The Contact pipeline is fully operational from frontend UI to Admin inbox.
+
+The application's language state is securely bound to the user's active session.
+
+Project is strictly locked, visually polished, and finalized for the final presentation.

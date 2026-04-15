@@ -46,6 +46,8 @@ app.use('/api/sliders', require('./routes/sliderRoutes')); // 🌟 NEW: HERO SLI
 // 3. DIRECT ROUTES (Messages)
 // ==========================================
 const messageController = require('./controllers/messageController');
+
+app.post('/api/messages', messageController.createMessage);
 app.get('/api/messages', messageController.getAllMessages);
 app.delete('/api/messages/:id', messageController.deleteMessage);
 

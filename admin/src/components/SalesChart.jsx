@@ -41,16 +41,31 @@ const SalesChart = () => {
     if (selectedCity === 'Ahmedabad') barColor = '#F4A460'; // Ahmedabad - Saffron
     if (selectedCity === 'Vadodara') barColor = '#4A90E2'; // Vadodara - Blue
 
+    const fullLabels = cityData.map(item => item.area);
+    
+    // 🚀 THE MULTI-LINE TRICK: Split long addresses by comma so they stack on top of each other!
+    const multiLineLabels = cityData.map(item => {
+      if (!item.area) return '';
+      if (item.area.includes(',')) {
+        return item.area.split(',').map(str => str.trim()); // Turns into an array = new lines!
+      }
+      if (item.area.length > 15) {
+        return item.area.match(/.{1,15}/g); // Splits by 15 characters if no commas exist
+      }
+      return item.area;
+    });
+
     setChartData({
-      labels: cityData.map(item => item.area),
+      labels: multiLineLabels, // 👈 X-Axis gets the neatly stacked multi-line array
       datasets: [
         {
           label: `Total Revenue (₹)`,
           data: cityData.map(item => item.revenue),
           backgroundColor: barColor,
-          borderRadius: 8, // Softer rounded corners
-          maxBarThickness: 70, // 👈 Fix: Allows bars to be thick but caps them so they don't look overly huge
-          categoryPercentage: 0.5, // 👈 Fix: Perfectly spaces the bars out
+          borderRadius: 8, 
+          maxBarThickness: 70, 
+          categoryPercentage: 0.5, 
+          fullLabels: fullLabels, // 👈 Keep the full string safe for the hover tooltip!
         },
       ],
     });
@@ -59,7 +74,7 @@ const SalesChart = () => {
   const cities = ['Surat', 'Ahmedabad', 'Vadodara'];
 
   return (
-    <div className="w-full"> {/* 👈 Removed the extra white box formatting */}
+    <div className="w-full">
       
       {/* Header & City Buttons */}
       <div className="flex justify-between items-center mb-6">
@@ -101,7 +116,11 @@ const SalesChart = () => {
                   titleFont: { size: 14 },
                   bodyFont: { size: 14, weight: 'bold' },
                   callbacks: {
-                    label: (context) => `₹${context.raw.toLocaleString()}` // 👈 Added commas to numbers
+                    title: (tooltipItems) => {
+                      const index = tooltipItems[0].dataIndex;
+                      return tooltipItems[0].dataset.fullLabels[index]; // Hover shows single line!
+                    },
+                    label: (context) => `₹${context.raw.toLocaleString()}`
                   }
                 }
               },
@@ -115,7 +134,11 @@ const SalesChart = () => {
                 x: { 
                   grid: { display: false },
                   border: { display: false },
-                  ticks: { font: { weight: 'bold', color: '#6B7280' } }
+                  ticks: { 
+                    font: { weight: 'bold', color: '#6B7280' },
+                    maxRotation: 0, // 👈 Force text to stay flat (horizontal)
+                    minRotation: 0
+                  }
                 }
               }
             }} 

@@ -121,7 +121,27 @@ const resources = {
       "ph_subject": "e.g. Order #10005 Delivery Issue",
       "ph_message": "How can we help you today?",
       "btn_sending": "Sending...",
-      "btn_send": "Send Inquiry"
+      "btn_send": "Send Inquiry",
+
+      // --- PRIVACY POLICY ---
+      "privacy_title": "Privacy Policy",
+      "privacy_last_updated": "Last Updated: March 2026",
+      "privacy_sec1_title": "1. Information We Collect",
+      "privacy_sec1_p": "At SweetCart, we are committed to protecting your privacy. We collect information that you provide directly to us when you register for an account, place an order, or contact our support team. This includes your full name, email address, mobile phone number, and delivery addresses.",
+      "privacy_sec2_title": "2. How We Use Your Data",
+      "privacy_sec2_p": "The information we collect is used strictly for the following operational purposes:",
+      "privacy_sec2_li1": "To process and fulfill your orders efficiently.",
+      "privacy_sec2_li2": "To communicate with you regarding your order status and delivery updates.",
+      "privacy_sec2_li3": "To provide customer support and respond to your inquiries.",
+      "privacy_sec2_li4": "To improve our website functionality and user experience.",
+      "privacy_sec3_title": "3. Data Security & Encryption",
+      "privacy_sec3_p": "We implement strict enterprise-grade security measures to maintain the safety of your personal information. Your passwords are cryptographically hashed using industry-standard bcrypt algorithms before being stored in our secure PostgreSQL database. We do not store plain-text passwords.",
+      "privacy_sec4_title": "4. Cookies and Local Storage",
+      "privacy_sec4_p": "Our application uses browser local storage and session storage to maintain your active shopping cart and keep you securely logged into your account. These are essential functional tools required for the e-commerce platform to operate seamlessly.",
+      "privacy_sec5_title": "5. Account Deletion",
+      "privacy_sec5_p": "You have the right to request the deletion of your personal data at any time. You can permanently delete your account, including all saved addresses and order history, directly from the 'Danger Zone' within your My Account dashboard.",
+      "privacy_contact_title": "Contact Us Regarding Privacy",
+      "privacy_contact_p": "If you have any questions about this Privacy Policy or how your data is handled, please contact our administrative team at"
     }
   },
   hin: {
@@ -242,7 +262,27 @@ const resources = {
       "ph_subject": "उदा. ऑर्डर #10005 डिलीवरी की समस्या",
       "ph_message": "आज हम आपकी कैसे मदद कर सकते हैं?",
       "btn_sending": "भेज रहा है...",
-      "btn_send": "पूछताछ भेजें"
+      "btn_send": "पूछताछ भेजें",
+
+      // --- PRIVACY POLICY ---
+      "privacy_title": "गोपनीयता नीति",
+      "privacy_last_updated": "अंतिम अपडेट: मार्च 2026",
+      "privacy_sec1_title": "1. हम क्या जानकारी एकत्र करते हैं",
+      "privacy_sec1_p": "स्वीटकार्ट में, हम आपकी गोपनीयता की रक्षा करने के लिए प्रतिबद्ध हैं। जब आप खाता बनाते हैं, ऑर्डर देते हैं, या हमारी सहायता टीम से संपर्क करते हैं, तो हम वह जानकारी एकत्र करते हैं जो आप सीधे हमें प्रदान करते हैं। इसमें आपका पूरा नाम, ईमेल पता, मोबाइल नंबर और डिलीवरी पते शामिल हैं।",
+      "privacy_sec2_title": "2. हम आपके डेटा का उपयोग कैसे करते हैं",
+      "privacy_sec2_p": "हमारे द्वारा एकत्र की गई जानकारी का उपयोग सख्ती से निम्नलिखित परिचालन उद्देश्यों के लिए किया जाता है:",
+      "privacy_sec2_li1": "आपके ऑर्डर को कुशलतापूर्वक प्रोसेस और पूरा करने के लिए।",
+      "privacy_sec2_li2": "आपके ऑर्डर की स्थिति और डिलीवरी अपडेट के संबंध में आपसे संवाद करने के लिए।",
+      "privacy_sec2_li3": "ग्राहक सहायता प्रदान करने और आपकी पूछताछ का उत्तर देने के लिए।",
+      "privacy_sec2_li4": "हमारी वेबसाइट की कार्यक्षमता और उपयोगकर्ता अनुभव को बेहतर बनाने के लिए।",
+      "privacy_sec3_title": "3. डेटा सुरक्षा और एन्क्रिप्शन",
+      "privacy_sec3_p": "हम आपकी व्यक्तिगत जानकारी की सुरक्षा बनाए रखने के लिए सख्त एंटरप्राइज़-ग्रेड सुरक्षा उपाय लागू करते हैं। हमारे सुरक्षित PostgreSQL डेटाबेस में संग्रहीत होने से पहले आपके पासवर्ड को उद्योग-मानक bcrypt एल्गोरिदम का उपयोग करके क्रिप्टोग्राफ़िक रूप से हैश किया जाता है। हम सादे-पाठ (plain-text) पासवर्ड संग्रहीत नहीं करते हैं।",
+      "privacy_sec4_title": "4. कुकीज़ और लोकल स्टोरेज",
+      "privacy_sec4_p": "हमारा एप्लिकेशन आपके सक्रिय शॉपिंग कार्ट को बनाए रखने और आपको आपके खाते में सुरक्षित रूप से लॉग इन रखने के लिए ब्राउज़र लोकल स्टोरेज और सेशन स्टोरेज का उपयोग करता है। ई-कॉमर्स प्लेटफ़ॉर्म को निर्बाध रूप से संचालित करने के लिए ये आवश्यक कार्यात्मक उपकरण हैं।",
+      "privacy_sec5_title": "5. खाता हटाना",
+      "privacy_sec5_p": "आपको किसी भी समय अपने व्यक्तिगत डेटा को हटाने का अनुरोध करने का अधिकार है। आप अपने 'माई अकाउंट' डैशबोर्ड के 'डेंजर ज़ोन' से अपने खाते को स्थायी रूप से हटा सकते हैं, जिसमें सभी सहेजे गए पते और ऑर्डर इतिहास शामिल हैं।",
+      "privacy_contact_title": "गोपनीयता के संबंध में हमसे संपर्क करें",
+      "privacy_contact_p": "यदि इस गोपनीयता नीति या आपके डेटा को कैसे संभाला जाता है, इसके बारे में आपके कोई प्रश्न हैं, तो कृपया हमारी प्रशासनिक टीम से संपर्क करें"
     }
   },
   guj: {
@@ -363,7 +403,27 @@ const resources = {
       "ph_subject": "ઉદા. ઓર્ડર #10005 ડિલિવરી સમસ્યા",
       "ph_message": "આજે અમે તમારી કેવી રીતે મદદ કરી શકીએ?",
       "btn_sending": "મોકલી રહ્યું છે...",
-      "btn_send": "પૂછપરછ મોકલો"
+      "btn_send": "પૂછપરછ મોકલો",
+
+      // --- PRIVACY POLICY ---
+      "privacy_title": "ગોપનીયતા નીતિ",
+      "privacy_last_updated": "છેલ્લું અપડેટ: માર્ચ 2026",
+      "privacy_sec1_title": "1. અમે કઈ માહિતી એકત્રિત કરીએ છીએ",
+      "privacy_sec1_p": "સ્વીટકાર્ટ ખાતે, અમે તમારી ગોપનીયતાના રક્ષણ માટે પ્રતિબદ્ધ છીએ. જ્યારે તમે એકાઉન્ટ માટે નોંધણી કરો છો, ઓર્ડર આપો છો અથવા અમારી સપોર્ટ ટીમનો સંપર્ક કરો છો ત્યારે તમે અમને સીધી પ્રદાન કરો છો તે માહિતી અમે એકત્રિત કરીએ છીએ. આમાં તમારું પૂરું નામ, ઇમેઇલ સરનામું, મોબાઇલ ફોન નંબર અને ડિલિવરી સરનામાં શામેલ છે.",
+      "privacy_sec2_title": "2. અમે તમારા ડેટાનો ઉપયોગ કેવી રીતે કરીએ છીએ",
+      "privacy_sec2_p": "અમે એકત્રિત કરીએ છીએ તે માહિતીનો ઉપયોગ સખત રીતે નીચેના ઓપરેશનલ હેતુઓ માટે થાય છે:",
+      "privacy_sec2_li1": "તમારા ઓર્ડરને કાર્યક્ષમ રીતે પ્રક્રિયા કરવા અને પૂર્ણ કરવા માટે.",
+      "privacy_sec2_li2": "તમારા ઓર્ડરની સ્થિતિ અને ડિલિવરી અપડેટ્સ અંગે તમારી સાથે વાતચીત કરવા માટે.",
+      "privacy_sec2_li3": "ગ્રાહક સપોર્ટ પ્રદાન કરવા અને તમારી પૂછપરછનો જવાબ આપવા માટે.",
+      "privacy_sec2_li4": "અમારી વેબસાઇટની કાર્યક્ષમતા અને વપરાશકર્તા અનુભવને સુધારવા માટે.",
+      "privacy_sec3_title": "3. ડેટા સુરક્ષા અને એન્ક્રિપ્શન",
+      "privacy_sec3_p": "અમે તમારી વ્યક્તિગત માહિતીની સુરક્ષા જાળવવા માટે કડક એન્ટરપ્રાઇઝ-ગ્રેડ સુરક્ષા પગલાં અમલમાં મૂકીએ છીએ. અમારા સુરક્ષિત PostgreSQL ડેટાબેઝમાં સંગ્રહિત થતાં પહેલાં તમારા પાસવર્ડ્સને ઉદ્યોગ-માનક bcrypt અલ્ગોરિધમ્સનો ઉપયોગ કરીને ક્રિપ્ટોગ્રાફિકલી હેશ કરવામાં આવે છે. અમે સાદા-ટેક્સ્ટ પાસવર્ડ્સ સંગ્રહિત કરતા નથી.",
+      "privacy_sec4_title": "4. કૂકીઝ અને લોકલ સ્ટોરેજ",
+      "privacy_sec4_p": "અમારી એપ્લિકેશન તમારા સક્રિય શોપિંગ કાર્ટને જાળવવા અને તમને તમારા એકાઉન્ટમાં સુરક્ષિત રીતે લૉગ ઇન રાખવા માટે બ્રાઉઝર લોકલ સ્ટોરેજ અને સેશન સ્ટોરેજનો ઉપયોગ કરે છે. ઇ-કોમર્સ પ્લેટફોર્મને એકીકૃત રીતે ચલાવવા માટે આ આવશ્યક કાર્યાત્મક સાધનો છે.",
+      "privacy_sec5_title": "5. એકાઉન્ટ કાઢી નાખવું",
+      "privacy_sec5_p": "તમને કોઈપણ સમયે તમારો વ્યક્તિગત ડેટા કાઢી નાખવાની વિનંતી કરવાનો અધિકાર છે. તમે તમારા 'માય એકાઉન્ટ' ડેશબોર્ડની અંદર 'ડેન્જર ઝોન' માંથી સીધા જ તમારા એકાઉન્ટને કાયમ માટે કાઢી શકો છો, જેમાં તમામ સાચવેલા સરનામાં અને ઓર્ડર ઇતિહાસનો સમાવેશ થાય છે.",
+      "privacy_contact_title": "ગોપનીયતા સંબંધિત અમારો સંપર્ક કરો",
+      "privacy_contact_p": "જો તમને આ ગોપનીયતા નીતિ અથવા તમારો ડેટા કેવી રીતે હેન્ડલ કરવામાં આવે છે તે વિશે કોઈ પ્રશ્નો હોય, તો કૃપા કરીને અમારી વહીવટી ટીમનો સંપર્ક કરો"
     }
   }
 };
@@ -374,6 +434,10 @@ i18n
   .init({
     resources,
     fallbackLng: 'eng', 
+    detection: {
+      order: ['sessionStorage', 'navigator'], // 🚀 Auto-reset on browser close!
+      caches: ['sessionStorage'],             // 🚀 Only stores temporarily!
+    },
     interpolation: {
       escapeValue: false 
     }

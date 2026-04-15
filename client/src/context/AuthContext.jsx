@@ -1,4 +1,5 @@
 import React, { createContext, useState, useEffect } from 'react';
+import i18n from '../i18n'; // 🌍 IMPORT i18n HERE (Adjust path if needed, e.g., './i18n')
 
 export const AuthContext = createContext();
 
@@ -36,6 +37,9 @@ export const AuthProvider = ({ children }) => {
     // 2. Annihilate Local Storage
     localStorage.removeItem('user');
     localStorage.removeItem('token');
+
+    // 🌍 3. RESET LANGUAGE TO ENGLISH ON LOGOUT
+    i18n.changeLanguage('eng');
     
     // 🔥 THE GHOST BUSTER (NUCLEAR OPTION) 🔥
     // This forces the browser to completely dump the React memory tree.

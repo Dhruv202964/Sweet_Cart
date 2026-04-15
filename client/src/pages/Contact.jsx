@@ -34,12 +34,36 @@ const Contact = () => {
     e.preventDefault();
     setLoading(true);
 
-    setTimeout(() => {
+    try {
+      // 🚀 THE FIX: POINTING EXACTLY TO YOUR SERVER.JS ROUTE
+      const response = await fetch('http://localhost:5000/api/messages', { 
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          customer_name: formData.name, // Matches your DB schema
+          email: formData.email,
+          subject: formData.subject,
+          message: formData.message
+        }),
+      });
+
+      if (response.ok) {
+        setSuccess(true);
+        // Clear only the message and subject, keep name/email if logged in
+        setFormData({ ...formData, subject: '', message: '' }); 
+        
+        // Hide success message after 5 seconds
+        setTimeout(() => setSuccess(false), 5000);
+      } else {
+        console.error("Failed to submit inquiry.");
+      }
+    } catch (error) {
+      console.error("API Connection Error:", error);
+    } finally {
       setLoading(false);
-      setSuccess(true);
-      setFormData({ ...formData, subject: '', message: '' }); 
-      setTimeout(() => setSuccess(false), 5000);
-    }, 1000);
+    }
   };
 
   return (
