@@ -1,12 +1,15 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import toast from 'react-hot-toast'; // 🔥 1. IMPORT TOAST
+import toast from 'react-hot-toast';
+import { Eye, EyeOff, ShieldCheck } from 'lucide-react'; 
 
 const Login = () => {
   const [formData, setFormData] = useState({
     email: '',
     password: ''
   });
+  
+  const [showPassword, setShowPassword] = useState(false); 
   
   const navigate = useNavigate();
 
@@ -17,9 +20,8 @@ const Login = () => {
   const handleLogin = async (e) => {
     e.preventDefault();
     
-    // 🔥 2. Show a loading toast while waiting for the server
     const loadingToast = toast.loading('Authenticating...', {
-      style: { border: '2px solid #f59e0b' } // Amber border for loading
+      style: { border: '2px solid #f59e0b' }
     });
 
     try {
@@ -36,20 +38,17 @@ const Login = () => {
         const role = data.user?.role || 'admin'; 
         localStorage.setItem('role', role);
 
-        // 🔥 3. Kill the loading toast and show Success!
         toast.dismiss(loadingToast);
         toast.success(`Welcome back, ${role.toUpperCase()}! 🔓`, {
           duration: 3000,
-          style: { border: '2px solid #10b981' } // Green border for success
+          style: { border: '2px solid #10b981' }
         });
         
-        // 🔥 4. Wait 1.5 seconds so they can actually see the awesome animation before redirecting
         setTimeout(() => {
           window.location.href = "/dashboard";
         }, 1500);
 
       } else {
-        // 🔥 5. Show error toast instead of native alert
         toast.dismiss(loadingToast);
         toast.error(data.msg || "Login Failed. Check email/password.");
       }
@@ -58,6 +57,19 @@ const Login = () => {
       toast.dismiss(loadingToast);
       toast.error("Server Error. Is the backend running?");
     }
+  };
+
+  // 🔥 UPGRADED: Forced white background and crisp dark text
+  const handleSupportClick = () => {
+    toast("Locked out? Contact the Lead Dev for master credential resets.", {
+      icon: '🛡️',
+      style: { 
+        background: '#ffffff', 
+        color: '#1F2937',      
+        fontWeight: 'bold', 
+        border: '2px solid #991B1B' 
+      }
+    });
   };
 
   return (
@@ -88,15 +100,24 @@ const Login = () => {
 
           <div>
             <label className="block text-sm font-bold text-gray-700 mb-2 uppercase">Password</label>
-            <input 
-              type="password" 
-              name="password" 
-              value={formData.password} 
-              onChange={handleChange} 
-              className="w-full p-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-brand-red focus:border-transparent outline-none transition" 
-              placeholder="••••••••" 
-              required 
-            />
+            <div className="relative">
+              <input 
+                type={showPassword ? "text" : "password"} 
+                name="password" 
+                value={formData.password} 
+                onChange={handleChange} 
+                className="w-full p-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-brand-red focus:border-transparent outline-none transition pr-12" 
+                placeholder="••••••••" 
+                required 
+              />
+              <button 
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-brand-red transition-colors outline-none"
+              >
+                {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+              </button>
+            </div>
           </div>
 
           <button 
@@ -107,9 +128,19 @@ const Login = () => {
           </button>
         </form>
 
-        <div className="mt-6 text-center text-sm text-gray-400">
+        <div 
+          onClick={handleSupportClick}
+          className="mt-8 text-center text-xs text-gray-400 relative group cursor-pointer flex items-center justify-center gap-1.5 hover:text-gray-700 transition-colors"
+        >
+          <ShieldCheck size={14} className="group-hover:text-brand-red transition-colors" />
           <p>Protected by SweetCart Security Systems v2.0</p>
+          
+          {/* 🔥 UPGRADED: Larger text, higher position, z-index fixed! */}
+          <span className="absolute -top-12 z-10 bg-gray-800 text-white text-sm font-bold tracking-widest py-2 px-4 rounded-md shadow-xl opacity-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none whitespace-nowrap">
+            Engineered by Team 404 ERROR
+          </span>
         </div>
+
       </div>
     </div>
   );
