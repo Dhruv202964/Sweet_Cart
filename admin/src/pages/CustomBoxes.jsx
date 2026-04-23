@@ -77,7 +77,7 @@ const CustomBoxes = () => {
             <PackagePlus className="text-white" size={28} />
           </div>
           <div>
-            <h1 className="text-3xl font-black text-gray-900 tracking-tight">VIP Box Queue</h1>
+            <h1 className="text-3xl font-black text-gray-900 tracking-tight">Custome Box Queue</h1>
             <p className="text-gray-500 font-medium">Manage, track, and pack custom orders.</p>
           </div>
         </div>
