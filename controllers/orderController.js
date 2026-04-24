@@ -1,6 +1,6 @@
 const db = require('../config/db');
 
-// 1. Get All Orders (🚀 UPGRADED: Now EXCLUDES Custom VIP Boxes from the regular list)
+// 1. Get All Orders (🚀 UPGRADED: Now pulls audio_message for the Admin Badge!)
 exports.getAllOrders = async (req, res) => {
   try {
     const result = await db.query(`
@@ -8,6 +8,7 @@ exports.getAllOrders = async (req, res) => {
         o.order_id, o.total_amount, o.status, o.payment_status, o.created_at,
         o.customer_name, o.phone, o.flat_house, o.landmark, o.state, o.pincode, 
         o.delivery_area, o.delivery_city AS city, o.delivery_address, u.email,
+        o.audio_message, /* 🎙️ THIS POWERS THE VOICE GIFT BADGE IN ADMIN! */
         (SELECT COALESCE(SUM(quantity), 0) FROM order_items WHERE order_id = o.order_id) AS item_count
       FROM orders o
       LEFT JOIN users u ON o.customer_id = u.user_id
@@ -101,7 +102,7 @@ exports.updateOrderStatus = async (req, res) => {
   }
 };
 
-// 6. Get Specific Order Items (🚀 UPGRADED FOR VIP BOX & DYNAMIC WEIGHT)
+// 6. Get Specific Order Items
 exports.getOrderItems = async (req, res) => {
   try {
     const { id } = req.params;
@@ -126,7 +127,7 @@ exports.getOrderItems = async (req, res) => {
   }
 };
  
-// 7. SUPER-POWERED Track Order (🚀 UPGRADED WITH JSON_AGG FALLBACKS)
+// 7. Track Order
 exports.trackOrder = async (req, res) => {
   try {
     const { order_id, email } = req.query;
@@ -178,14 +179,15 @@ exports.trackOrder = async (req, res) => {
   }
 };
 
-// 8. Customer Checkout (🚀 UPGRADED FOR VIP BOX & STOCK SAFETY)
+// 8. Customer Checkout (🚀 UPGRADED: Handles the Audio String perfectly!)
 exports.placeOrder = async (req, res) => {
   const client = await db.connect(); 
   try {
     const { 
       customer_id, firstName, lastName, email, mobile, 
       address, area, landmark, state, city, pincode, 
-      cartItems, total_amount 
+      cartItems, total_amount,
+      audio_message // 🎙️ EXTRACTS AUDIO FROM FRONTEND
     } = req.body;
     
     await client.query('BEGIN');
@@ -193,24 +195,25 @@ exports.placeOrder = async (req, res) => {
     const customer_name = `${firstName} ${lastName}`;
     const full_address = `${address}, ${landmark}`;
 
+    // 🎙️ INSERTS AUDIO INTO DATABASE
     const orderResult = await client.query(`
       INSERT INTO orders (
         customer_id, customer_name, email, phone, 
         delivery_address, flat_house, landmark, delivery_area, delivery_city, state, pincode, 
-        total_amount, status, payment_status
+        total_amount, status, payment_status, audio_message
       ) 
-      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, 'Pending', 'Pending Payment') 
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, 'Pending', 'Pending Payment', $13) 
       RETURNING order_id
     `, [
       customer_id || null, customer_name, email, mobile, 
       full_address, address, landmark, area, city, state, pincode, 
-      total_amount
+      total_amount, audio_message || null // 🎙️ FALLBACK TO NULL IF NO AUDIO
     ]);
 
     const newOrderId = orderResult.rows[0].order_id;
 
     for (let item of cartItems) {
-      // 🚀 The 300 IQ Move: If it's a custom box (99999), save null so we don't break the database FK!
+      // If it's a custom box (99999), save null so we don't break the database FK!
       const p_id = item.product_id === 99999 ? null : item.product_id;
 
       await client.query(`
@@ -287,7 +290,7 @@ exports.checkPaymentStatus = async (req, res) => {
   }
 };
 
-// 11. 💰 ADMIN APPROVE PAYMENT
+// 11. ADMIN APPROVE PAYMENT
 exports.approvePayment = async (req, res) => {
   try {
     const { id } = req.params;
@@ -299,7 +302,7 @@ exports.approvePayment = async (req, res) => {
   }
 };
 
-// 12. 💣 GHOST ORDER DELETION (Triggered by Timer or Page Refresh)
+// 12. GHOST ORDER DELETION
 exports.cancelUnpaidOrder = async (req, res) => {
   const client = await db.connect();
   try {
@@ -320,7 +323,7 @@ exports.cancelUnpaidOrder = async (req, res) => {
   }
 };
 
-// 13. 📋 GET PENDING PAYMENT APPROVALS (🚀 UPGRADED WITH JSON_AGG FALLBACKS)
+// 13. GET PENDING PAYMENT APPROVALS
 exports.getPendingApprovals = async (req, res) => {
   try {
     const result = await db.query(`
@@ -349,7 +352,7 @@ exports.getPendingApprovals = async (req, res) => {
   }
 };
 
-// 14. 🎁 ADMIN: GET CUSTOM BOX PACKING QUEUE (🚀 FIXED: Hides Unpaid Orders!)
+// 14. ADMIN: GET CUSTOM BOX PACKING QUEUE
 exports.getCustomBoxOrders = async (req, res) => {
   try {
     const result = await db.query(`
@@ -366,5 +369,28 @@ exports.getCustomBoxOrders = async (req, res) => {
   } catch (err) {
     console.error("❌ CUSTOM BOX QUEUE ERROR:", err.message);
     res.status(500).json({ msg: "Server Error: Could not fetch custom boxes" });
+  }
+};
+
+// 15. PUBLIC 🎁 GET VOICE GIFT BY ORDER ID
+exports.getVoiceGift = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const result = await db.query(
+      "SELECT customer_name, audio_message FROM orders WHERE order_id = $1", 
+      [id]
+    );
+    
+    if (result.rows.length === 0 || !result.rows[0].audio_message) {
+      return res.status(404).json({ msg: "No voice gift found for this order." });
+    }
+    
+    res.json({ 
+      sender: result.rows[0].customer_name, 
+      audio: result.rows[0].audio_message 
+    });
+  } catch (err) {
+    console.error("❌ VOICE GIFT ERROR:", err.message);
+    res.status(500).json({ msg: "Server Error: Could not load voice gift." });
   }
 };

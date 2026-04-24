@@ -2,7 +2,7 @@ import React, { useState, useContext, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { CartContext } from '../context/CartContext';
 import { AuthContext } from '../context/AuthContext'; 
-import { CheckCircle, Save, Home as HomeIcon, Briefcase, MapPin, User, Mail, Phone, Map, Navigation, ShieldCheck, Package, Truck, Loader2 } from 'lucide-react';
+import { CheckCircle, Save, Home as HomeIcon, Briefcase, MapPin, User, Mail, Phone, Map, Navigation, ShieldCheck, Package, Truck, Loader2, Mic, Square, Trash2, Play, X } from 'lucide-react';
 
 const locationData = {
   "Gujarat": ["Surat", "Ahmedabad", "Vadodara", "Rajkot", "Gandhinagar"],
@@ -43,7 +43,6 @@ const Checkout = () => {
   const [selectedSavedAddressId, setSelectedSavedAddressId] = useState(null);
   const [saveAddress, setSaveAddress] = useState(false);
 
-  // 🚀 THE FIX: A flag to tell the shield we are intentionally emptying the cart to go to payment!
   const isOrderPlaced = useRef(false);
 
   const [formData, setFormData] = useState({
@@ -51,11 +50,15 @@ const Checkout = () => {
     address: '', area: '', landmark: '', city: '', pincode: ''
   });
 
+  // 🎙️ VOICE RECORDING STATES
+  const [audioData, setAudioData] = useState(null);
+  const [isRecording, setIsRecording] = useState(false);
+  const [showVoiceOption, setShowVoiceOption] = useState(false); // 🌟 NEW: TOGGLE STATE
+  const mediaRecorderRef = useRef(null);
+
   const cartTotal = cart.reduce((total, item) => total + (item.price * item.quantity), 0);
 
-  // 🛡️ THE ZERO-DOLLAR EXPLOIT SHIELD (Fixed!)
   useEffect(() => {
-    // Only kick them to the menu if the cart is empty AND they didn't just place an order
     if (cart.length === 0 && !isOrderPlaced.current) {
       navigate('/menu', { replace: true }); 
     }
@@ -120,6 +123,50 @@ const Checkout = () => {
     }));
   };
 
+  // 🎙️ START RECORDING FUNCTION
+  const startRecording = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const mediaRecorder = new MediaRecorder(stream);
+      mediaRecorderRef.current = mediaRecorder;
+      const audioChunks = [];
+
+      mediaRecorder.ondataavailable = (event) => {
+        audioChunks.push(event.data);
+      };
+
+      mediaRecorder.onstop = () => {
+        const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+        const reader = new FileReader();
+        reader.readAsDataURL(audioBlob);
+        reader.onloadend = () => {
+          setAudioData(reader.result); 
+        };
+      };
+
+      mediaRecorder.start();
+      setIsRecording(true);
+      
+      setTimeout(() => {
+        if (mediaRecorderRef.current && mediaRecorderRef.current.state === 'recording') {
+          mediaRecorderRef.current.stop();
+          setIsRecording(false);
+        }
+      }, 10000);
+    } catch (err) {
+      console.error("Mic access denied", err);
+      alert("Please allow microphone access to record a Voice Gift!");
+    }
+  };
+
+  // 🎙️ STOP RECORDING FUNCTION
+  const stopRecording = () => {
+    if (mediaRecorderRef.current && mediaRecorderRef.current.state === 'recording') {
+      mediaRecorderRef.current.stop();
+      setIsRecording(false);
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (cart.length === 0 || cartTotal <= 0) return;
@@ -139,6 +186,7 @@ const Checkout = () => {
         pincode: formData.pincode,
         total_amount: cartTotal,
         customer_id: isAuthenticated && user?.user_id ? user.user_id : null,
+        audio_message: audioData, 
         cartItems: cart.map(item => ({
           product_id: item.product_id,
           name: item.name,
@@ -183,10 +231,9 @@ const Checkout = () => {
             }
         }
 
-        // 🚀 THE FIX IN ACTION
-        isOrderPlaced.current = true; // Turn OFF the shield temporarily
-        clearCart(); // Empty the cart
-        navigate(`/payment/${orderData.order_id}`, { replace: true }); // Redirect to payment page!
+        isOrderPlaced.current = true; 
+        clearCart(); 
+        navigate(`/payment/${orderData.order_id}`, { replace: true }); 
         
       } else {
         const errorData = await res.json();
@@ -229,10 +276,8 @@ const Checkout = () => {
 
         <div className="flex flex-col lg:flex-row gap-10">
           
-          {/* Main Form Area */}
           <div className="lg:w-2/3">
             
-            {/* 🌟 PREMIUM QUICK-SELECT UI 🌟 */}
             {isAuthenticated && savedAddresses.length > 0 && (
                 <div className="mb-10 animate-in fade-in duration-500">
                     <p className="text-xs font-black text-amber-600 uppercase tracking-widest mb-4 flex items-center gap-2">
@@ -316,6 +361,66 @@ const Checkout = () => {
                   </div>
                 )}
               </div>
+
+              {/* 🌟 UNIQUE FEATURE: SLEEK AUDIO GIFT UI 🌟 */}
+              {!showVoiceOption ? (
+                <div 
+                  onClick={() => setShowVoiceOption(true)} 
+                  className="bg-white hover:bg-purple-50 p-5 rounded-3xl border-2 border-dashed border-purple-200 cursor-pointer flex items-center justify-between transition-all group shadow-sm"
+                >
+                  <div className="flex items-center gap-4">
+                    <div className="bg-purple-100 p-3 rounded-full group-hover:scale-110 group-hover:bg-purple-600 group-hover:text-white transition-all duration-300">
+                      <Mic size={24} className="text-purple-600 group-hover:text-white" />
+                    </div>
+                    <div>
+                      <p className="font-black text-gray-800 text-lg group-hover:text-purple-900 transition-colors">Add a Voice Gift Message</p>
+                      <p className="text-xs font-bold text-gray-500">We'll attach an Audio-QR to your Sweet Box (Free!)</p>
+                    </div>
+                  </div>
+                  <div className="text-purple-500 font-black bg-purple-100 px-4 py-2 rounded-xl group-hover:bg-purple-600 group-hover:text-white transition-all">
+                    + Add
+                  </div>
+                </div>
+              ) : (
+                <div className="bg-gradient-to-br from-purple-50 to-pink-50 p-8 md:p-10 rounded-[40px] shadow-lg shadow-purple-200/40 border border-purple-100 text-center relative overflow-hidden animate-in fade-in zoom-in-95 duration-300">
+                  <button 
+                    type="button" 
+                    onClick={() => { setShowVoiceOption(false); setAudioData(null); }} 
+                    className="absolute top-4 right-4 p-2 bg-white rounded-full text-gray-400 hover:text-red-500 hover:bg-red-50 transition-all shadow-sm"
+                  >
+                    <X size={20} />
+                  </button>
+                  <div className="absolute top-0 right-0 w-32 h-32 bg-purple-200 rounded-full blur-3xl opacity-50 -translate-y-10 translate-x-10"></div>
+                  <h2 className="text-2xl font-black text-purple-900 mb-2">🎁 Record Your Message</h2>
+                  <p className="text-sm font-bold text-purple-700/70 mb-6">Speak clearly! We'll generate a QR code for the box.</p>
+
+                  {!audioData ? (
+                    <div className="flex justify-center items-center gap-4">
+                      {!isRecording ? (
+                        <button type="button" onClick={startRecording} className="bg-purple-600 hover:bg-purple-700 text-white rounded-full p-5 shadow-xl shadow-purple-500/30 hover:scale-105 transition-all animate-pulse">
+                          <Mic size={28} />
+                        </button>
+                      ) : (
+                        <div className="flex items-center gap-4">
+                          <span className="text-red-500 font-black animate-pulse flex items-center gap-2">
+                            <span className="w-3 h-3 bg-red-500 rounded-full inline-block"></span> Recording...
+                          </span>
+                          <button type="button" onClick={stopRecording} className="bg-red-100 hover:bg-red-200 text-red-600 rounded-full p-4 transition-all">
+                            <Square size={24} />
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  ) : (
+                    <div className="flex justify-center items-center gap-4 bg-white p-4 rounded-3xl border-2 border-purple-100 shadow-sm w-fit mx-auto">
+                      <audio src={audioData} controls className="h-10 w-48 custom-audio-player" />
+                      <button type="button" onClick={() => setAudioData(null)} className="text-red-500 hover:bg-red-50 p-2 rounded-full transition-all">
+                        <Trash2 size={20} />
+                      </button>
+                    </div>
+                  )}
+                </div>
+              )}
 
               <button type="submit" disabled={submitting || cart.length === 0 || cartTotal <= 0} className="w-full py-6 mt-4 rounded-[24px] font-black text-white text-2xl bg-gradient-to-r from-amber-500 to-orange-500 hover:from-orange-500 hover:to-amber-500 transition-all duration-300 shadow-2xl shadow-orange-500/30 hover:-translate-y-2 disabled:opacity-70 disabled:hover:translate-y-0 flex items-center justify-center gap-3">
                 { submitting ? <><Loader2 className="animate-spin"/> Processing...</> : `Pay ₹${cartTotal.toFixed(2)} Securely 🚀` }

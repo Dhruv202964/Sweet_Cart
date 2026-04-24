@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { XCircle, Clock, Smartphone, User, ShoppingBag, Loader2, CheckCircle, Timer, ShieldAlert, Zap } from 'lucide-react';
 import toast from 'react-hot-toast';
 
-// ⏱️ THE LIVE COUNTDOWN ENGINE (Exactly like your screenshot)
+// ⏱️ THE LIVE COUNTDOWN ENGINE
 const LiveTimer = ({ createdAt }) => {
   const [timeLeft, setTimeLeft] = useState(0);
 
@@ -47,8 +47,11 @@ const PaymentApprovals = () => {
   const [approvals, setApprovals] = useState([]);
   const [loading, setLoading] = useState(true);
   
-  // 🚀 NEW: State to track which card is currently expanded to show items!
+  // 🚀 EXPAND STATE
   const [expandedId, setExpandedId] = useState(null);
+  
+  // 🛑 NEW: BEAUTIFUL CUSTOM MODAL STATE
+  const [orderToReject, setOrderToReject] = useState(null);
 
   const fetchApprovals = async () => {
     try {
@@ -79,18 +82,23 @@ const PaymentApprovals = () => {
     } catch (err) { toast.error("Approval failed."); }
   };
 
-  const handleReject = async (id) => {
-    if(!window.confirm(`Are you sure you want to decline Order #${id}?`)) return;
+  // 🚀 NEW: THE ACTUAL REJECT FUNCTION CALLED BY THE MODAL
+  const executeReject = async () => {
+    if (!orderToReject) return;
+    
     try {
-      const res = await fetch(`http://localhost:5000/api/orders/${id}/cancel-unpaid`, { method: 'POST' });
+      const res = await fetch(`http://localhost:5000/api/orders/${orderToReject}/cancel-unpaid`, { method: 'POST' });
       if (res.ok) {
-        setApprovals(approvals.filter(a => a.order_id !== id));
-        toast.error(`Order #${id} Rejected & Cancelled. ❌`);
+        setApprovals(approvals.filter(a => a.order_id !== orderToReject));
+        toast.error(`Order #${orderToReject} Rejected & Cancelled. ❌`);
       }
-    } catch (err) { toast.error("Rejection failed."); }
+    } catch (err) { 
+      toast.error("Rejection failed."); 
+    } finally {
+      setOrderToReject(null); // Close modal
+    }
   };
 
-  // Toggle the expanded state when a card is clicked
   const toggleExpand = (id) => {
     setExpandedId(prevId => prevId === id ? null : id);
   };
@@ -98,9 +106,8 @@ const PaymentApprovals = () => {
   if (loading) return <div className="p-8 flex justify-center mt-20"><Loader2 className="animate-spin text-amber-500 w-12 h-12" /></div>;
 
   return (
-    <div className="p-4 sm:p-8 max-w-7xl mx-auto font-sans bg-[#FDFCFB] min-h-screen">
+    <div className="p-4 sm:p-8 max-w-7xl mx-auto font-sans bg-[#FDFCFB] min-h-screen relative">
       
-      {/* 🌟 EXACT HEADER FROM YOUR SCREENSHOT */}
       <div className="mb-10">
         <h1 className="text-3xl md:text-4xl font-black text-[#0B132B] tracking-tight flex items-center gap-2 mb-2">
           <Zap className="text-amber-500 fill-amber-500" size={32} /> Verify Payments
@@ -132,8 +139,6 @@ const PaymentApprovals = () => {
                 onClick={() => toggleExpand(order.order_id)}
                 className="bg-white rounded-[28px] shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100 overflow-hidden relative transition-all hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] flex flex-col cursor-pointer"
               >
-                
-                {/* 👤 COMPACT TOP INFO (Exactly like your screenshot) */}
                 <div className="p-7 pb-5">
                   <div className="flex items-center gap-4 mb-6">
                     <div className="w-14 h-14 bg-slate-50 border border-slate-200 rounded-[1rem] flex items-center justify-center shadow-sm shrink-0">
@@ -155,7 +160,6 @@ const PaymentApprovals = () => {
                   </div>
                 </div>
 
-                {/* 🛒 EXPANDABLE MANIFEST (Hidden by default, shows on click!) */}
                 {isExpanded && (
                   <div className="bg-[#F8FAFC] border-t border-b border-slate-100 p-6 animate-in slide-in-from-top-2 duration-300">
                     <div className="flex justify-between items-center mb-4">
@@ -178,16 +182,16 @@ const PaymentApprovals = () => {
                   </div>
                 )}
 
-                {/* ⚡ ACTION FOOTER (Always visible!) */}
                 <div 
                   className="p-6 pt-4 bg-white"
-                  onClick={(e) => e.stopPropagation()} // Prevents clicking buttons from expanding/collapsing the card
+                  onClick={(e) => e.stopPropagation()} 
                 >
                   <LiveTimer createdAt={order.created_at} />
 
                   <div className="flex gap-4">
+                    {/* 🛑 NEW: OPENS THE CUSTOM MODAL INSTEAD OF BROWSER POPUP */}
                     <button 
-                      onClick={() => handleReject(order.order_id)}
+                      onClick={() => setOrderToReject(order.order_id)}
                       className="flex-1 py-3.5 bg-white text-rose-500 font-black tracking-widest uppercase text-xs rounded-xl flex justify-center items-center gap-2 transition-all border-2 border-rose-100 hover:bg-rose-50 hover:border-rose-200"
                     >
                       Decline
@@ -206,6 +210,39 @@ const PaymentApprovals = () => {
           })}
         </div>
       )}
+
+      {/* 🛑 BEAUTIFUL CUSTOM REJECT MODAL */}
+      {orderToReject && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-200 p-4">
+          <div className="bg-white rounded-[2rem] shadow-2xl w-full max-w-sm overflow-hidden animate-in zoom-in-95 duration-300 border border-slate-100">
+            <div className="p-8 text-center">
+              <div className="mx-auto flex items-center justify-center h-20 w-20 rounded-full bg-rose-50 mb-6 shadow-inner">
+                <XCircle size={40} className="text-rose-500 animate-pulse" />
+              </div>
+              <h3 className="text-2xl font-black text-[#0B132B] mb-2 tracking-tight">Decline Order #{orderToReject}?</h3>
+              <p className="text-sm text-slate-500 mb-8 font-medium leading-relaxed">
+                Are you absolutely sure? This will permanently cancel the transaction and the customer will need to order again.
+              </p>
+              
+              <div className="flex gap-3 w-full">
+                <button 
+                  onClick={() => setOrderToReject(null)}
+                  className="flex-1 px-4 py-3.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-black tracking-widest uppercase text-xs rounded-xl transition-all"
+                >
+                  Go Back
+                </button>
+                <button 
+                  onClick={executeReject}
+                  className="flex-[1.5] px-4 py-3.5 bg-rose-500 hover:bg-rose-600 text-white font-black tracking-widest uppercase text-xs rounded-xl shadow-lg shadow-rose-500/30 transition-all flex justify-center items-center gap-2"
+                >
+                  Yes, Decline
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 };

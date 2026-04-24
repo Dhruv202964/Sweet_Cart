@@ -1,7 +1,7 @@
 -- ############################################################
 -- # SWEET_CART DATABASE SCHEMA - LOCAL POSTGRESQL ENVIRONMENT
 -- # Team: 404 ERROR 
--- # Updated: April 2026 (Day 30: Final System Connections & Analytics)
+-- # Updated: April 2026 (Day 32: Hardware Integration & Audio-QR)
 -- ############################################################
 
 -- 0. SYSTEM LOCALIZATION
@@ -79,6 +79,7 @@ CREATE TABLE orders (
     delivery_city VARCHAR(100) DEFAULT 'Surat', 
     state VARCHAR(100) DEFAULT 'Gujarat', 
     pincode VARCHAR(20),        
+    audio_message TEXT,         -- 🎙️ NEW: Stores the Base64 audio string for the VIP QR Voice Gift
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -92,9 +93,9 @@ CREATE TABLE order_items (
     product_id INT REFERENCES products(product_id) ON DELETE CASCADE,
     quantity INT NOT NULL,
     price_at_time DECIMAL(10, 2) NOT NULL,
-    weight_selected VARCHAR(20) DEFAULT '1KG',     -- ✨ NEW: Captures 250G/500G/1KG selection
-    is_custom_box BOOLEAN DEFAULT FALSE,           -- ✨ NEW: Flags if this item is a VIP custom gift box
-    custom_box_selections TEXT                     -- ✨ NEW: Stores the exact packing list for the kitchen
+    weight_selected VARCHAR(20) DEFAULT '1KG',     -- ✨ Captures 250G/500G/1KG selection
+    is_custom_box BOOLEAN DEFAULT FALSE,           -- ✨ Flags if this item is a VIP custom gift box
+    custom_box_selections TEXT                     -- ✨ Stores the exact packing list for the kitchen
 );
 
 -- 6. CONTACT MESSAGES TABLE (CRM Inbox Integration)
@@ -107,7 +108,7 @@ CREATE TABLE contact_messages (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- 7. HERO SLIDERS TABLE (🖼️ NEW: Dynamic Storefront CMS)
+-- 7. HERO SLIDERS TABLE (🖼️ Dynamic Storefront CMS)
 CREATE TABLE hero_sliders (
     id SERIAL PRIMARY KEY,
     title VARCHAR(255),
@@ -119,7 +120,7 @@ CREATE TABLE hero_sliders (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- 8. DAILY STATS TABLE (📈 NEW: The Analytics Engine)
+-- 8. DAILY STATS TABLE (📈 The Analytics Engine)
 -- Captures daily unique visitors to populate the Admin Dashboard
 CREATE TABLE daily_stats (
     stat_date DATE PRIMARY KEY,

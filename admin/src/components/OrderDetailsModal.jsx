@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { X, MapPin, Phone, Mail, User } from 'lucide-react';
+import { X, MapPin, Phone, Mail, User, Mic } from 'lucide-react';
+import { QRCodeSVG } from 'qrcode.react'; 
 
 const OrderDetailsModal = ({ order, onClose }) => {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [showQR, setShowQR] = useState(false); // 🌟 NEW: HIDDEN QR STATE
 
   useEffect(() => {
     fetch(`http://localhost:5000/api/orders/${order.order_id}`)
@@ -20,11 +22,10 @@ const OrderDetailsModal = ({ order, onClose }) => {
 
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-      {/* 🌟 FIX 1: Added max-h-[90vh] and flex-col to the main modal container */}
       <div className="bg-white w-full max-w-2xl max-h-[90vh] flex flex-col rounded-2xl shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-200">
         
         {/* Header - Fixed at Top */}
-        <div className="flex justify-between items-center p-6 border-b border-gray-100 bg-gray-50 flex-shrink-0">
+        <div className="flex justify-between items-center p-6 border-b border-gray-100 bg-gray-50 flex-shrink-0 print:hidden">
           <div className="flex items-center gap-3">
             <span className="text-2xl">🧾</span>
             <h2 className="text-2xl font-bold text-brand-red">Order #{order.order_id}</h2>
@@ -34,7 +35,6 @@ const OrderDetailsModal = ({ order, onClose }) => {
           </button>
         </div>
 
-        {/* 🌟 FIX 2: Wrapped the Content Area in an overflow-y-auto div */}
         <div className="overflow-y-auto flex-1 custom-scrollbar">
           
           {/* 🚚 SUPER DETAILED CUSTOMER & SHIPPING INFO */}
@@ -71,6 +71,48 @@ const OrderDetailsModal = ({ order, onClose }) => {
               </div>
             </div>
           </div>
+
+          {/* 🌟 UNIQUE FEATURE: THE HIDDEN ADMIN QR GENERATOR */}
+          {order.audio_message && (
+            <div className="m-6 bg-purple-50 p-5 rounded-2xl border border-purple-100 flex flex-col sm:flex-row items-center justify-between shadow-sm gap-4">
+              <div className="flex items-center gap-3">
+                <div className="bg-purple-200 p-3 rounded-full">
+                  <Mic size={24} className="text-purple-700" />
+                </div>
+                <div>
+                  <h3 className="font-black text-purple-900 text-lg leading-tight">Voice Gift Attached</h3>
+                  <p className="text-xs font-bold text-purple-700/80 print:hidden">Customer recorded a custom audio message.</p>
+                </div>
+              </div>
+              
+              {!showQR ? (
+                <button 
+                  onClick={() => setShowQR(true)} 
+                  className="px-5 py-2.5 bg-purple-600 hover:bg-purple-700 text-white rounded-xl font-black text-sm transition-all shadow-lg shadow-purple-500/30 whitespace-nowrap"
+                >
+                  Generate QR Label
+                </button>
+              ) : (
+                <div className="flex items-center gap-4 bg-white p-2 rounded-2xl shadow-inner border border-purple-100">
+                  <div className="bg-white p-2 rounded-xl shadow-sm border-2 border-dashed border-purple-200 print:border-none print:shadow-none">
+                    <QRCodeSVG 
+                      value={`http://localhost:3000/gift/${order.order_id}`} 
+                      size={80} 
+                      level="H" 
+                      fgColor="#581c87" 
+                    />
+                  </div>
+                  <button 
+                    onClick={() => window.print()} 
+                    className="px-4 py-2 bg-gray-900 hover:bg-black text-white rounded-xl font-black text-xs transition-all shadow-md print:hidden flex flex-col items-center"
+                  >
+                    <span>🖨️ Print</span>
+                    <span>Label</span>
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
 
           {/* Items Table */}
           <div className="p-6">
@@ -112,10 +154,10 @@ const OrderDetailsModal = ({ order, onClose }) => {
             )}
           </div>
 
-        </div> {/* 🌟 End of Scrollable Area */}
+        </div> 
 
         {/* Footer & Totals - Fixed at Bottom */}
-        <div className="p-6 bg-gray-50 flex justify-between items-end border-t border-gray-100 flex-shrink-0">
+        <div className="p-6 bg-gray-50 flex justify-between items-end border-t border-gray-100 flex-shrink-0 print:hidden">
           <div>
             <span className="text-xs font-bold text-gray-400 uppercase tracking-wider mr-3">Status</span>
             <span className={`px-4 py-2 rounded-xl text-sm font-bold uppercase tracking-wider

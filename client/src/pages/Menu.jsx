@@ -2,21 +2,17 @@ import React, { useState, useEffect, useContext } from 'react';
 import { Star, Plus } from 'lucide-react';
 import { Link } from 'react-router-dom'; 
 import { CartContext } from '../context/CartContext';
-// 🌍 NEW: IMPORTING TRANSLATION ENGINE
 import { useTranslation } from 'react-i18next';
 
-// 🚀 EXTRACTED CARD COMPONENT
 const MenuProductCard = ({ product, category }) => {
   const { cart, addToCart, decreaseQuantity } = useContext(CartContext);
   const [selectedWeight, setSelectedWeight] = useState('1KG');
-  const { t } = useTranslation(); // 🌍 INIT TRANSLATION FOR CARD
+  const { t } = useTranslation();
 
-  // 🚀 THE PRICING MATH LOGIC
   const isKg = product.unit?.toLowerCase() === 'kg';
   const weightMultiplier = selectedWeight === '250G' ? 0.25 : selectedWeight === '500G' ? 0.5 : 1;
   const displayPrice = isKg ? (parseFloat(product.price) * weightMultiplier) : parseFloat(product.price);
 
-  // 🚀 CART SYNC LOGIC
   const uniqueCartId = isKg ? `${product.product_id}_${selectedWeight}` : `${product.product_id}_default`;
   const cartItem = cart.find(c => c.cartItemId ? c.cartItemId === uniqueCartId : c.product_id === product.product_id);
 
@@ -50,7 +46,6 @@ const MenuProductCard = ({ product, category }) => {
           </Link>
           <div className="flex items-center bg-amber-100 px-2 py-1 rounded text-amber-700 text-xs font-bold shrink-0"><Star size={12} className="mr-1 fill-amber-500 text-amber-500" /> 4.8</div>
         </div>
-        {/* Dynamic description stays as is, fallback gets translated */}
         <p className="text-sm text-gray-500 mb-6 line-clamp-2">{product.description || t('default_product_desc', 'Fresh and authentic quality, made with premium ingredients.')}</p>
         
         <div className="flex items-end justify-between mt-auto pt-4 border-t border-amber-50">
@@ -59,7 +54,6 @@ const MenuProductCard = ({ product, category }) => {
             <div className="flex items-baseline">
               <span className="text-2xl font-black text-gray-900">₹{displayPrice.toFixed(2)}</span>
               
-              {/* 🚀 DYNAMIC DROPDOWN */}
               {isKg ? (
                 <select 
                   value={selectedWeight} 
@@ -76,17 +70,19 @@ const MenuProductCard = ({ product, category }) => {
             </div>
           </div>
 
+          {/* 🌟 UNBREAKABLE QUANTITY BUTTONS FOR MENU.JSX 🌟 */}
           {cartItem ? (
-            <div className="flex items-center bg-amber-100 rounded-2xl border border-amber-200 overflow-hidden shadow-sm">
-              <button onClick={handleDecrease} className="px-4 py-2.5 text-amber-700 hover:bg-amber-200 hover:text-red-700 transition-colors font-black text-xl leading-none">-</button>
-              <span className="px-2 py-2.5 text-amber-900 font-bold min-w-[28px] text-center text-base">{cartItem.quantity}</span>
-              <button onClick={handleAddToCart} className="px-4 py-2.5 text-amber-700 hover:bg-amber-200 hover:text-green-700 transition-colors font-black text-xl leading-none">+</button>
+            <div className="flex items-center bg-amber-100 rounded-2xl border border-amber-200 overflow-hidden shadow-sm h-12">
+              <button onClick={handleDecrease} className="w-12 h-full flex items-center justify-center text-amber-700 hover:bg-amber-200 hover:text-red-700 transition-colors font-black text-2xl">-</button>
+              <span className="w-8 text-center text-amber-900 font-bold text-base">{cartItem.quantity}</span>
+              <button onClick={handleAddToCart} className="w-12 h-full flex items-center justify-center text-amber-700 hover:bg-amber-200 hover:text-green-700 transition-colors font-black text-2xl">+</button>
             </div>
           ) : (
-            <button onClick={handleAddToCart} className="bg-amber-100 hover:bg-amber-500 text-amber-700 hover:text-white p-3 rounded-2xl transition-all group-hover:shadow-md">
+            <button onClick={handleAddToCart} className="bg-amber-100 hover:bg-amber-500 text-amber-700 hover:text-white w-12 h-12 flex items-center justify-center rounded-2xl transition-all group-hover:shadow-md">
               <Plus size={20} strokeWidth={3} />
             </button>
           )}
+
         </div>
       </div>
     </div>
@@ -99,7 +95,7 @@ const Menu = () => {
   const [loading, setLoading] = useState(true);
   
   const { searchQuery } = useContext(CartContext);
-  const { t } = useTranslation(); // 🌍 INIT TRANSLATION FOR MENU
+  const { t } = useTranslation();
 
   useEffect(() => {
     fetch('http://localhost:5000/api/products')

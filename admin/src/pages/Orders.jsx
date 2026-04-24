@@ -111,13 +111,12 @@ const Orders = () => {
     }
   };
 
-  // 🚀 FIX: THE NEW COLOR THEMES FOR BADGES!
   const getStatusBadge = (status) => {
     switch (status) {
       case 'Delivered': return 'bg-green-100 text-green-700 border-green-200 shadow-sm';
       case 'Out for Delivery': return 'bg-blue-100 text-blue-700 border-blue-200 shadow-sm';
-      case 'Packed': return 'bg-purple-100 text-purple-700 border-purple-300 shadow-sm'; // ✨ NEW PURPLE!
-      case 'Pending': return 'bg-orange-100 text-orange-700 border-orange-300 shadow-sm'; // ✨ NEW ORANGE!
+      case 'Packed': return 'bg-purple-100 text-purple-700 border-purple-300 shadow-sm'; 
+      case 'Pending': return 'bg-orange-100 text-orange-700 border-orange-300 shadow-sm'; 
       case 'Cancelled by User': return 'bg-red-50 text-red-800 border-red-300 font-black shadow-sm';
       case 'Cancelled': 
       case 'Cancelled by Admin': return 'bg-red-100 text-red-900 border-red-400 font-black shadow-sm';
@@ -295,10 +294,20 @@ const Orders = () => {
               filteredOrders.map((order) => (
                 <tr key={order.order_id} className="hover:bg-red-50 transition">
                   <td className="p-5 font-bold text-gray-400">#{order.order_id}</td>
+                  
+                  {/* 🌟 UNIQUE FEATURE LOGIC: VOICE GIFT BADGE */}
                   <td className="p-5">
-                    <p className="font-bold text-gray-800">{order.customer_name || "Guest User"}</p>
-                    <p className="text-xs text-gray-500">{order.item_count || 1} Items</p>
+                    <div className="flex items-center gap-2">
+                      <p className="font-bold text-gray-800">{order.customer_name || "Guest User"}</p>
+                      {order.audio_message && (
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-black bg-purple-100 text-purple-800 border border-purple-200 shadow-sm animate-pulse">
+                          🎤 Voice Gift
+                        </span>
+                      )}
+                    </div>
+                    <p className="text-xs text-gray-500 mt-1">{order.item_count || 1} Items</p>
                   </td>
+                  
                   <td className="p-5">
                     <span className={`px-2 py-1 rounded-lg text-xs font-bold uppercase tracking-wider 
                       ${(order.city || 'Surat').toLowerCase() === 'surat' ? 'bg-green-100 text-green-700 border border-green-200' : 'bg-indigo-100 text-indigo-700 border border-indigo-200'}`}>

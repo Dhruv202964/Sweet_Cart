@@ -337,7 +337,7 @@ Performance Optimization: Restricted the setInterval auto-slider component exclu
 
 Database Expansion: Executed ALTER TABLE commands in Neon to add ingredients (TEXT) and gallery_images (TEXT ARRAY) to support rich product galleries.
 
-Dynamic Routing: Configured <Route path="/product/:id"> and wrapped Home and Menu product cards in React Router <Link> components for seamless navigation.
+Dynamic Routing: Configured  and wrapped Home and Menu product cards in React Router  components for seamless navigation.
 
 Premium Product UI: Engineered ProductDetails.jsx with a split-screen layout, manual image carousel (left/right chevrons), cart integration, and dynamic ingredient rendering.
 
@@ -449,13 +449,13 @@ Footer Aesthetic Restoration: Reverted an accidental styling overwrite, meticulo
 
 ⚙️ Technical Implementation
 
-Multi-Branch Map Switcher: Engineered a complex React State toggle within About.jsx allowing users to seamlessly switch between the "Rustampura Main Hub" and "Adajan Branch". The UI dynamically swaps shop details, operating hours, and live Google Maps <iframe> embeds without reloading the DOM.
+Multi-Branch Map Switcher: Engineered a complex React State toggle within About.jsx allowing users to seamlessly switch between the "Rustampura Main Hub" and "Adajan Branch". The UI dynamically swaps shop details, operating hours, and live Google Maps  embeds without reloading the DOM.
 
 Animated Secret Team Roster: Built Team.jsx utilizing Tailwind's animate-in utilities to create a "sliding dossier" reveal system. Obfuscated real developer names/DB technologies for security, and integrated a hidden "4th Member AI Co-Pilot" easter egg.
 
 Enterprise Legal & Support: Deployed a production-ready PrivacyPolicy.jsx outlining data security (bcrypt hashing, JWTs) and built Contact.jsx featuring a simulated, state-driven inquiry submission form.
 
-Global Link Wiring: Fully integrated react-router-dom <Link> components across the global Footer.jsx, ensuring fluid, SPA-style navigation to all newly created enterprise pages.
+Global Link Wiring: Fully integrated react-router-dom  components across the global Footer.jsx, ensuring fluid, SPA-style navigation to all newly created enterprise pages.
 
 ✅ Milestones
 
@@ -690,21 +690,21 @@ Date: 2026-04-14 | Status: Complete | Phase: VIP Gifting & Exploit Resolution
 
 🛠️ Critical Fixes
 
-Zero-Dollar Ghost Cart Exploit: Patched a critical routing flaw where users could manipulate browser history to submit ₹0 carts. Engineered a dynamic React Router interceptor using `replace: true` and `useRef` shielding to wipe empty checkout attempts from session history.
+Zero-Dollar Ghost Cart Exploit: Patched a critical routing flaw where users could manipulate browser history to submit ₹0 carts. Engineered a dynamic React Router interceptor using replace: true and useRef shielding to wipe empty checkout attempts from session history.
 
-Checkout UI Re-render Glitch: Resolved the "1-word typing" bug by lifting the `SleekInput` component out of the main render cycle, permanently preventing input fields from losing focus.
+Checkout UI Re-render Glitch: Resolved the "1-word typing" bug by lifting the SleekInput component out of the main render cycle, permanently preventing input fields from losing focus.
 
-Database Null Constraints: Eliminated backend crashes during custom box submission by executing exact SQL `ALTER TABLE` commands, injecting `weight_selected`, `is_custom_box`, and `custom_box_selections` columns into PostgreSQL.
+Database Null Constraints: Eliminated backend crashes during custom box submission by executing exact SQL ALTER TABLE commands, injecting weight_selected, is_custom_box, and custom_box_selections columns into PostgreSQL.
 
 Corrupted Data Crash Protection: Designed a UI safety net inside the Admin panel to intercept legacy "undefined undefined" data and empty packing lists, preventing fatal application crashes when expanding corrupted legacy orders.
 
 ⚙️ Technical Implementation
 
-Dynamic VIP Box Engine: Engineered `MakeYourOwnBox.jsx` allowing users to construct up to 5 individual sections with independent weight allocations (e.g., 250G, 500G). Integrated a live mathematics engine to strictly enforce a 5KG global box limit alongside custom glassmorphism warning modals to replace native browser alerts.
+Dynamic VIP Box Engine: Engineered MakeYourOwnBox.jsx allowing users to construct up to 5 individual sections with independent weight allocations (e.g., 250G, 500G). Integrated a live mathematics engine to strictly enforce a 5KG global box limit alongside custom glassmorphism warning modals to replace native browser alerts.
 
-Fintech Payment Gateway Overhaul: Completely redesigned `Payment.jsx` polling UI. Replaced developer-facing "ghost order" terminology with polished, consumer-facing "Session Timeout" and explicit "Declined by Store" (Admin Rejection) screens to enhance user trust and transparency.
+Fintech Payment Gateway Overhaul: Completely redesigned Payment.jsx polling UI. Replaced developer-facing "ghost order" terminology with polished, consumer-facing "Session Timeout" and explicit "Declined by Store" (Admin Rejection) screens to enhance user trust and transparency.
 
-Admin Packing Hub: Upgraded `CustomBoxes.jsx` utilizing a bulletproof 12-column CSS grid to optimize visual space on widescreen monitors. Designed an expandable, receipt-style "Official Packing Slip" UI and implemented strict state logic to lock dropdowns for Delivered and Cancelled orders.
+Admin Packing Hub: Upgraded CustomBoxes.jsx utilizing a bulletproof 12-column CSS grid to optimize visual space on widescreen monitors. Designed an expandable, receipt-style "Official Packing Slip" UI and implemented strict state logic to lock dropdowns for Delivered and Cancelled orders.
 
 ✅ Milestones
 
@@ -756,7 +756,7 @@ Global Dictionary Expansion: Meticulously translated and injected massive JSON b
 
 Surgical Hook Injection: Deployed the useTranslation hook across Home.jsx, Menu.jsx, ProductDetails.jsx, AboutUs.jsx, and ContactUs.jsx. Wrapped all hardcoded English strings in t('key', 'Fallback') functions to ensure instant, seamless switching.
 
-Premium Language Dropdown: Deprecated the outdated, native HTML <select> tag in the Navbar. Engineered a custom, floating, glassmorphism dropdown UI utilizing Tailwind animate-in utilities, lucide-react Globe icons, and an useRef outside-click detector for a flawless mobile and desktop experience.
+Premium Language Dropdown: Deprecated the outdated, native HTML  tag in the Navbar. Engineered a custom, floating, glassmorphism dropdown UI utilizing Tailwind animate-in utilities, lucide-react Globe icons, and an useRef outside-click detector for a flawless mobile and desktop experience.
 
 ✅ Milestones
 
@@ -771,19 +771,19 @@ Date: 2026-04-15 | Status: Complete | Phase: Final System Connections & UX Polis
 
 🛠️ Critical Fixes
 
-API Disconnect: Discovered and patched a frontend UI blindspot where the `Contact.jsx` component was using a fake `setTimeout` function. Rewired the `fetch` call to successfully hit the real `POST /api/messages` endpoint, ensuring customer inquiries properly save to the PostgreSQL `contact_messages` table and appear in the Admin Inbox.
+API Disconnect: Discovered and patched a frontend UI blindspot where the Contact.jsx component was using a fake setTimeout function. Rewired the fetch call to successfully hit the real POST /api/messages endpoint, ensuring customer inquiries properly save to the PostgreSQL contact_messages table and appear in the Admin Inbox.
 
-Admin Chart Rendering: Bypassed aggressive Chart.js canvas caching and overlapping text bugs. Engineered a multi-line array splitting function in `SalesChart.jsx` that elegantly stacks long area names (e.g., "SINGANPOR ROAD, KATARGAM") vertically along the X-axis while preserving the full string for hover tooltips.
+Admin Chart Rendering: Bypassed aggressive Chart.js canvas caching and overlapping text bugs. Engineered a multi-line array splitting function in SalesChart.jsx that elegantly stacks long area names (e.g., "SINGANPOR ROAD, KATARGAM") vertically along the X-axis while preserving the full string for hover tooltips.
 
 ⚙️ Technical Implementation
 
-Gradient UX Masking: Injected a CSS `bg-gradient-to-t` overlay onto the homepage `<HeroSlider />` component in `Home.jsx`, creating a seamless, premium melt effect from the slider imagery into the primary `#FFFDF8` background color.
+Gradient UX Masking: Injected a CSS bg-gradient-to-t overlay onto the homepage <HeroSlider /> component in Home.jsx, creating a seamless, premium melt effect from the slider imagery into the primary #FFFDF8 background color.
 
-Session-Bound i18n Translation: Overhauled the `i18next` initialization in `i18n.js` to strictly enforce `sessionStorage` detection. The platform now intelligently auto-resets the site language to English whenever the browser tab is closed.
+Session-Bound i18n Translation: Overhauled the i18next initialization in i18n.js to strictly enforce sessionStorage detection. The platform now intelligently auto-resets the site language to English whenever the browser tab is closed.
 
-Authentication Language Wiping: Upgraded the `logout` function within `AuthContext.jsx` to forcefully trigger `i18n.changeLanguage('eng')`, preventing subsequent users on the same device from inheriting the previous user's language settings.
+Authentication Language Wiping: Upgraded the logout function within AuthContext.jsx to forcefully trigger i18n.changeLanguage('eng'), preventing subsequent users on the same device from inheriting the previous user's language settings.
 
-Legal Localization Expansion: Surgically injected `useTranslation` hooks into `PrivacyPolicy.jsx` and injected comprehensive legal translations (English, Hindi, Gujarati) into the global dictionary.
+Legal Localization Expansion: Surgically injected useTranslation hooks into PrivacyPolicy.jsx and injected comprehensive legal translations (English, Hindi, Gujarati) into the global dictionary.
 
 ✅ Milestones
 
@@ -815,3 +815,30 @@ The "Team 404" Easter Egg: Constructed an interactive, multi-layered security fo
 Admin Login UI now matches top-tier commercial security standards.
 
 Developer attribution (Team 404 ERROR) is permanently and elegantly integrated into the master panel.
+
+Day 32: Hardware Integration & Audio-QR Ecosystem (Mission B)
+Date: 2026-04-24 | Status: Complete | Phase: Hardware Integration & Gifting
+
+🎯 Objective Engineer a seamless Audio-QR gifting ecosystem utilizing the Web Speech API to capture, encode, and playback Base64 audio via a cinematic, retro cassette tape UI.
+
+🛠️ Critical Fixes
+
+Window Confirm Deprecation: Eradicated the native 2005-style window.confirm popup in PaymentApprovals.jsx. Engineered a custom, Tailwind-animated danger modal with screen-blur to safely execute irreversible order rejection sequences.
+
+Express Routing Hierarchy: Fixed a fatal backend 404 Not Found error by strictly enforcing route order, moving the public router.get('/gift/:id') endpoint safely above the dynamic router.get('/:id') parameter trap in orderRoutes.js.
+
+⚙️ Technical Implementation
+
+Hardware Integration (Mic): Utilized the browser's native MediaRecorder in Checkout.jsx to request client microphone access. Captured voice inputs as audio Blobs, converted them into compact Base64 string payloads, and seamlessly injected them into the PostgreSQL orders table.
+
+Hidden Admin QR Generator: Upgraded OrderDetailsModal.jsx to dynamically generate and expose an SVG QR Code (qrcode.react) linked directly to the public storefront URL for printing onto physical Farsan boxes.
+
+The Cinematic Cassette Player: Engineered GiftPlayback.jsx as a fully public, unprotected route. Built a highly immersive, dark-mode 1970s cassette tape interface featuring spinning CSS animations and direct audio playback triggered by dynamic URL IDs.
+
+Smart Layout Architecture: Built a custom React  wrapper within App.jsx utilizing the useLocation() hook to programmatically hide the global Navbar and Footer strictly on /gift/ routes, preserving the cinematic aesthetic.
+
+✅ Milestones
+
+Full-stack Voice Gift architecture is 100% operational from microphone capture to database storage and mobile playback.
+
+Legacy browser alerts are officially purged from the application.
