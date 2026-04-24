@@ -32,14 +32,10 @@ const allowedOrigins = [
   'https://sweet-cart-admin.vercel.app'    // Update this with your Admin Vercel URL later
 ];
 
+// Remove the allowedOrigins array and the function
+// Use this one line to allow EVERYTHING for the presentation
 app.use(cors({
-  origin: function (origin, callback) {
-    if (!origin) return callback(null, true);
-    if (allowedOrigins.indexOf(origin) === -1) {
-      return callback(new Error('CORS blocked this request'), false);
-    }
-    return callback(null, true);
-  },
+  origin: true, // This automatically allows whatever URL hits it
   credentials: true
 }));
 
