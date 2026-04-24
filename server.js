@@ -11,7 +11,7 @@ const app = express();
 // ==========================================
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
-  ssl: { rejectUnauthorized: false } // Required for Supabase/Render
+  ssl: { rejectUnauthorized: false } 
 });
 
 pool.connect((err, client, release) => {
@@ -23,20 +23,25 @@ pool.connect((err, client, release) => {
 });
 
 // ==========================================
-// 2. CORS & MIDDLEWARE
+// 2. CORS & SECURITY WHITELIST
 // ==========================================
-// Allows your local VS Code AND your live Vercel link to talk to the brain
+// Here is your exact Vercel link allowing data to flow!
 const allowedOrigins = [
   'http://localhost:5173', 
-  'https://sweet-cart-client.vercel.app', // Update this with your actual Vercel URL
-  'https://sweet-cart-admin.vercel.app'    // Update this with your Admin Vercel URL later
+  'https://sweetcart-theta.vercel.app' 
 ];
 
-// Remove the allowedOrigins array and the function
-// Use this one line to allow EVERYTHING for the presentation
 app.use(cors({
-  origin: true, // This automatically allows whatever URL hits it
-  credentials: true
+  origin: function (origin, callback) {
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.indexOf(origin) === -1) {
+      return callback(new Error('CORS blocked this request'), false);
+    }
+    return callback(null, true);
+  },
+  credentials: true, 
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
 app.use(express.json());
@@ -44,7 +49,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // ==========================================
-// 3. THE "FACULTY-FRIENDLY" HOME ROUTE
+// 3. HOME ROUTE (Proof of Life)
 // ==========================================
 app.get('/', (req, res) => {
   res.json({ 
@@ -55,7 +60,7 @@ app.get('/', (req, res) => {
 });
 
 // ==========================================
-// 4. ROUTERS (Integrated from your snippet)
+// 4. ROUTERS
 // ==========================================
 app.use('/api/auth', require('./routes/authRoutes'));
 app.use('/api/products', require('./routes/productRoutes')); 
@@ -65,7 +70,7 @@ app.use('/api/addresses', require('./routes/addressRoutes'));
 app.use('/api/sliders', require('./routes/sliderRoutes'));
 
 // ==========================================
-// 5. ERROR HANDLING (404 Catch-all)
+// 5. 404 ERROR HANDLING
 // ==========================================
 app.use((req, res) => {
   res.status(404).json({ msg: `Backend route not found: ${req.originalUrl}` });
