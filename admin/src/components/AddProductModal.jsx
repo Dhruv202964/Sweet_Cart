@@ -1,12 +1,15 @@
 import React, { useState } from 'react';
+import { X, PackagePlus, IndianRupee, Box, Image, Tag, Leaf, Sparkles } from 'lucide-react';
 
 const AddProductModal = ({ onClose, onProductAdded }) => {
   const [formData, setFormData] = useState({
     name: '',
     price: '',
-    category: 'sweets', // Default option
+    category_id: '1', // Default to Sweets (ID 1)
     stock_quantity: '',
-    image_url: '' 
+    image_url: '',
+    description: '',
+    unit: 'kg'
   });
 
   const handleChange = (e) => {
@@ -23,108 +26,129 @@ const AddProductModal = ({ onClose, onProductAdded }) => {
       });
 
       if (response.ok) {
-        alert('Product Added Successfully! 🍬');
-        onProductAdded(); // Refresh the list
-        onClose(); // Close the modal
+        // Success vibe
+        onProductAdded(); 
+        onClose(); 
       } else {
-        alert('Failed to add product');
+        alert('Failed to add product. Check if the backend is running!');
       }
     } catch (error) {
       console.error(error);
-      alert('Server Error');
+      alert('Server Error: Connection refused.');
     }
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg shadow-2xl w-full max-w-lg p-6 relative animate-fade-in">
+    <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-md flex items-center justify-center z-[100] p-4 animate-in fade-in duration-300">
+      <div className="bg-white rounded-[2.5rem] shadow-2xl w-full max-w-xl p-8 relative border border-white/20 animate-in zoom-in-95 duration-300">
         
-        {/* Close Button (X) */}
+        {/* ❌ CLOSE BUTTON */}
         <button 
           onClick={onClose}
-          className="absolute top-4 right-4 text-gray-500 hover:text-red-600 font-bold text-xl"
+          className="absolute top-6 right-6 text-slate-400 hover:text-red-600 transition-colors p-2 hover:bg-red-50 rounded-full"
         >
-          &times;
+          <X size={24} strokeWidth={3} />
         </button>
 
-        <h2 className="text-2xl font-bold text-brand-red mb-6">Add New Item</h2>
-
-        <form onSubmit={handleSubmit} className="space-y-4">
-          
-          {/* Name */}
+        <div className="flex items-center gap-3 mb-8">
+          <div className="bg-red-100 p-3 rounded-2xl text-red-600">
+            <PackagePlus size={28} />
+          </div>
           <div>
-            <label className="block text-sm font-bold text-gray-700">Item Name</label>
+            <h2 className="text-2xl font-black text-slate-900 tracking-tight">Add New Signature</h2>
+            <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">Inventory Management</p>
+          </div>
+        </div>
+
+        <form onSubmit={handleSubmit} className="space-y-5">
+          
+          {/* Item Name */}
+          <div className="space-y-1.5">
+            <label className="flex items-center gap-2 text-[10px] font-black uppercase text-slate-500 tracking-widest ml-1">
+              <Tag size={12} className="text-amber-500" /> Item Name
+            </label>
             <input 
               type="text" name="name" required
-              className="w-full border p-2 rounded focus:ring-2 focus:ring-brand-orange outline-none"
-              placeholder="e.g. Kesar Peda"
+              className="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl focus:ring-4 focus:ring-red-500/5 focus:border-red-600 outline-none font-bold text-slate-800 transition-all placeholder:text-slate-300"
+              placeholder="e.g. Premium Sugar-Free Kaju Katli"
               onChange={handleChange}
             />
           </div>
 
-          {/* Row: Price & Stock */}
-          <div className="flex gap-4">
-            <div className="flex-1">
-              <label className="block text-sm font-bold text-gray-700">Price (₹)</label>
+          {/* Price & Stock Row */}
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-1.5">
+              <label className="flex items-center gap-2 text-[10px] font-black uppercase text-slate-500 tracking-widest ml-1">
+                <IndianRupee size={12} className="text-amber-500" /> Price (₹)
+              </label>
               <input 
                 type="number" name="price" required
-                className="w-full border p-2 rounded focus:ring-2 focus:ring-brand-orange outline-none"
+                className="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl focus:ring-4 focus:ring-red-500/5 focus:border-red-600 outline-none font-bold text-slate-800 transition-all"
                 placeholder="0.00"
                 onChange={handleChange}
               />
             </div>
-            <div className="flex-1">
-              <label className="block text-sm font-bold text-gray-700">Stock Qty</label>
+            <div className="space-y-1.5">
+              <label className="flex items-center gap-2 text-[10px] font-black uppercase text-slate-500 tracking-widest ml-1">
+                <Box size={12} className="text-amber-500" /> Stock Qty
+              </label>
               <input 
                 type="number" name="stock_quantity" required
-                className="w-full border p-2 rounded focus:ring-2 focus:ring-brand-orange outline-none"
+                className="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl focus:ring-4 focus:ring-red-500/5 focus:border-red-600 outline-none font-bold text-slate-800 transition-all"
                 placeholder="Available units"
                 onChange={handleChange}
               />
             </div>
           </div>
 
-          {/* Category */}
-          <div>
-            <label className="block text-sm font-bold text-gray-700">Category</label>
-            <select 
-              name="category" 
-              className="w-full border p-2 rounded focus:ring-2 focus:ring-brand-orange outline-none bg-white"
-              onChange={handleChange}
-            >
-              <option value="sweets">🍬 Sweets</option>
-              <option value="namkeen">🌶️ Namkeen (Farsan)</option>
-              <option value="seasonal">🌟 Seasonal</option>
-              <option value="other">🥡 Other</option>
-            </select>
+          {/* Category Selector */}
+          <div className="space-y-1.5">
+            <label className="flex items-center gap-2 text-[10px] font-black uppercase text-slate-500 tracking-widest ml-1">
+              <Sparkles size={12} className="text-amber-500" /> Select Category
+            </label>
+            <div className="grid grid-cols-2 gap-2">
+              {[
+                { id: '1', name: 'Sweets', icon: '🍬' },
+                { id: '2', name: 'Farsan', icon: '🌶️' },
+                { id: '3', name: 'Dairy', icon: '🥛' },
+                { id: '7', name: 'Sugar-Free', icon: '🌿' } // Linked to your DB ID 7
+              ].map((cat) => (
+                <button
+                  key={cat.id}
+                  type="button"
+                  onClick={() => setFormData({ ...formData, category_id: cat.id })}
+                  className={`flex items-center justify-center gap-2 p-3 rounded-xl border-2 font-bold text-xs transition-all ${
+                    formData.category_id === cat.id 
+                    ? (cat.id === '7' ? 'bg-emerald-50 border-emerald-500 text-emerald-700 shadow-md' : 'bg-red-50 border-red-600 text-red-700 shadow-md')
+                    : 'bg-slate-50 border-transparent text-slate-400 hover:bg-slate-100'
+                  }`}
+                >
+                  <span>{cat.icon}</span> {cat.name}
+                </button>
+              ))}
+            </div>
           </div>
 
           {/* Image URL */}
-          <div>
-            <label className="block text-sm font-bold text-gray-700">Image URL</label>
+          <div className="space-y-1.5">
+            <label className="flex items-center gap-2 text-[10px] font-black uppercase text-slate-500 tracking-widest ml-1">
+              <Image size={12} className="text-amber-500" /> Image URL
+            </label>
             <input 
               type="text" name="image_url"
-              className="w-full border p-2 rounded focus:ring-2 focus:ring-brand-orange outline-none"
-              placeholder="https://..."
+              className="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl focus:ring-4 focus:ring-red-500/5 focus:border-red-600 outline-none font-bold text-slate-800 transition-all placeholder:text-slate-300"
+              placeholder="https://images.unsplash.com/..."
               onChange={handleChange}
             />
-            <p className="text-xs text-gray-400 mt-1">Paste a link to the image for now.</p>
           </div>
 
-          {/* Buttons */}
-          <div className="flex justify-end gap-3 mt-6">
-            <button 
-              type="button" 
-              onClick={onClose}
-              className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded"
-            >
-              Cancel
-            </button>
+          {/* Submit Button */}
+          <div className="pt-4">
             <button 
               type="submit" 
-              className="px-6 py-2 bg-brand-orange text-white font-bold rounded shadow hover:bg-red-700 transition"
+              className="w-full py-5 bg-red-700 text-white font-black uppercase tracking-[0.2em] text-sm rounded-[1.5rem] shadow-xl hover:bg-red-800 hover:shadow-red-200 transition-all active:scale-[0.98] flex items-center justify-center gap-2"
             >
-              Save Item
+              Commit to Collection <Sparkles size={18} />
             </button>
           </div>
 

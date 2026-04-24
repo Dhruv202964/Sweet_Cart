@@ -5,6 +5,9 @@ require('dotenv').config();
 const dbUrl = process.env.DATABASE_URL || '';
 const isLocal = dbUrl.includes('localhost');
 
+// 👀 Quick sanity check so you know exactly what the server is reading!
+console.log(`🔌 Initializing Database... (Mode: ${isLocal ? 'Localhost' : 'Supabase Cloud'})`);
+
 const pool = new Pool({
   connectionString: dbUrl,
   // Automatically turn ON SSL for Supabase, turn OFF SSL for your laptop!

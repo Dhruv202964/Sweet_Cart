@@ -15,6 +15,7 @@ import ProtectedRoute from './components/ProtectedRoute';
 import Home from './pages/Home';
 import Dashboard from './pages/Dashboard'; // Admin Dashboard
 import Menu from './pages/Menu';
+import SugarFree from './pages/SugarFree'; // 🌿 NEW IMPORT
 import Checkout from './pages/Checkout';
 import Payment from './pages/Payment'; 
 import ProductDetails from './pages/ProductDetails';
@@ -28,17 +29,21 @@ import Contact from './pages/Contact';
 import PrivacyPolicy from './pages/PrivacyPolicy';
 import Team from './pages/Team';
 import MakeYourOwnBox from './pages/MakeYourOwnBox'; 
-import GiftPlayback from './pages/GiftPlayback'; // 📼 NEW IMPORT
+import GiftPlayback from './pages/GiftPlayback'; 
 
-// 🌟 LEAD DEV TRICK: This automatically hides the Navbar/Footer for the cinematic Audio page!
+// 🌟 LEAD DEV TRICK: Updated to handle cinematic pages AND health pages
 const Layout = ({ children }) => {
   const location = useLocation();
   const isCinematicPage = location.pathname.startsWith('/gift');
+  const isSugarFreePage = location.pathname === '/sugar-free';
 
   return (
     <>
       {!isCinematicPage && <Navbar />}
-      <main className={`min-h-screen ${isCinematicPage ? 'bg-[#0a0a0a]' : 'bg-[#FFFDF8]'}`}>
+      <main className={`min-h-screen ${
+        isCinematicPage ? 'bg-[#0a0a0a]' : 
+        isSugarFreePage ? 'bg-[#F7FDF9]' : 'bg-[#FFFDF8]'
+      }`}>
         {children}
       </main>
       {!isCinematicPage && <Footer />}
@@ -56,6 +61,7 @@ function App() {
               {/* 🟢 PUBLIC ROUTES */}
               <Route path="/" element={<Home />} />
               <Route path="/menu" element={<Menu />} /> 
+              <Route path="/sugar-free" element={<SugarFree />} /> {/* 🌿 NEW ROUTE */}
               <Route path="/make-your-own-box" element={<MakeYourOwnBox />} /> 
               <Route path="/checkout" element={<Checkout />} />
               <Route path="/payment/:order_id" element={<Payment />} /> 
@@ -76,7 +82,6 @@ function App() {
               {/* 🛡️ PROTECTED ADMIN ROUTES (THE VAULT) 🛡️ */}
               <Route element={<ProtectedRoute />}>
                 <Route path="/admin" element={<Dashboard />} />
-                {/* Any future admin pages go inside here too! */}
               </Route>
 
             </Routes>
