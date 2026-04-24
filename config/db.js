@@ -7,9 +7,9 @@ const isLocal = dbUrl.includes('localhost');
 
 const pool = new Pool({
   connectionString: dbUrl,
-  // Automatically turn ON SSL for Neon, turn OFF SSL for your laptop!
+  // Automatically turn ON SSL for Supabase, turn OFF SSL for your laptop!
   ssl: isLocal ? false : { rejectUnauthorized: false },
-  // Give your laptop more connections, but protect Neon's free tier
+  // Give your laptop more connections, but protect Supabase's free tier
   max: isLocal ? 20 : 10, 
   idleTimeoutMillis: 30000, 
   connectionTimeoutMillis: 15000, 
@@ -19,7 +19,7 @@ pool.query('SELECT NOW()', (err, res) => {
   if (err) {
     console.error('❌ Failed to connect to Database:', err.message);
   } else {
-    console.log(`✅ Successfully connected to ${isLocal ? 'LOCAL (Laptop)' : 'CLOUD (Neon)'} PostgreSQL Database!`);
+    console.log(`✅ Successfully connected to ${isLocal ? 'LOCAL (Laptop)' : 'CLOUD (Supabase)'} PostgreSQL Database!`);
   }
 });
 
