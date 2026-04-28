@@ -36,9 +36,13 @@ const AutoSlidingImage = ({ mainImage, gallery, category }) => {
 
   if (images.length === 0) return <span className="text-7xl group-hover:scale-110 transition duration-500 drop-shadow-md">{category === 'Sweets' ? '🍬' : '🥟'}</span>;
 
+  // SMART IMAGE URL
+  const currentImage = images[currentIndex];
+  const finalSrc = currentImage?.startsWith('http') ? currentImage : `http://localhost:5000${currentImage}`;
+
   return (
     <img 
-      src={images[currentIndex]} 
+      src={finalSrc} 
       alt="Product view" 
       className="w-full h-full object-cover rounded-2xl group-hover:scale-110 transition-all duration-700 ease-in-out" 
       onError={(e) => { e.target.src = 'https://images.unsplash.com/photo-1558961363-fa8fdf82db35?q=80&w=500&auto=format&fit=crop'; }}
@@ -87,6 +91,10 @@ const Home = () => {
     const uniqueCartId = isKg ? `${product.product_id}_${selectedWeight}` : `${product.product_id}_default`;
     const cartItem = cart.find(c => c.cartItemId ? c.cartItemId === uniqueCartId : c.product_id === product.product_id);
     const isSugarFree = product.category_name?.toLowerCase() === 'sugar-free' || product.category_id === 7;
+
+    const handleDecrease = () => {
+      decreaseQuantity(cartItem.cartItemId || product.product_id);
+    };
 
     return (
       <div className={`bg-white rounded-3xl shadow-sm hover:shadow-2xl transition-all duration-500 overflow-hidden border group flex flex-col relative ${isSugarFree ? 'hover:shadow-emerald-500/20 border-emerald-100' : 'hover:shadow-amber-500/10 border-amber-100'}`}>

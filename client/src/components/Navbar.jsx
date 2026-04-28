@@ -2,7 +2,7 @@ import { useState, useContext, useRef, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { CartContext } from '../context/CartContext';
 import { AuthContext } from '../context/AuthContext'; 
-import { CircleUser, Menu, X, Settings, LogOut, Package, LogIn, Globe, Sparkles, ChevronDown, Leaf, Search } from 'lucide-react'; 
+import { User, Menu, X, Settings, LogOut, Package, LogIn, Globe, Sparkles, ChevronDown, Leaf, Search } from 'lucide-react'; 
 import CartSidebar from './CartSidebar';
 import { useTranslation } from 'react-i18next';
 
@@ -154,7 +154,7 @@ const Navbar = () => {
                   className={`flex items-center gap-2 p-1 rounded-full border transition-all ${isAuthenticated ? 'bg-amber-50 border-amber-200 pr-3' : 'bg-white border-slate-100'}`}
                 >
                   <div className={`w-8 h-8 rounded-full flex items-center justify-center text-white shadow-sm ${isAuthenticated ? 'bg-amber-600' : 'bg-slate-200 text-slate-500'}`}>
-                    <CircleUser size={20} />
+                    <User size={20} />
                   </div>
                   {isAuthenticated && <span className="text-xs font-black text-slate-800 hidden lg:block truncate max-w-[100px] uppercase tracking-tighter">{user?.full_name.split(' ')[0]}</span>}
                 </button>

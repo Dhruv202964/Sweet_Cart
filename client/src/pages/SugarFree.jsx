@@ -2,6 +2,11 @@ import React, { useState, useEffect, useContext } from 'react';
 import { Plus, Sparkles, Loader2, Leaf, Heart, ShieldCheck } from 'lucide-react';
 import { CartContext } from '../context/CartContext';
 
+// 🖼️ IMPORT YOUR 3 STORY IMAGES (Ensure these exist in src/assets/)
+import story1Img from '../assets/sugarfree_story1.png';
+import story2Img from '../assets/sugarfree_story2.png';
+import story3Img from '../assets/sugarfree_story3.png';
+
 const FancyHeading = ({ word1, word2, color1 = "text-emerald-950", color2 = "text-emerald-600" }) => (
   <div className="flex flex-col items-center mb-10 text-center">
     <h2 className="text-4xl md:text-6xl font-serif font-bold tracking-wide flex gap-4">
@@ -42,8 +47,11 @@ const SugarFree = () => {
     fetch('http://localhost:5000/api/products')
       .then(res => res.json())
       .then(data => {
-        // ID 7 is Sugar-Free based on your database screenshot
         setProducts(data.filter(p => p.category_name?.toLowerCase() === 'sugar-free' || p.category_id === 7));
+        setLoading(false);
+      })
+      .catch(err => {
+        console.error("Fetch error:", err);
         setLoading(false);
       });
   }, []);
@@ -52,7 +60,11 @@ const SugarFree = () => {
     <div className="bg-white p-6 rounded-[2.5rem] border border-emerald-100 shadow-sm hover:shadow-emerald-200 transition-all flex flex-col group h-full">
       <div className="h-48 w-full bg-emerald-50 rounded-2xl mb-4 overflow-hidden flex items-center justify-center">
         {p.image_url ? (
-            <img src={p.image_url} alt={p.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform" />
+            <img 
+              src={p.image_url.startsWith('http') ? p.image_url : `http://localhost:5000${p.image_url}`} 
+              alt={p.name} 
+              className="w-full h-full object-cover group-hover:scale-110 transition-transform" 
+            />
         ) : (
             <span className="text-5xl group-hover:rotate-12 transition-transform">🌿</span>
         )}
@@ -80,52 +92,37 @@ const SugarFree = () => {
       <div className="max-w-7xl mx-auto px-4">
         <FancyHeading word1="Healthy" word2="Signatures" />
         
-        {loading ? <Loader2 className="animate-spin text-emerald-500 mx-auto" /> : (
+        {loading ? <div className="text-center py-20"><Loader2 className="animate-spin text-emerald-500 mx-auto" /></div> : (
           <>
-            {/* --- STORY 1: THE TRADITION --- */}
             <StorySection 
               title="A Promise of Pure Ghee & Zero Sugar" 
-              desc="Surat’s legacy of Pista Ghari and Kaju Katli shouldn't be off-limits. We use premium Stevia and natural fruit fibers to ensure the sweetness remains authentic, but your blood sugar stays steady." 
-              img="https://images.unsplash.com/photo-1511018556341-d16986a1c194?q=80&w=800"
+              desc="Surat’s legacy of Pista Ghari and Kaju Katli shouldn't be off-limits. We use premium Stevia and natural fruit fibers to ensure the sweetness remains authentic." 
+              img={story1Img}
               subtitle="Ancient Tradition"
             />
-            
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 my-16">
               {products.slice(0, 4).map(p => <InternalProductCard key={p.product_id} p={p} />)}
             </div>
 
-            {/* --- STORY 2 (NEW): NATURE'S CRAFT --- */}
             <StorySection 
               reverse
               title="Crafted with Nature's Best" 
-              desc="No artificial sweeteners or chemicals. We use premium California almonds, hand-picked Arabian dates, and fresh milk mawa to ensure every sugar-free bite is rich in nutrients and flavor. We don't just remove sugar; we add nutrition." 
-              img="https://images.unsplash.com/photo-1505576399279-565b52d4ac71?q=80&w=800"
+              desc="No artificial sweeteners. We use premium California almonds, Arabian dates, and fresh milk mawa to ensure every bite is rich in nutrients." 
+              img={story2Img}
               subtitle="100% Natural"
             />
-
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 my-16">
               {products.slice(4, 8).map(p => <InternalProductCard key={p.product_id} p={p} />)}
             </div>
 
-            {/* --- STORY 3: THE PROMISE --- */}
             <StorySection 
               title="Sweetness Without Sacrifice" 
-              desc="From your morning snack to yourfestive celebrations, our Sugar-Free range is designed to keep your energy steady and your heart happy. We’ve spent months perfecting these recipes so you never feel like you're compromising." 
-              img="https://images.unsplash.com/photo-1490818387583-1baba5e638af?q=80&w=800"
+              desc="From your morning snack to your festive celebrations, our Sugar-Free range is designed to keep your energy steady and your heart happy." 
+              img={story3Img}
               subtitle="The SweetCart Promise"
             />
-
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 my-16">
               {products.slice(8, 12).map(p => <InternalProductCard key={p.product_id} p={p} />)}
-            </div>
-
-            {/* --- FINAL CTA SECTION --- */}
-            <div className="bg-emerald-900 text-white rounded-[4rem] p-12 md:p-20 text-center mt-32 relative overflow-hidden">
-               <Leaf className="absolute -bottom-10 -right-10 text-emerald-800 w-64 h-64 opacity-50" />
-               <Leaf className="absolute -top-10 -left-10 text-emerald-800 w-64 h-64 opacity-20 rotate-180" />
-               <h3 className="text-4xl md:text-5xl font-serif font-bold mb-8 relative z-10">Healthy Living, Sweetly Delivered.</h3>
-               <p className="text-emerald-100 text-lg max-w-2xl mx-auto mb-10 relative z-10">Join thousands of Surat families who have switched to SweetCart Healthy Signatures for a guilt-free lifestyle.</p>
-               <button onClick={() => window.scrollTo({top: 0, behavior: 'smooth'})} className="bg-emerald-400 text-emerald-950 px-12 py-4 rounded-full font-black hover:scale-105 transition-transform relative z-10 shadow-2xl">EXPLORE MORE BITES</button>
             </div>
           </>
         )}

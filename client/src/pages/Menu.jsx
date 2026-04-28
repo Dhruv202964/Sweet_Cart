@@ -75,7 +75,7 @@ const MenuProductCard = ({ product, category }) => {
 
       <Link to={`/product/${product.product_id}`} className={`block h-56 relative overflow-hidden flex items-center justify-center p-4 cursor-pointer ${isSugarFree ? 'bg-emerald-50/50' : 'bg-amber-50'}`}>
         {product.image_url ? (
-          <img src={product.image_url} alt={product.name} className="w-full h-full object-cover rounded-2xl group-hover:scale-110 transition duration-700" />
+          <img src={product.image_url.startsWith('http') ? product.image_url : `http://localhost:5000${product.image_url}`} alt={product.name} className="w-full h-full object-cover rounded-2xl group-hover:scale-110 transition duration-700" />
         ) : (
           <span className="text-7xl group-hover:scale-110 transition duration-500">{category === 'Sweets' ? '🍬' : '🍽️'}</span>
         )}
