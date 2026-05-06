@@ -67,3 +67,43 @@ To handle heavy payloads (like the Base64 Audio-QR data) safely, the checkout pi
    ```bash
    git clone [https://github.com/Dhruv202964/Sweet_Cart.git](https://github.com/Dhruv202964/Sweet_Cart.git)
    cd Sweet_Cart
+
+2. **Install dependencies for both client and server:**
+
+    cd client && npm install
+    cd ../server && npm install
+
+3. **Environment Setup:**
+
+   Create a .env file in the server directory with the following variables:
+
+   PORT=5000
+   DATABASE_URL=your_postgresql_connection_string
+   JWT_SECRET=your_secure_secret
+   EMAIL_USER=your_smtp_email
+   EMAIL_PASS=your_smtp_password
+
+4. **Initialize the Database:**
+   Execute the schema queries located in server/database/schema.sql within your PostgreSQL instance.
+
+5. **Spin up the application:**
+
+   # Terminal 1 (Backend)
+     cd server
+     npm run dev
+
+  # Terminal 2 (Frontend)
+     cd client
+     npm run dev
+
+
+👨‍💻 Team 404 ERROR
+This architecture was engineered by Team 404 ERROR:
+
+Dhruv Thakar - Lead Full-Stack Developer & Database Architect
+
+Sneha - UI/UX & Documentation Lead
+
+Bhargavi - QA & Presentation Lead
+
+Powered by infinite coffee, late-night debugging, and React hooks.
