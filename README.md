@@ -35,7 +35,6 @@ SweetCart is a comprehensive, enterprise-grade e-commerce architecture engineere
 *   **Secure Authentication:** Protected user accounts with encrypted password resets (OTP) and beautifully styled, inline-CSS automated email delivery.
 
 ### 🛡️ The Admin Dashboard (Secure CMS)
-*   **Role-Based Access Control (RBAC):** Middleware protecting backend routes exclusively for authorized admin JWTs.
 *   **Dynamic Hero Slider CMS:** Admins can dynamically toggle active homepage promotions without touching the codebase.
 *   **Automated Inventory Intelligence:** Server-side logic to automatically lock out-of-stock items and dynamically compute all-time "Best Sellers" via aggregate SQL queries.
 *   **Integrated CRM:** A centralized inbox for customer inquiries routed directly from the storefront.
