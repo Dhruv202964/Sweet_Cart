@@ -1,5 +1,5 @@
 import './index.css';
-import React from 'react';
+import React, { useEffect } from 'react'; // 🌟 ADDED useEffect here
 import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
 
 // Context Imports
@@ -31,11 +31,16 @@ import Team from './pages/Team';
 import MakeYourOwnBox from './pages/MakeYourOwnBox'; 
 import GiftPlayback from './pages/GiftPlayback'; 
 
-// 🌟 LEAD DEV TRICK: Updated to handle cinematic pages AND health pages
+// 🌟 LEAD DEV TRICK: Updated to handle cinematic pages, health pages, AND Auto-Scrolling
 const Layout = ({ children }) => {
   const location = useLocation();
   const isCinematicPage = location.pathname.startsWith('/gift');
   const isSugarFreePage = location.pathname === '/sugar-free';
+
+  // 🚀 THE FIX: This forces the window to the top every time the URL changes!
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [location.pathname]);
 
   return (
     <>

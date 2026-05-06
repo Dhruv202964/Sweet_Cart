@@ -15,7 +15,7 @@ const PrivacyPolicy = () => {
           </div>
           <div>
             <h1 className="text-4xl font-black text-gray-900 tracking-tighter">{t('privacy_title', 'Privacy Policy')}</h1>
-            <p className="text-gray-500 font-medium mt-1">{t('privacy_last_updated', 'Last Updated: March 2026')}</p>
+            <p className="text-gray-500 font-medium mt-1">{t('privacy_last_updated', 'Last Updated: May 2026')}</p>
           </div>
         </div>
 
@@ -47,9 +47,15 @@ const PrivacyPolicy = () => {
             <p>{t('privacy_sec4_p', 'Our application uses browser local storage and session storage to maintain your active shopping cart and keep you securely logged into your account. These are essential functional tools required for the e-commerce platform to operate seamlessly.')}</p>
           </section>
 
+          {/* 🌟 NEW AUDIO-QR COMPLIANCE SECTION */}
           <section>
-            <h2 className="text-2xl font-black text-gray-900 mb-4">{t('privacy_sec5_title', '5. Account Deletion')}</h2>
-            <p>{t('privacy_sec5_p', 'You have the right to request the deletion of your personal data at any time. You can permanently delete your account, including all saved addresses and order history, directly from the "Danger Zone" within your My Account dashboard.')}</p>
+            <h2 className="text-2xl font-black text-gray-900 mb-4">{t('privacy_sec5_title', '5. Audio-QR & Voice Data')}</h2>
+            <p className="text-gray-700 font-medium leading-relaxed">{t('privacy_sec5_p', 'Our unique Audio-QR gifting feature allows you to record custom voice messages for recipients. These audio files are securely encoded and stored strictly for generating the playback experience. We do not use your voice data for any analytical or marketing purposes, and this data is permanently purged from our servers if the associated account is deleted.')}</p>
+          </section>
+
+          <section>
+            <h2 className="text-2xl font-black text-gray-900 mb-4">{t('privacy_sec6_title', '6. Account Deletion')}</h2>
+            <p>{t('privacy_sec6_p', 'You have the right to request the deletion of your personal data at any time. You can permanently delete your account, including all saved addresses and order history, directly from the "Danger Zone" within your My Account dashboard.')}</p>
           </section>
 
           <section className="bg-amber-50 p-6 rounded-2xl border border-amber-200 mt-10">

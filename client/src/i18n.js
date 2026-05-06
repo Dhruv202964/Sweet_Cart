@@ -125,7 +125,7 @@ const resources = {
 
       // --- PRIVACY POLICY ---
       "privacy_title": "Privacy Policy",
-      "privacy_last_updated": "Last Updated: March 2026",
+      "privacy_last_updated": "Last Updated: May 2026",
       "privacy_sec1_title": "1. Information We Collect",
       "privacy_sec1_p": "At SweetCart, we are committed to protecting your privacy. We collect information that you provide directly to us when you register for an account, place an order, or contact our support team. This includes your full name, email address, mobile phone number, and delivery addresses.",
       "privacy_sec2_title": "2. How We Use Your Data",
@@ -138,8 +138,10 @@ const resources = {
       "privacy_sec3_p": "We implement strict enterprise-grade security measures to maintain the safety of your personal information. Your passwords are cryptographically hashed using industry-standard bcrypt algorithms before being stored in our secure PostgreSQL database. We do not store plain-text passwords.",
       "privacy_sec4_title": "4. Cookies and Local Storage",
       "privacy_sec4_p": "Our application uses browser local storage and session storage to maintain your active shopping cart and keep you securely logged into your account. These are essential functional tools required for the e-commerce platform to operate seamlessly.",
-      "privacy_sec5_title": "5. Account Deletion",
-      "privacy_sec5_p": "You have the right to request the deletion of your personal data at any time. You can permanently delete your account, including all saved addresses and order history, directly from the 'Danger Zone' within your My Account dashboard.",
+      "privacy_sec5_title": "5. Audio-QR & Voice Data",
+      "privacy_sec5_p": "Our unique Audio-QR gifting feature allows you to record custom voice messages for recipients. These audio files are securely encoded and stored strictly for generating the playback experience. We do not use your voice data for any analytical or marketing purposes, and this data is permanently purged from our servers if the associated account is deleted.",
+      "privacy_sec6_title": "6. Account Deletion",
+      "privacy_sec6_p": "You have the right to request the deletion of your personal data at any time. You can permanently delete your account, including all saved addresses and order history, directly from the 'Danger Zone' within your My Account dashboard.",
       "privacy_contact_title": "Contact Us Regarding Privacy",
       "privacy_contact_p": "If you have any questions about this Privacy Policy or how your data is handled, please contact our administrative team at"
     }
@@ -266,7 +268,7 @@ const resources = {
 
       // --- PRIVACY POLICY ---
       "privacy_title": "गोपनीयता नीति",
-      "privacy_last_updated": "अंतिम अपडेट: मार्च 2026",
+      "privacy_last_updated": "अंतिम अपडेट: मई 2026",
       "privacy_sec1_title": "1. हम क्या जानकारी एकत्र करते हैं",
       "privacy_sec1_p": "स्वीटकार्ट में, हम आपकी गोपनीयता की रक्षा करने के लिए प्रतिबद्ध हैं। जब आप खाता बनाते हैं, ऑर्डर देते हैं, या हमारी सहायता टीम से संपर्क करते हैं, तो हम वह जानकारी एकत्र करते हैं जो आप सीधे हमें प्रदान करते हैं। इसमें आपका पूरा नाम, ईमेल पता, मोबाइल नंबर और डिलीवरी पते शामिल हैं।",
       "privacy_sec2_title": "2. हम आपके डेटा का उपयोग कैसे करते हैं",
@@ -279,8 +281,10 @@ const resources = {
       "privacy_sec3_p": "हम आपकी व्यक्तिगत जानकारी की सुरक्षा बनाए रखने के लिए सख्त एंटरप्राइज़-ग्रेड सुरक्षा उपाय लागू करते हैं। हमारे सुरक्षित PostgreSQL डेटाबेस में संग्रहीत होने से पहले आपके पासवर्ड को उद्योग-मानक bcrypt एल्गोरिदम का उपयोग करके क्रिप्टोग्राफ़िक रूप से हैश किया जाता है। हम सादे-पाठ (plain-text) पासवर्ड संग्रहीत नहीं करते हैं।",
       "privacy_sec4_title": "4. कुकीज़ और लोकल स्टोरेज",
       "privacy_sec4_p": "हमारा एप्लिकेशन आपके सक्रिय शॉपिंग कार्ट को बनाए रखने और आपको आपके खाते में सुरक्षित रूप से लॉग इन रखने के लिए ब्राउज़र लोकल स्टोरेज और सेशन स्टोरेज का उपयोग करता है। ई-कॉमर्स प्लेटफ़ॉर्म को निर्बाध रूप से संचालित करने के लिए ये आवश्यक कार्यात्मक उपकरण हैं।",
-      "privacy_sec5_title": "5. खाता हटाना",
-      "privacy_sec5_p": "आपको किसी भी समय अपने व्यक्तिगत डेटा को हटाने का अनुरोध करने का अधिकार है। आप अपने 'माई अकाउंट' डैशबोर्ड के 'डेंजर ज़ोन' से अपने खाते को स्थायी रूप से हटा सकते हैं, जिसमें सभी सहेजे गए पते और ऑर्डर इतिहास शामिल हैं।",
+      "privacy_sec5_title": "5. ऑडियो-क्यूआर और वॉयस डेटा",
+      "privacy_sec5_p": "हमारी अनूठी ऑडियो-क्यूआर उपहार सुविधा आपको प्राप्तकर्ताओं के लिए कस्टम वॉयस संदेश रिकॉर्ड करने की अनुमति देती है। प्लेबैक अनुभव उत्पन्न करने के लिए इन ऑडियो फ़ाइलों को सुरक्षित रूप से एन्कोड और संग्रहीत किया जाता है। हम किसी भी विश्लेषणात्मक या मार्केटिंग उद्देश्यों के लिए आपके वॉयस डेटा का उपयोग नहीं करते हैं, और यदि संबद्ध खाता हटा दिया जाता है तो यह डेटा हमारे सर्वर से स्थायी रूप से हटा दिया जाता है।",
+      "privacy_sec6_title": "6. खाता हटाना",
+      "privacy_sec6_p": "आपको किसी भी समय अपने व्यक्तिगत डेटा को हटाने का अनुरोध करने का अधिकार है। आप अपने 'माई अकाउंट' डैशबोर्ड के 'डेंजर ज़ोन' से अपने खाते को स्थायी रूप से हटा सकते हैं, जिसमें सभी सहेजे गए पते और ऑर्डर इतिहास शामिल हैं।",
       "privacy_contact_title": "गोपनीयता के संबंध में हमसे संपर्क करें",
       "privacy_contact_p": "यदि इस गोपनीयता नीति या आपके डेटा को कैसे संभाला जाता है, इसके बारे में आपके कोई प्रश्न हैं, तो कृपया हमारी प्रशासनिक टीम से संपर्क करें"
     }
@@ -389,7 +393,7 @@ const resources = {
       "loc_l2": "અડાજણ, સુરત, ગુજરાત 395009",
       "phone_title": "ફોન સપોર્ટ",
       "phone_l1": "+91 98765 43210",
-      "phone_l2": "સોમ-શનિ: સવારે 9 થી રાત્રે 8",
+      "phone_l2": "સોમ-શનि: સવારે 9 થી રાત્રે 8",
       "email_title": "અમને ઇમેઇલ કરો",
       "email_l1": "support@sweetcart.com",
       "email_l2": "અમે 24 કલાકમાં જવાબ આપીએ છીએ.",
@@ -407,7 +411,7 @@ const resources = {
 
       // --- PRIVACY POLICY ---
       "privacy_title": "ગોપનીયતા નીતિ",
-      "privacy_last_updated": "છેલ્લું અપડેટ: માર્ચ 2026",
+      "privacy_last_updated": "છેલ્લું અપડેટ: મે 2026",
       "privacy_sec1_title": "1. અમે કઈ માહિતી એકત્રિત કરીએ છીએ",
       "privacy_sec1_p": "સ્વીટકાર્ટ ખાતે, અમે તમારી ગોપનીયતાના રક્ષણ માટે પ્રતિબદ્ધ છીએ. જ્યારે તમે એકાઉન્ટ માટે નોંધણી કરો છો, ઓર્ડર આપો છો અથવા અમારી સપોર્ટ ટીમનો સંપર્ક કરો છો ત્યારે તમે અમને સીધી પ્રદાન કરો છો તે માહિતી અમે એકત્રિત કરીએ છીએ. આમાં તમારું પૂરું નામ, ઇમેઇલ સરનામું, મોબાઇલ ફોન નંબર અને ડિલિવરી સરનામાં શામેલ છે.",
       "privacy_sec2_title": "2. અમે તમારા ડેટાનો ઉપયોગ કેવી રીતે કરીએ છીએ",
@@ -420,8 +424,10 @@ const resources = {
       "privacy_sec3_p": "અમે તમારી વ્યક્તિગત માહિતીની સુરક્ષા જાળવવા માટે કડક એન્ટરપ્રાઇઝ-ગ્રેડ સુરક્ષા પગલાં અમલમાં મૂકીએ છીએ. અમારા સુરક્ષિત PostgreSQL ડેટાબેઝમાં સંગ્રહિત થતાં પહેલાં તમારા પાસવર્ડ્સને ઉદ્યોગ-માનક bcrypt અલ્ગોરિધમ્સનો ઉપયોગ કરીને ક્રિપ્ટોગ્રાફિકલી હેશ કરવામાં આવે છે. અમે સાદા-ટેક્સ્ટ પાસવર્ડ્સ સંગ્રહિત કરતા નથી.",
       "privacy_sec4_title": "4. કૂકીઝ અને લોકલ સ્ટોરેજ",
       "privacy_sec4_p": "અમારી એપ્લિકેશન તમારા સક્રિય શોપિંગ કાર્ટને જાળવવા અને તમને તમારા એકાઉન્ટમાં સુરક્ષિત રીતે લૉગ ઇન રાખવા માટે બ્રાઉઝર લોકલ સ્ટોરેજ અને સેશન સ્ટોરેજનો ઉપયોગ કરે છે. ઇ-કોમર્સ પ્લેટફોર્મને એકીકૃત રીતે ચલાવવા માટે આ આવશ્યક કાર્યાત્મક સાધનો છે.",
-      "privacy_sec5_title": "5. એકાઉન્ટ કાઢી નાખવું",
-      "privacy_sec5_p": "તમને કોઈપણ સમયે તમારો વ્યક્તિગત ડેટા કાઢી નાખવાની વિનંતી કરવાનો અધિકાર છે. તમે તમારા 'માય એકાઉન્ટ' ડેશબોર્ડની અંદર 'ડેન્જર ઝોન' માંથી સીધા જ તમારા એકાઉન્ટને કાયમ માટે કાઢી શકો છો, જેમાં તમામ સાચવેલા સરનામાં અને ઓર્ડર ઇતિહાસનો સમાવેશ થાય છે.",
+      "privacy_sec5_title": "5. ઑડિઓ-ક્યૂઆર અને વૉઇસ ડેટા",
+      "privacy_sec5_p": "અમારી અનોખી ઑડિઓ-ક્યૂઆર ગિફ્ટ સુવિધા તમને પ્રાપ્તકર્તાઓ માટે કસ્ટમ વૉઇસ સંદેશાઓ રેકોર્ડ કરવાની મંજૂરી આપે છે. આ ઑડિઓ ફાઇલો સુરક્ષિત રીતે એન્કોડ કરવામાં આવે છે અને પ્લેબેક અનુભવ જનરેટ કરવા માટે સંગ્રહિત થાય છે. અમે કોઈપણ વિશ્લેષણાત્મક અથવા માર્કેટિંગ હેતુઓ માટે તમારા વૉઇસ ડેટાનો ઉપયોગ કરતા નથી, અને જો સંકળાયેલ એકાઉન્ટ કાઢી નાખવામાં આવે તો આ ડેટા અમારા સર્વર્સમાંથી કાયમ માટે કાઢી નાખવામાં આવે છે.",
+      "privacy_sec6_title": "6. એકાઉન્ટ કાઢી નાખવું",
+      "privacy_sec6_p": "તમને કોઈપણ સમયે તમારો વ્યક્તિગત ડેટા કાઢી નાખવાની વિનંતી કરવાનો અધિકાર છે. તમે તમારા 'માય એકાઉન્ટ' ડેશબોર્ડની અંદર 'ડેન્જર ઝોન' માંથી સીધા જ તમારા એકાઉન્ટને કાયમ માટે કાઢી શકો છો, જેમાં તમામ સાચવેલા સરનામાં અને ઓર્ડર ઇતિહાસનો સમાવેશ થાય છે.",
       "privacy_contact_title": "ગોપનીયતા સંબંધિત અમારો સંપર્ક કરો",
       "privacy_contact_p": "જો તમને આ ગોપનીયતા નીતિ અથવા તમારો ડેટા કેવી રીતે હેન્ડલ કરવામાં આવે છે તે વિશે કોઈ પ્રશ્નો હોય, તો કૃપા કરીને અમારી વહીવટી ટીમનો સંપર્ક કરો"
     }

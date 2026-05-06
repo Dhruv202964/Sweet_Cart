@@ -136,7 +136,7 @@ exports.deleteAccount = async (req, res) => {
   }
 };
 
-// 🌟 5. Send OTP for Password Reset (UPDATED: 2 Mins + Premium Template)
+// 🌟 5. Send OTP for Password Reset (Premium Enterprise Template)
 exports.forgotPassword = async (req, res) => {
   try {
       const { email } = req.body;
@@ -149,7 +149,7 @@ exports.forgotPassword = async (req, res) => {
       // Generate a 6-digit OTP
       const otp = Math.floor(100000 + Math.random() * 900000).toString();
       
-      // 🌟 UPDATED: Set expiry for EXACTLY 2 minutes from now
+      // Set expiry for EXACTLY 2 minutes from now
       const expiry = new Date(Date.now() + 2 * 60000);
 
       // Save OTP to database
@@ -158,62 +158,50 @@ exports.forgotPassword = async (req, res) => {
           [otp, expiry, email]
       );
 
-      // 🌟 UPDATED: Premium Dashboard Email Template
+      // 🌟 The Premium SweetCart OTP Email Template
       const mailOptions = {
           from: process.env.EMAIL_USER,
           to: email,
-          subject: 'SweetCart - Your Verification Code', 
+          subject: 'SweetCart - Your Secure Verification Code', 
           html: `
-              <!DOCTYPE html>
-              <html>
-              <head>
-                  <meta charset="UTF-8">
-                  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                  <title>SweetCart Verification</title>
-              </head>
-              <body style="margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f3f4f6;">
-                  <table border="0" cellpadding="0" cellspacing="0" width="100%" style="padding: 40px 0;">
-                      <tr>
-                          <td align="center">
-                              <table border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 500px; background-color: #ffffff; border-radius: 8px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
-                                  <tr>
-                                      <td align="center" style="padding: 30px 0 20px 0; border-bottom: 2px solid #f3f4f6;">
-                                          <h1 style="margin: 0; color: #d97706; font-size: 28px; font-weight: 900; letter-spacing: 1px;">SweetCart</h1>
-                                      </td>
-                                  </tr>
-                                  <tr>
-                                      <td style="padding: 30px 40px; text-align: center;">
-                                          <h2 style="margin: 0 0 15px 0; color: #1f2937; font-size: 20px;">Password Reset Request</h2>
-                                          <p style="margin: 0 0 25px 0; color: #4b5563; font-size: 15px; line-height: 1.5;">
-                                              We received a request to reset your SweetCart password. Enter the following verification code to continue:
-                                          </p>
-                                          
-                                          <div style="background-color: #fffbeb; border: 2px dashed #f59e0b; border-radius: 8px; padding: 20px; margin-bottom: 25px;">
-                                              <h1 style="margin: 0; font-size: 42px; font-weight: 700; color: #d97706; letter-spacing: 10px;">${otp}</h1>
-                                          </div>
-                                          
-                                          <p style="margin: 0 0 20px 0; color: #ef4444; font-size: 14px; font-weight: 600;">
-                                              ⏱️ This code expires in exactly 2 minutes.
-                                          </p>
-                                          <p style="margin: 0; color: #6b7280; font-size: 13px; line-height: 1.5;">
-                                              If you didn't request this change, please ignore this email to keep your account secure.
-                                          </p>
-                                      </td>
-                                  </tr>
-                                  <tr>
-                                      <td align="center" style="padding: 20px 40px; background-color: #f9fafb; border-bottom-left-radius: 8px; border-bottom-right-radius: 8px;">
-                                          <p style="margin: 0; color: #9ca3af; font-size: 12px;">
-                                              &copy; 2026 Team 404 ERROR. All rights reserved.<br>
-                                              SweetCart Ecosystem
-                                          </p>
-                                      </td>
-                                  </tr>
-                              </table>
-                          </td>
-                      </tr>
-                  </table>
-              </body>
-              </html>
+          <div style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; max-width: 600px; margin: 0 auto; background-color: #FFFDF8; border: 1px solid #EAEAEA; border-radius: 16px; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.05);">
+              
+              <!-- Header with Brand Gradient -->
+              <div style="background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%); padding: 40px 30px; text-align: center;">
+                  <h1 style="color: #FFFFFF; margin: 0; font-size: 32px; font-weight: 900; letter-spacing: 1px;">SweetCart</h1>
+                  <p style="color: #FFFDE7; margin: 10px 0 0 0; font-size: 16px; font-weight: 500;">Premium Sweets & Snacks</p>
+              </div>
+
+              <!-- Main Body -->
+              <div style="padding: 40px 40px 30px; background-color: #FFFFFF; text-align: center;">
+                  <h2 style="color: #1F2937; font-size: 24px; font-weight: 800; margin-top: 0; margin-bottom: 20px;">Secure Password Reset</h2>
+                  
+                  <p style="color: #4B5563; font-size: 16px; line-height: 1.6; margin-bottom: 30px;">
+                      We received a request to reset your SweetCart password. Enter the secure verification code below to authorize this change:
+                  </p>
+
+                  <!-- The Highlighted OTP Box -->
+                  <div style="background-color: #FFFBEB; border: 2px dashed #F59E0B; border-radius: 12px; padding: 25px; margin: 0 auto 30px; max-width: 300px;">
+                      <h1 style="margin: 0; font-size: 48px; font-weight: 900; color: #D97706; letter-spacing: 12px; text-align: center;">${otp}</h1>
+                  </div>
+
+                  <p style="color: #EF4444; font-size: 15px; font-weight: 700; margin-bottom: 25px;">
+                      ⏱️ This code expires in exactly 2 minutes.
+                  </p>
+
+                  <p style="color: #9CA3AF; font-size: 13px; line-height: 1.5; border-top: 1px solid #F3F4F6; padding-top: 25px;">
+                      If you didn't request a password reset, you can safely ignore this email. Your SweetCart account remains completely secure.
+                  </p>
+              </div>
+
+              <!-- Footer -->
+              <div style="background-color: #1F2937; padding: 25px; text-align: center;">
+                  <p style="color: #9CA3AF; font-size: 12px; margin: 0; line-height: 1.6;">
+                      &copy; ${new Date().getFullYear()} SweetCart Enterprise. All rights reserved.<br>
+                      Engineered and secured by <strong>Team 404 ERROR</strong>.
+                  </p>
+              </div>
+          </div>
           `
       };
 

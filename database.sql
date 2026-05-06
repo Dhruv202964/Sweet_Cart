@@ -1,7 +1,7 @@
 -- ############################################################
 -- # SWEET_CART DATABASE SCHEMA - LOCAL POSTGRESQL ENVIRONMENT
 -- # Team: 404 ERROR 
--- # Updated: April 25, 2026 (Day 33: Brand Identity & Healthy Signatures)
+-- # Updated: May 7, 2026 (Day 34: Enterprise Documentation & System Logic)
 -- ############################################################
 
 -- 0. SYSTEM LOCALIZATION
@@ -44,7 +44,7 @@ CREATE TABLE categories (
     description TEXT
 );
 
--- 3. PRODUCTS TABLE (Upgraded for Multi-Image Galleries & Rich Ingredients)
+-- 3. PRODUCTS TABLE (Upgraded for Multi-Image Galleries, Rich Ingredients & Auto-Lockdown)
 CREATE TABLE products (
     product_id SERIAL PRIMARY KEY,
     category_id INT REFERENCES categories(category_id) ON DELETE SET NULL,
@@ -53,6 +53,7 @@ CREATE TABLE products (
     ingredients TEXT, 
     price DECIMAL(10, 2) NOT NULL,
     stock_quantity INT DEFAULT 0,
+    low_stock_threshold INT DEFAULT 5, -- 🚨 NEW: For Auto Low-Stock Lockdown
     unit VARCHAR(10) DEFAULT 'kg', 
     image_url TEXT,
     gallery_images TEXT[], 
@@ -125,6 +126,25 @@ CREATE TABLE daily_stats (
     total_visitors INT DEFAULT 0
 );
 
+-- 9. CARTS TABLE (🛒 NEW: For Abandoned Cart Recovery Emails)
+CREATE TABLE carts (
+    cart_id SERIAL PRIMARY KEY,
+    user_id INT REFERENCES users(user_id) ON DELETE CASCADE,
+    status VARCHAR(20) DEFAULT 'active' CHECK (status IN ('active', 'converted', 'abandoned')),
+    reminder_sent BOOLEAN DEFAULT FALSE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- 10. CART ITEMS TABLE (🛒 NEW: Session memory)
+CREATE TABLE cart_items (
+    cart_item_id SERIAL PRIMARY KEY,
+    cart_id INT REFERENCES carts(cart_id) ON DELETE CASCADE,
+    product_id INT REFERENCES products(product_id) ON DELETE CASCADE,
+    quantity INT NOT NULL,
+    weight_selected VARCHAR(20) DEFAULT '1KG'
+);
+
 -- ############################################################
 -- # SYSTEM SEEDING DATA (Core Dependencies)
 -- ############################################################
@@ -132,29 +152,29 @@ CREATE TABLE daily_stats (
 -- Initial Categories (Including specialized Niche Category)
 INSERT INTO categories (name) VALUES ('Sweets'), ('Farsan'), ('Dairy'), ('Sugar-Free');
 
--- Default Admin Account (Password is hashed 'admin123')
+-- Default Admin Account
 INSERT INTO users (full_name, email, password_hash, phone, role) VALUES 
 ('Admin', 'admin@sweetcart.com', '$2a$10$X...', '9876543210', 'admin'); 
 
 -- 🌿 MISSION C: INJECT HEALTH-CENTRIC SIGNATURE DATA (12 PRODUCTS)
-INSERT INTO products (name, description, price, stock_quantity, unit, category_id, is_bestseller, ingredients)
+INSERT INTO products (name, description, price, stock_quantity, low_stock_threshold, unit, category_id, is_bestseller, ingredients)
 VALUES 
-('Sugar-Free Pista Ghari', 'The authentic Surat legacy, completely guilt-free.', 850.00, 50, 'KG', (SELECT category_id FROM categories WHERE name = 'Sugar-Free'), true, 'Premium Pistachios, Pure Ghee, Stevia Extract, and Cardamom.'),
-('Sugar-Free Kaju Katli', 'Classic diamond fudge with zero sugar spike.', 900.00, 100, 'KG', (SELECT category_id FROM categories WHERE name = 'Sugar-Free'), true, 'Premium Cashews, Erythritol, Rose Water, and Edible Silver Foil.'),
-('Sugar-Free Khajur Pak', 'Naturally sweetened entirely with premium dry fruits.', 1200.00, 40, 'KG', (SELECT category_id FROM categories WHERE name = 'Sugar-Free'), false, 'Arabian Dates, Almonds, Walnuts, Nutmeg, and Ghee.'),
-('Sugar-Free Anjeer Roll', 'Rich fig rolls packed with crunch.', 1100.00, 60, 'KG', (SELECT category_id FROM categories WHERE name = 'Sugar-Free'), true, 'Dried Figs (Anjeer), Roasted Cashews, Poppy Seeds, and Almonds.'),
-('Sugar-Free Malai Peda', 'Soft, milky, and perfectly sweetened without the sugar.', 650.00, 80, 'KG', (SELECT category_id FROM categories WHERE name = 'Sugar-Free'), false, 'Fresh Milk Mawa, Stevia, Saffron strands, and Pistachio dust.'),
-('Sugar-Free Baked Shakarpara', 'The ultimate tea-time snack, baked not fried!', 400.00, 120, 'KG', (SELECT category_id FROM categories WHERE name = 'Sugar-Free'), false, 'Whole Wheat Flour, Zero-Calorie Sweetener, Cow Ghee, and Cardamom.'),
-('Sugar-Free Badam Barfi', 'Pure almond goodness.', 1050.00, 45, 'KG', (SELECT category_id FROM categories WHERE name = 'Sugar-Free'), true, 'California Almonds, Stevia Sweetener, Clarified Butter, and Saffron.'),
-('Sugar-Free Moong Dal Halwa', 'Rich, warm, and comforting.', 700.00, 30, 'KG', (SELECT category_id FROM categories WHERE name = 'Sugar-Free'), false, 'Yellow Moong Dal, Pure Desi Ghee, Almond Milk, and Erythritol.'),
-('Sugar-Free Diet Chivda', 'Savory, crunchy, and diabetic-friendly.', 350.00, 150, 'KG', (SELECT category_id FROM categories WHERE name = 'Sugar-Free'), false, 'Roasted Poha, Peanuts, Curry Leaves, Turmeric, and Pink Salt.'),
-('Sugar-Free Mysore Pak', 'Melt-in-your-mouth texture from the South.', 800.00, 55, 'KG', (SELECT category_id FROM categories WHERE name = 'Sugar-Free'), true, 'Roasted Gram Flour, Generous Ghee, and Natural Stevia Blend.'),
-('Sugar-Free Pista Roll', 'Vibrant and nutty.', 1150.00, 40, 'KG', (SELECT category_id FROM categories WHERE name = 'Sugar-Free'), false, 'Pure Mawa, Crushed Pistachios, Cashew Base, and Zero-Calorie Sweetener.'),
-('Sugar-Free Dry Fruit Kachori', 'A mini savory-sweet bite.', 550.00, 90, 'KG', (SELECT category_id FROM categories WHERE name = 'Sugar-Free'), false, 'Whole Wheat Shell, Raisins, Cashews, Spices, and Stevia dust.');
+('Sugar-Free Pista Ghari', 'The authentic Surat legacy, completely guilt-free.', 850.00, 50, 5, 'KG', (SELECT category_id FROM categories WHERE name = 'Sugar-Free'), true, 'Premium Pistachios, Pure Ghee, Stevia Extract, and Cardamom.'),
+('Sugar-Free Kaju Katli', 'Classic diamond fudge with zero sugar spike.', 900.00, 100, 5, 'KG', (SELECT category_id FROM categories WHERE name = 'Sugar-Free'), true, 'Premium Cashews, Erythritol, Rose Water, and Edible Silver Foil.'),
+('Sugar-Free Khajur Pak', 'Naturally sweetened entirely with premium dry fruits.', 1200.00, 40, 5, 'KG', (SELECT category_id FROM categories WHERE name = 'Sugar-Free'), false, 'Arabian Dates, Almonds, Walnuts, Nutmeg, and Ghee.'),
+('Sugar-Free Anjeer Roll', 'Rich fig rolls packed with crunch.', 1100.00, 60, 5, 'KG', (SELECT category_id FROM categories WHERE name = 'Sugar-Free'), true, 'Dried Figs (Anjeer), Roasted Cashews, Poppy Seeds, and Almonds.'),
+('Sugar-Free Malai Peda', 'Soft, milky, and perfectly sweetened without the sugar.', 650.00, 80, 5, 'KG', (SELECT category_id FROM categories WHERE name = 'Sugar-Free'), false, 'Fresh Milk Mawa, Stevia, Saffron strands, and Pistachio dust.'),
+('Sugar-Free Baked Shakarpara', 'The ultimate tea-time snack, baked not fried!', 400.00, 120, 5, 'KG', (SELECT category_id FROM categories WHERE name = 'Sugar-Free'), false, 'Whole Wheat Flour, Zero-Calorie Sweetener, Cow Ghee, and Cardamom.'),
+('Sugar-Free Badam Barfi', 'Pure almond goodness.', 1050.00, 45, 5, 'KG', (SELECT category_id FROM categories WHERE name = 'Sugar-Free'), true, 'California Almonds, Stevia Sweetener, Clarified Butter, and Saffron.'),
+('Sugar-Free Moong Dal Halwa', 'Rich, warm, and comforting.', 700.00, 30, 5, 'KG', (SELECT category_id FROM categories WHERE name = 'Sugar-Free'), false, 'Yellow Moong Dal, Pure Desi Ghee, Almond Milk, and Erythritol.'),
+('Sugar-Free Diet Chivda', 'Savory, crunchy, and diabetic-friendly.', 350.00, 150, 5, 'KG', (SELECT category_id FROM categories WHERE name = 'Sugar-Free'), false, 'Roasted Poha, Peanuts, Curry Leaves, Turmeric, and Pink Salt.'),
+('Sugar-Free Mysore Pak', 'Melt-in-your-mouth texture from the South.', 800.00, 55, 5, 'KG', (SELECT category_id FROM categories WHERE name = 'Sugar-Free'), true, 'Roasted Gram Flour, Generous Ghee, and Natural Stevia Blend.'),
+('Sugar-Free Pista Roll', 'Vibrant and nutty.', 1150.00, 40, 5, 'KG', (SELECT category_id FROM categories WHERE name = 'Sugar-Free'), false, 'Pure Mawa, Crushed Pistachios, Cashew Base, and Zero-Calorie Sweetener.'),
+('Sugar-Free Dry Fruit Kachori', 'A mini savory-sweet bite.', 550.00, 90, 5, 'KG', (SELECT category_id FROM categories WHERE name = 'Sugar-Free'), false, 'Whole Wheat Shell, Raisins, Cashews, Spices, and Stevia dust.');
 
 -- Sample Bestseller Product
-INSERT INTO products (category_id, name, price, stock_quantity, unit, ingredients, gallery_images, is_bestseller) VALUES 
-(1, 'Premium Pista Ghari', 850.00, 50, 'kg', 'Pure Ghee, Pistachios, Sugar, Mawa', ARRAY['pista_1.jpg', 'pista_2.jpg'], TRUE);
+INSERT INTO products (category_id, name, price, stock_quantity, low_stock_threshold, unit, ingredients, gallery_images, is_bestseller) VALUES 
+(1, 'Premium Pista Ghari', 850.00, 50, 5, 'kg', 'Pure Ghee, Pistachios, Sugar, Mawa', ARRAY['pista_1.jpg', 'pista_2.jpg'], TRUE);
 
 -- Initial Fallback Hero Slider
 INSERT INTO hero_sliders (title, subtitle, image_url, cta_text, cta_link, is_active) VALUES 
